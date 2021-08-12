@@ -398,7 +398,6 @@ else
 		git ls-files -z | sudo rsync --files-from=- -0cpt . "$mnt/${PROJECT_NAME}"
 	else
 		sudo mkdir -p -m 0755 ${mnt}/${PROJECT_NAME}/{selftests,travis-ci}
-		tree --du -shaC "${REPO_ROOT}/selftests/bpf"
 		sudo rsync -avm "${REPO_ROOT}/selftests/bpf" "$mnt/${PROJECT_NAME}/selftests/"
 		sudo rsync -avm "${REPO_ROOT}/travis-ci/vmtest" "$mnt/${PROJECT_NAME}/travis-ci/"
         fi

@@ -13,6 +13,9 @@ CHECKOUT_KERNEL=${CHECKOUT_KERNEL:-1}
 echo "KERNEL: $KERNEL"
 echo
 
+#add CI folder to git in current state
+git add travis-ci/vmtest
+
 # Build latest pahole
 ${VMTEST_ROOT}/build_pahole.sh travis-ci/vmtest/pahole
 
