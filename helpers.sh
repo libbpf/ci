@@ -22,3 +22,23 @@ travis_fold() {
     echo -e "$line"
   fi
 }
+
+__print() {
+  local TITLE=""
+  if [[ -n $2 ]]; then
+      TITLE=" title=$2"
+  fi
+  echo "::$1${TITLE}::$3"
+}
+
+# $1 - title
+# $2 - message
+print_error() {
+  __print error $1 $2
+}
+
+# $1 - title
+# $2 - message
+print_notice() {
+  __print notice $1 $2
+}

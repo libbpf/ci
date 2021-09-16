@@ -1,0 +1,35 @@
+name: 'prepare-rootfs'
+description: 'build rootfs
+1. download base root img to /tmp/root.img
+2. either copy "/vmlinux" or download "vmlinux" to "/boot" in image
+3. (FIXME) either copy "/vmlinuz" from build dir or download "vmlinuz" to workspace root
+4. copy hardcoded "selftests" and "travis-ci/vmtest" directory to "/$PROJECT_NAME" in root image
+5. (FIXME) run bpftool check and save result in $GITHUB_WORKSPACE/bpftool_exitstatus
+'
+inputs:
+  project-name:
+    description: 'project name'
+    required: true
+  arch:
+    description: 'arch'
+    required: true
+  kernel:
+    description: 'kernel version'
+    default: 'LATEST'
+    required: true
+  kernel-root:
+    description: 'kernel source dir'
+    default: '.kernel'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        export REPO_ROOT="${{ github.workspace }}"
+        export KERNEL="${{ inputs.kernel }}"
+        export KERNEL_ROOT="${{ inputs.kernel-root }}"
+        $GITHUB_ACTION_PATH/run_vmtest.sh
+      shell: bash
+      env:
+        PROJECT_NAME: ${{ inputs.project-name }}
+        TARGET_ARCH: ${{ inputs.arch }}

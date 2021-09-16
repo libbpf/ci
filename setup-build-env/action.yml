@@ -1,0 +1,35 @@
+name: 'setup build env'
+description: 'Setup build env'
+inputs:
+  pahole:
+    description: 'pahole rev/tag/branch'
+    required: true
+    default: 'master'
+  pahole-origin:
+    description: 'pahole repo'
+    required: true
+    default: 'https://git.kernel.org/pub/scm/devel/pahole/pahole.git'
+runs:
+  using: "composite"
+  steps:
+    - name: Setup environment
+      shell: bash
+      run: |
+        echo "::group::Setup"
+        sudo apt-get update
+        sudo apt-get install -y libguestfs-tools qemu-kvm zstd binutils-dev elfutils libcap-dev libelf-dev libdw-dev python3-docutils
+        echo "::endgroup::"
+    - name: Install clang
+      shell: bash
+      run: |
+        ${GITHUB_ACTION_PATH}/install_clang.sh
+    - name: Install pahole
+      shell: bash
+      run: |
+        export PAHOLE_BRANCH=${{ inputs.pahole }}
+        export PAHOLE_ORIGIN=${{ inputs.pahole-origin }}
+        ${GITHUB_ACTION_PATH}/build_pahole.sh
+    - name: set pahole location
+      shell: bash
+      run: |
+        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib" >> $GITHUB_ENV

@@ -1,0 +1,24 @@
+name: 'get-linux-source'
+description: 'Download linux source'
+inputs:
+  repo:
+    description: 'source repo'
+    default: 'https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git'
+    required: false
+  rev:
+    description: 'source rev'
+    default: 'master'
+    required: true
+  dest:
+    description: 'destination directory'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Get bpf-next source
+      shell: bash
+      run: |
+        export KERNEL_ORIGIN='${{ inputs.repo }}'
+        export KERNEL_BRANCH='${{ inputs.rev }}'
+        export REPO_PATH='${{ inputs.dest }}'
+        ${{ github.action_path }}/checkout_latest_kernel.sh

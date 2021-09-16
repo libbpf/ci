@@ -1,0 +1,22 @@
+name: 'run qemu'
+description: 'Run qemu with given rootfs and print summary'
+inputs:
+  arch:
+    description: 'arch'
+    required: true
+  img:
+    description: 'img path'
+    required: true
+  vmlinuz:
+    description: 'vmlinuz path'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: test
+      shell: bash
+      env:
+        vmlinuz: ${{ inputs.vmlinuz }}
+        IMG: ${{ inputs.img }}
+      run: |
+        ARCH="${{ inputs.arch }}" ${GITHUB_ACTION_PATH}/run.sh
