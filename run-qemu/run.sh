@@ -68,4 +68,12 @@ echo -e "$exitfile" | while read result; do
   fi
 done
 
+shutdownstatus="$(guestfish --ro -a "$IMG" -i cat /shutdown-status 2>/dev/null)"
+if [[ "${shutdownstatus}" == "clean" ]]; then
+    printf "%20s: \033[1;32mCLEAN\033[0m\n" "shutdown"
+else
+    printf "%20s: \033[1;31mNOT CLEAN\033[0m" "shutdown"
+    exitstatus=1
+fi
+
 exit "$exitstatus"

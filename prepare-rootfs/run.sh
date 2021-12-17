@@ -492,6 +492,10 @@ guestfish --remote \
 cat <<HERE >"$tmp"
 #!/bin/sh
 
+rm -f /shutdown-status
+echo "clean" > /shutdown-status
+chmod 644 /shutdown-status
+
 poweroff
 HERE
 guestfish --remote \
