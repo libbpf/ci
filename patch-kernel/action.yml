@@ -1,0 +1,15 @@
+name: 'patch kernel tree'
+description: 'patch kernel'
+inputs:
+  repo-root:
+    description: "Directory to apply patch to"
+    required: true
+    default: ${{ github.workspace }}
+runs:
+  using: "composite"
+  steps:
+    - name: apply temporary patches
+      shell: bash
+      run: |
+        cd
+        ${GITHUB_ACTION_PATH}/patch_kernel.sh
