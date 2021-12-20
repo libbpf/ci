@@ -1,6 +1,9 @@
 name: 'patch kernel tree'
 description: 'patch kernel'
 inputs:
+  patches-root:
+    description: "Directory to find patches"
+    required: true
   repo-root:
     description: "Directory to apply patch to"
     required: true
@@ -10,6 +13,4 @@ runs:
   steps:
     - name: apply temporary patches
       shell: bash
-      run: |
-        cd
-        ${GITHUB_ACTION_PATH}/patch_kernel.sh
+      run: cd ${{ inputs.repo-root }} && ${GITHUB_ACTION_PATH}/patch_kernel.sh "${{ inputs.patches-root }}"
