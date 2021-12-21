@@ -341,7 +341,7 @@ cp "$vmlinuz" "$GITHUB_WORKSPACE"/vmlinuz
 # Mount and set up the rootfs image. Use a persistent guestfish session in
 # order to avoid the startup overhead.
 # Work around https://bugs.launchpad.net/fuel/+bug/1467579.
-sudo chmod +r /boot/vmlinuz*
+sudo chmod +r /boot/vmlinuz* || true
 eval "$(guestfish --listen)"
 if (( ONESHOT )); then
 	rm -f "$IMG"
