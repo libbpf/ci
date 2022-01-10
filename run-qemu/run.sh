@@ -39,7 +39,7 @@ fi
 "$qemu" -nodefaults --no-reboot -display none -serial mon:stdio \
   ${accel} -smp "$smp" -m 4G \
   -drive file="$IMG",format=raw,index=1,media=disk,if=virtio,cache=none \
-  -kernel "$vmlinuz" -append "root=/dev/vda rw console=$console panic=-1 $APPEND"
+  -kernel "$vmlinuz" -append "root=/dev/vda rw console=$console panic=-1 sysctl.vm.panic_on_oom=1 $APPEND"
 
 exitfile="$(cat $GITHUB_WORKSPACE/bpftool_exitstatus)\n"
 exitfile+="$(guestfish --ro -a "$IMG" -i cat /exitstatus 2>/dev/null)"
