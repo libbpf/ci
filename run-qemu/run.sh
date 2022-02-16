@@ -36,6 +36,9 @@ if kvm-ok ; then
 else
   accel=$tcg_accel
 fi
+
+reset
+
 "$qemu" -nodefaults --no-reboot -nographic -serial mon:stdio \
   ${accel} -smp "$smp" -m 6G \
   -drive file="$IMG",format=raw,index=1,media=disk,if=virtio,cache=none \
