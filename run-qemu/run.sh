@@ -37,14 +37,12 @@ else
   accel=$tcg_accel
 fi
 
-echo "12345"
-
-("$qemu" -nodefaults --no-reboot -nographic -serial mon:stdio \
+"$qemu" -nodefaults --no-reboot -nographic \
+  -chardev stdio,id=char0,mux=on,signal=off,logfile=boot.log \
+  -serial chardev:char0 \
   ${accel} -smp "$smp" -m 6G \
   -drive file="$IMG",format=raw,index=1,media=disk,if=virtio,cache=none \
-  -kernel "$vmlinuz" -append "root=/dev/vda rw console=$console panic=-1 sysctl.vm.panic_on_oom=1 $APPEND")
-
-echo "54321"
+  -kernel "$vmlinuz" -append "root=/dev/vda rw console=$console panic=-1 sysctl.vm.panic_on_oom=1 $APPEND"
 
 exitfile="$(cat $GITHUB_WORKSPACE/bpftool_exitstatus)\n"
 exitfile+="$(guestfish --ro -a "$IMG" -i cat /exitstatus 2>/dev/null)"
