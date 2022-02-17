@@ -414,9 +414,9 @@ if [[ "${KERNEL}" = 'LATEST' ]]; then
 	"${REPO_ROOT}/${KERNEL_ROOT}/tools/testing/selftests/bpf/test_bpftool_synctypes.py" && true
 	bpftool_exitstatus=$?
 	if [[ "$bpftool_exitstatus" -eq 0 ]]; then
-		print_notice bpftool_checks "bpftool checks passed successfully."
+		echo "bpftool checks passed successfully."
 	else
-		print_error bpftool_checks "bpftool checks returned ${bpftool_exitstatus}."
+		echo "bpftool checks returned ${bpftool_exitstatus}."
 	fi
 	bpftool_exitstatus="bpftool:${bpftool_exitstatus}"
 else
@@ -466,9 +466,9 @@ if [[ ! -z SETUPCMD ]]; then
 	if [[ -v BUILDDIR ]]; then kernel='latest'; fi
 	setup_envvars="export KERNEL=${kernel}"
 	cat <<HERE >"$tmp"
-#!/bin/sh
+#!/bin/bash
 set -eu
-
+exec 1>/dev/ttyS0 2>/dev/ttyS0
 echo 'Running setup commands'
 ${setup_envvars}
 set +e
