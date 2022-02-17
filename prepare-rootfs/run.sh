@@ -414,9 +414,9 @@ if [[ "${KERNEL}" = 'LATEST' ]]; then
 	"${REPO_ROOT}/${KERNEL_ROOT}/tools/testing/selftests/bpf/test_bpftool_synctypes.py" && true
 	bpftool_exitstatus=$?
 	if [[ "$bpftool_exitstatus" -eq 0 ]]; then
-		print_notice bpftool "bpftool checks passed successfully."
+		echo "bpftool checks passed successfully."
 	else
-		print_error bpftool "bpftool checks returned ${bpftool_exitstatus}."
+		echo "bpftool checks returned ${bpftool_exitstatus}."
 	fi
 	bpftool_exitstatus="bpftool:${bpftool_exitstatus}"
 else
