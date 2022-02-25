@@ -468,7 +468,6 @@ if [[ ! -z SETUPCMD ]]; then
 	cat <<HERE >"$tmp"
 #!/bin/bash
 set -eu
-exec 1>/dev/ttyS0 2>/dev/ttyS0
 echo 'Running setup commands'
 ${setup_envvars}
 set +e
