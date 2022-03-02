@@ -5,7 +5,7 @@ source $(cd $(dirname $0) && pwd)/../helpers.sh
 
 # Install required packages
 travis_fold start install_clang "Installing Clang/LLVM"
-sudo apt-get install --allow-downgrades -y libc6=2.31-0ubuntu9.2
+sudo apt-get update
 sudo apt-get install -y g++ libelf-dev
 
 echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main" | sudo tee -a /etc/apt/sources.list
