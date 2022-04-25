@@ -1,4 +1,4 @@
-x86_64/libbpf-vmtest-rootfs-2020.09.27.tar.zst	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/libbpf-vmtest-rootfs-2020.09.27.tar.zst
+x86_64/libbpf-vmtest-rootfs-2022.04.25.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/x86_64/libbpf-vmtest-rootfs-2022.04.25.tar.zst
 x86_64/vmlinux-4.9.0.zst	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinux-4.9.0.zst
 x86_64/vmlinux-5.5.0.zst	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinux-5.5.0.zst
 x86_64/vmlinuz-5.5.0	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinuz-5.5.0
