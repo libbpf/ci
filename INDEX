@@ -3,4 +3,4 @@ x86_64/vmlinux-4.9.0.zst	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vml
 x86_64/vmlinux-5.5.0.zst	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinux-5.5.0.zst
 x86_64/vmlinuz-5.5.0	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinuz-5.5.0
 x86_64/vmlinuz-4.9.0	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinuz-4.9.0
-s390x/libbpf-vmtest-rootfs-2021.03.24.tar.zst	https://libbpf-ci.s3-us-west-1.amazonaws.com/s390x/libbpf-vmtest-rootfs-2021.03.24.tar.zst
+s390x/libbpf-vmtest-rootfs-2022.05.09.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/s390x/libbpf-vmtest-rootfs-2022.05.09.tar.zst
