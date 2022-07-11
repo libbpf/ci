@@ -154,7 +154,7 @@ fi
 echo "Kernel release: $KERNELRELEASE" >&2
 echo
 
-travis_fold start vmlinux_setup "Preparing Linux image"
+foldable start vmlinux_setup "Preparing Linux image"
 
 tmp=
 ARCH_DIR="$DIR/x86_64"
@@ -192,4 +192,4 @@ download "${ARCH}/vmlinux-${KERNELRELEASE}.zst" | zstd -d > "$vmlinux"
 
 echo $vmlinux
 
-travis_fold end vmlinux_setup
+foldable end vmlinux_setup

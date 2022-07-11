@@ -24,7 +24,7 @@ echo SNAPSHOT_URL = ${SNAPSHOT_URL}
 
 if [ ! -d "${REPO_PATH}" ]; then
 	echo
-	travis_fold start pull_kernel_srcs "Fetching kernel sources"
+	foldable start pull_kernel_srcs "Fetching kernel sources"
 
 	mkdir -p $(dirname "${REPO_PATH}")
 	cd $(dirname "${REPO_PATH}")
@@ -48,5 +48,5 @@ if [ ! -d "${REPO_PATH}" ]; then
 	fi
 	rm -rf ${REPO_PATH}/.git || true
 
-	travis_fold end pull_kernel_srcs
+	foldable end pull_kernel_srcs
 fi
