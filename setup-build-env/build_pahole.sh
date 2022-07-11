@@ -18,9 +18,6 @@ git remote add origin ${PAHOLE_ORIGIN}
 git fetch --depth=1 origin
 git checkout master
 
-# temporary fix up for pahole until official 1.22 release
-sed -i 's/DDWARVES_MINOR_VERSION=21/DDWARVES_MINOR_VERSION=22/' CMakeLists.txt
-
 mkdir -p build
 cd build
 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -D__LIB=lib ..
