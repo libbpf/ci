@@ -4,7 +4,7 @@ set -eu
 
 source $(cd $(dirname $0) && pwd)/../helpers.sh
 
-travis_fold start build_pahole "Building pahole"
+foldable start build_pahole "Building pahole"
 
 sudo apt-get update && sudo apt-get install elfutils libelf-dev libdw-dev
 
@@ -28,4 +28,4 @@ export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib
 ldd $(which pahole)
 pahole --version
 
-travis_fold end build_pahole
+foldable end build_pahole

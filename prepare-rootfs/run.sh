@@ -301,7 +301,7 @@ if [[ $SKIPIMG -eq 0 && ! -v ROOTFSVERSION ]]; then
 	ROOTFSVERSION="$(newest_rootfs_version)"
 fi
 
-travis_fold start vmlinux_setup "Preparing Linux image"
+foldable start vmlinux_setup "Preparing Linux image"
 
 echo "Kernel release: $KERNELRELEASE" >&2
 echo
@@ -403,9 +403,9 @@ guestfish --remote \
 	upload "$source_vmlinux" "$vmlinux" : \
 	chmod 644 "$vmlinux"
 
-travis_fold end vmlinux_setup
+foldable end vmlinux_setup
 
-travis_fold start bpftool_checks "Running bpftool checks..."
+foldable start bpftool_checks "Running bpftool checks..."
 bpftool_exitstatus=
 if [[ "${KERNEL}" = 'LATEST' ]]; then
 	# "&& true" does not change the return code (it is not executed if the
@@ -424,9 +424,9 @@ else
 	bpftool_exitstatus="bpftool:0"
 fi
 echo ${bpftool_exitstatus} > $GITHUB_WORKSPACE/bpftool_exitstatus
-travis_fold end bpftool_checks
+foldable end bpftool_checks
 
-travis_fold start copy_files "Copying files..."
+foldable start copy_files "Copying files..."
 
 if (( SKIPSOURCE )); then
 	echo "Not copying source files..." >&2
@@ -472,15 +472,15 @@ echo 'Running setup commands'
 ${setup_envvars}
 set +e
 ${setup_cmd}; exitstatus=\$?
-echo -e '$(travis_fold start collect_status "Collect status")'
+echo -e '$(foldable start collect_status "Collect status")'
 set -e
 # If setup command did not write its exit status to /exitstatus, do it now
 if [[ ! -s /exitstatus ]]; then
 	echo setup_cmd:\$exitstatus > /exitstatus
 fi
 chmod 644 /exitstatus
-echo -e '$(travis_fold end collect_status)'
-echo -e '$(travis_fold start shutdown Shutdown)'
+echo -e '$(foldable end collect_status)'
+echo -e '$(foldable start shutdown Shutdown)'
 HERE
 fi
 
@@ -505,4 +505,4 @@ tmp=
 
 guestfish --remote exit
 
-travis_fold end copy_files
+foldable end copy_files

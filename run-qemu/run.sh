@@ -5,7 +5,7 @@ trap 'exit 2' ERR
 
 source $(cd $(dirname $0) && pwd)/../helpers.sh
 
-travis_fold start vm_init "Starting virtual machine..."
+foldable start vm_init "Starting virtual machine..."
 
 echo "Starting VM with $(nproc) CPUs..."
 
@@ -56,7 +56,7 @@ else
   exitstatus=1
 fi
 
-travis_fold end shutdown
+foldable end shutdown
 
 # Final summary - Don't use a fold, keep it visible
 echo -e "\033[1;33mTest Results:\033[0m"

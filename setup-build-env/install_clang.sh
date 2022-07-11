@@ -4,7 +4,7 @@ set -eu
 source $(cd $(dirname $0) && pwd)/../helpers.sh
 
 # Install required packages
-travis_fold start install_clang "Installing Clang/LLVM"
+foldable start install_clang "Installing Clang/LLVM"
 sudo apt-get update
 sudo apt-get install -y g++ libelf-dev
 
@@ -23,4 +23,4 @@ if [ $n -ge 5 ] ; then
   echo "clang install failed"
   exit 1
 fi
-travis_fold end install_clang
+foldable end install_clang
