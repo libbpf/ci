@@ -1,0 +1,18 @@
+name: 'build samples/bpf'
+description: 'Build samples/bpf'
+inputs:
+  vmlinux_btf:
+    description: 'path to vmlinux BTF file'
+    required: true
+  kernel:
+    description: 'kernel version'
+    default: 'LATEST'
+  toolchain:
+    description: 'what toolchain to use'
+    default: 'gcc'
+runs:
+  using: "composite"
+  steps:
+    - name: build samples/bpf
+      shell: bash
+      run: ${GITHUB_ACTION_PATH}/build_samples.sh "${{ inputs.vmlinux_btf }}" "${{ inputs.kernel }}" "${{ inputs.toolchain }}"
