@@ -10,9 +10,14 @@ inputs:
   toolchain:
     description: 'what toolchain to use'
     default: 'gcc'
+  kbuild-output:
+    description: 'relative or absolute path to use for storing build artifacts'
+    default: '.'
 runs:
   using: "composite"
   steps:
     - name: build selftests
       shell: bash
-      run: ${GITHUB_ACTION_PATH}/build_selftests.sh "${{ inputs.vmlinux_btf }}" "${{ inputs.kernel }}" "${{ inputs.toolchain }}"
+      run: |
+        kbuild_output="$(realpath ${{ inputs.kbuild-output }})"
+        ${GITHUB_ACTION_PATH}/build_selftests.sh "${{ inputs.vmlinux_btf }}" "${{ inputs.kernel }}" "${{ inputs.toolchain }}" "${kbuild_output}"

@@ -9,6 +9,7 @@ source "${THISDIR}"/../helpers.sh
 VMLINUX_BTF="$1"
 KERNEL="$2"
 TOOLCHAIN="$3"
+export KBUILD_OUTPUT="$4"
 
 LLVM_VER="$(llvm_version $TOOLCHAIN)" && :
 if [ $? -eq 0 ]; then

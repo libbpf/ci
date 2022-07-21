@@ -18,6 +18,9 @@ inputs:
   kernel-root:
     description: 'kernel source dir'
     required: true
+  kbuild-output:
+    description: 'relative or absolute path to use for storing build artifacts'
+    default: ''
   image-output:
     description: 'path where to store the generated image'
     required: true
@@ -32,7 +35,11 @@ runs:
         export REPO_ROOT="${{ github.workspace }}"
         export KERNEL="${{ inputs.kernel }}"
         export KERNEL_ROOT="${{ inputs.kernel-root }}"
-        $GITHUB_ACTION_PATH/run_vmtest.sh ${{ inputs.image-output }} ${{ inputs.test }}
+        kbuild_output="${{ inputs.kbuild-output }}"
+        # TODO: Stop falling back to $KERNEL_ROOT once all clients provide this
+        #       input parameter.
+        kbuild_output="$(realpath $([ -z "$kbuild_output" ] && echo "$KERNEL_ROOT" || echo "$kbuild_output" ))"
+        $GITHUB_ACTION_PATH/run_vmtest.sh "${kbuild_output}" ${{ inputs.image-output }} ${{ inputs.test }}
       shell: bash
       env:
         PROJECT_NAME: ${{ inputs.project-name }}

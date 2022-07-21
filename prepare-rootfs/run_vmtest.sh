@@ -6,8 +6,9 @@ THISDIR="$(cd $(dirname $0) && pwd)"
 
 source "${THISDIR}"/../helpers.sh
 
-IMAGE="${1}"
-TEST="${2:-}"
+KBUILD_OUTPUT="${1}"
+IMAGE="${2}"
+TEST="${3:-}"
 
 foldable start env "Setup env"
 sudo apt-get update
@@ -26,7 +27,7 @@ VMTEST_SETUPCMD="export GITHUB_WORKFLOW=${GITHUB_WORKFLOW:-}; export PROJECT_NAM
 setup_cmd=$(sed 's/\([[:space:]]\)/\\\1/g' <<< "${VMTEST_SETUPCMD}")
 
 if [[ "${KERNEL}" = 'LATEST' ]]; then
-  "${THISDIR}"/run.sh -b "${KERNEL_ROOT}" -o -d ~ -s "${setup_cmd}" "${IMAGE}"
+  "${THISDIR}"/run.sh --build "${KBUILD_OUTPUT}" --source "${KERNEL_ROOT}" -o -d ~ -s "${setup_cmd}" "${IMAGE}"
 else
   "${THISDIR}"/run.sh -k "${KERNEL}*" -o -d ~ -s "${setup_cmd}" "${IMAGE}"
 fi

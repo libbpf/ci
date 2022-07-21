@@ -8,6 +8,7 @@ source "${THISDIR}"/../helpers.sh
 
 ARCH="$1"
 TOOLCHAIN="$2"
+export KBUILD_OUTPUT="$3"
 
 LLVM_VER="$(llvm_version $TOOLCHAIN)" && :
 if [ $? -eq 0 ]; then
@@ -16,10 +17,11 @@ fi
 
 foldable start build_kernel "Building kernel with $TOOLCHAIN"
 
+mkdir -p "${KBUILD_OUTPUT}"
 cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
     ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${ARCH} \
     ${GITHUB_WORKSPACE}/ci/vmtest/configs/config \
-    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${ARCH} 2> /dev/null > .config && :
+    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${ARCH} 2> /dev/null > "${KBUILD_OUTPUT}"/.config && :
 
 make -j $((4*$(nproc))) olddefconfig all
 
