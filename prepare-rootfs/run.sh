@@ -292,7 +292,7 @@ fi
 
 # Only go to the network if it's actually a glob pattern.
 if [[ -v BUILDDIR ]]; then
-	KERNELRELEASE="$(make -C "$BUILDDIR" -s kernelrelease)"
+	KERNELRELEASE="$(KBUILD_OUTPUT="${BUILDDIR}" make -C "${KERNELSRC:-$BUILDDIR}" -s kernelrelease)"
 elif [[ ! $KERNELRELEASE =~ ^([^\\*?[]|\\[*?[])*\\?$ ]]; then
 	# We need to cache the list of URLs outside of the command
 	# substitution, which happens in a subshell.
@@ -333,7 +333,7 @@ cleanup() {
 trap cleanup EXIT
 
 if [[ -v BUILDDIR ]]; then
-	vmlinuz="$BUILDDIR/$(make -C "$BUILDDIR" -s image_name)"
+	vmlinuz="$BUILDDIR/$(KBUILD_OUTPUT="${BUILDDIR}" make -C "${KERNELSRC:-$BUILDDIR}" -s image_name)"
 else
 	vmlinuz="${ARCH_DIR}/vmlinuz-${KERNELRELEASE}"
 	if [[ ! -e $vmlinuz ]]; then
