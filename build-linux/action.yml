@@ -1,0 +1,15 @@
+name: 'build linux'
+description: 'Build Linux'
+inputs:
+  arch:
+    description: 'arch'
+    required: true
+  toolchain:
+    description: 'what toolchain to use'
+    default: 'gcc'
+runs:
+  using: "composite"
+  steps:
+    - name: build linux
+      shell: bash
+      run: ${GITHUB_ACTION_PATH}/build.sh "${{ inputs.arch }}" "${{ inputs.toolchain }}"
