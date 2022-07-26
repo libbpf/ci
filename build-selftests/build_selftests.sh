@@ -9,14 +9,10 @@ source "${THISDIR}"/../helpers.sh
 VMLINUX_BTF="$1"
 KERNEL="$2"
 TOOLCHAIN="$3"
-TOOLCHAIN_NAME="$(echo $TOOLCHAIN | cut -d '-' -f 1)"
-TOOLCHAIN_VERSION="$(echo $TOOLCHAIN | cut -d '-' -f 2)"
 
-if [ "$TOOLCHAIN_NAME" == "llvm" ]; then
-export LLVM="-$TOOLCHAIN_VERSION"
-LLVM_VER=$TOOLCHAIN_VERSION
-else
-LLVM_VER=15
+LLVM_VER="$(llvm_version $TOOLCHAIN)" && :
+if [ $? -eq 0 ]; then
+	export LLVM="-$LLVM_VER"
 fi
 
 foldable start build_selftests "Building selftests with $TOOLCHAIN"

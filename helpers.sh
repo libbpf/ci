@@ -34,3 +34,18 @@ print_error() {
 print_notice() {
   __print notice $1 $2
 }
+
+# $1 - toolchain name
+llvm_version() {
+  local toolchain="$1"
+  local toolchain_name="$(echo $toolchain | cut -d '-' -f 1)"
+  local toolchain_version="$(echo $toolchain | cut -d '-' -f 2)"
+
+  if [ "$toolchain_name" == "llvm" ]; then
+    echo "$toolchain_version"
+    return 0
+  else
+    echo "15"
+    return 1
+  fi
+}
