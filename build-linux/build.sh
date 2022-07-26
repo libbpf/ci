@@ -2,18 +2,17 @@
 
 set -euo pipefail
 
-ARCH="$1"
-TOOLCHAIN="$2"
-TOOLCHAIN_NAME="$(echo $TOOLCHAIN | cut -d '-' -f 1)"
-TOOLCHAIN_VERSION="$(echo $TOOLCHAIN | cut -d '-' -f 2)"
-
-if [ "$TOOLCHAIN_NAME" == "llvm" ]; then
-export LLVM="-$TOOLCHAIN_VERSION"
-fi
-
 THISDIR="$(cd $(dirname $0) && pwd)"
 
 source "${THISDIR}"/../helpers.sh
+
+ARCH="$1"
+TOOLCHAIN="$2"
+
+LLVM_VER="$(llvm_version $TOOLCHAIN)" && :
+if [ $? -eq 0 ]; then
+	export LLVM="-$LLVM_VER"
+fi
 
 foldable start build_kernel "Building kernel with $TOOLCHAIN"
 
