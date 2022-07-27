@@ -17,7 +17,8 @@ source "${THISDIR}"/../helpers.sh
 
 foldable start build_kernel "Building kernel with $TOOLCHAIN"
 
-cp ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config-latest.${ARCH} .config
+cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config > .config
+cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${ARCH} >> .config
 
 make -j $((4*$(nproc))) olddefconfig all
 
