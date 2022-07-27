@@ -23,6 +23,10 @@ cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
     ${GITHUB_WORKSPACE}/ci/vmtest/configs/config \
     ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${ARCH} 2> /dev/null > "${KBUILD_OUTPUT}"/.config && :
 
-make -j $(kernel_build_make_jobs) olddefconfig all
+make olddefconfig
+make -j $(kernel_build_make_jobs) all || (
+  echo "Build failed; falling back to full rebuild"
+  make clean; make -j $(kernel_build_make_jobs) all
+)
 
 foldable end build_kernel
