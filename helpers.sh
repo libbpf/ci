@@ -45,7 +45,7 @@ llvm_version() {
     echo "$toolchain_version"
     return 0
   else
-    echo "15"
+    echo "16"
     return 1
   fi
 }

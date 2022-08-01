@@ -14,7 +14,7 @@ while [ $n -lt 5 ]; do
   set +e && \
   wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - && \
   sudo apt-get update && \
-  sudo apt-get install -y clang-15 lld-15 llvm-15 && \
+  sudo apt-get install -y clang-16 lld-16 llvm-16 && \
   set -e && \
   break
   n=$(($n + 1))
