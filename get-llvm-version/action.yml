@@ -1,0 +1,12 @@
+name: 'get-llvm-version'
+description: 'Retrieve the LLVM version to use'
+outputs:
+  version:
+    description: "LLVM version"
+    value: ${{ steps.llvm-version.outputs.version }}
+runs:
+  using: "composite"
+  steps:
+    - id: llvm-version
+      shell: bash
+      run: echo "::set-output name=version::$(source $GITHUB_ACTION_PATH/../helpers.sh; llvm_default_version)"
