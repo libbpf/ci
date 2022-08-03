@@ -35,6 +35,11 @@ print_notice() {
   __print notice $1 $2
 }
 
+# No arguments
+llvm_default_version() {
+  echo "16"
+}
+
 # $1 - toolchain name
 llvm_version() {
   local toolchain="$1"
@@ -45,7 +50,7 @@ llvm_version() {
     echo "$toolchain_version"
     return 0
   else
-    echo "16"
+    llvm_default_version
     return 1
   fi
 }
