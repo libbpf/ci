@@ -16,7 +16,12 @@ fi
 
 foldable start build_kernel "Building kernel with $TOOLCHAIN"
 
-cp ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config-latest.${ARCH} .config
+cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
+    ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${ARCH} \
+    ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config-latest \
+    ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config-latest.${ARCH} \
+    ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config \
+    ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config.${ARCH} 2> /dev/null > .config && :
 
 make -j $((4*$(nproc))) olddefconfig all
 
