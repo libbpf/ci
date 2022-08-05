@@ -7,7 +7,8 @@ THISDIR="$(cd $(dirname $0) && pwd)"
 source "${THISDIR}"/../helpers.sh
 
 foldable start env "Setup env"
-sudo apt install -y libguestfs-tools
+sudo apt-get update
+sudo apt-get install -y libguestfs-tools zstd
 foldable stop env
 
 USER=`whoami`
