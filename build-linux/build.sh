@@ -18,8 +18,6 @@ foldable start build_kernel "Building kernel with $TOOLCHAIN"
 
 cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
     ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${ARCH} \
-    ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config-latest \
-    ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config-latest.${ARCH} \
     ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config \
     ${GITHUB_WORKSPACE}/travis-ci/vmtest/configs/config.${ARCH} 2> /dev/null > .config && :
 
