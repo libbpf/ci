@@ -6,6 +6,8 @@ THISDIR="$(cd $(dirname $0) && pwd)"
 
 source "${THISDIR}"/../helpers.sh
 
+IMAGE="${1}"
+
 foldable start env "Setup env"
 sudo apt-get update
 sudo apt-get install -y libguestfs-tools zstd
@@ -23,7 +25,7 @@ VMTEST_SETUPCMD="export GITHUB_WORKFLOW=${GITHUB_WORKFLOW:-}; export PROJECT_NAM
 setup_cmd=$(sed 's/\([[:space:]]\)/\\\1/g' <<< "${VMTEST_SETUPCMD}")
 
 if [[ "${KERNEL}" = 'LATEST' ]]; then
-  "${THISDIR}"/run.sh -b "${KERNEL_ROOT}" -o -d ~ -s "${setup_cmd}" /tmp/root.img
+  "${THISDIR}"/run.sh -b "${KERNEL_ROOT}" -o -d ~ -s "${setup_cmd}" "${IMAGE}"
 else
-  "${THISDIR}"/run.sh -k "${KERNEL}*" -o -d ~ -s "${setup_cmd}" /tmp/root.img
+  "${THISDIR}"/run.sh -k "${KERNEL}*" -o -d ~ -s "${setup_cmd}" "${IMAGE}"
 fi
