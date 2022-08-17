@@ -24,6 +24,10 @@ inputs:
   image-output:
     description: 'path where to store the generated image'
     default: '/tmp/root.img'
+  test:
+    description: 'the name of the test to run'
+    default: ''
+    required: false
 runs:
   using: "composite"
   steps:
@@ -31,7 +35,7 @@ runs:
         export REPO_ROOT="${{ github.workspace }}"
         export KERNEL="${{ inputs.kernel }}"
         export KERNEL_ROOT="${{ inputs.kernel-root }}"
-        $GITHUB_ACTION_PATH/run_vmtest.sh ${{ inputs.image-output }}
+        $GITHUB_ACTION_PATH/run_vmtest.sh ${{ inputs.image-output }} ${{ inputs.test }}
       shell: bash
       env:
         PROJECT_NAME: ${{ inputs.project-name }}

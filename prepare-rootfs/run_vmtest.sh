@@ -7,6 +7,7 @@ THISDIR="$(cd $(dirname $0) && pwd)"
 source "${THISDIR}"/../helpers.sh
 
 IMAGE="${1}"
+TEST="${2:-}"
 
 foldable start env "Setup env"
 sudo apt-get update
@@ -20,7 +21,7 @@ if [[ ${USER} != 'root' ]]; then
   foldable stop adduser_to_kvm
 fi
 
-VMTEST_SETUPCMD="export GITHUB_WORKFLOW=${GITHUB_WORKFLOW:-}; export PROJECT_NAME=${PROJECT_NAME}; /${PROJECT_NAME}/vmtest/run_selftests.sh"
+VMTEST_SETUPCMD="export GITHUB_WORKFLOW=${GITHUB_WORKFLOW:-}; export PROJECT_NAME=${PROJECT_NAME}; /${PROJECT_NAME}/vmtest/run_selftests.sh ${TEST}"
 # Escape whitespace characters.
 setup_cmd=$(sed 's/\([[:space:]]\)/\\\1/g' <<< "${VMTEST_SETUPCMD}")
 
