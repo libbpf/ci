@@ -23,7 +23,7 @@ inputs:
     required: true
   image-output:
     description: 'path where to store the generated image'
-    default: '/tmp/root.img'
+    required: true
   test:
     description: 'the name of the test to run'
     default: ''
