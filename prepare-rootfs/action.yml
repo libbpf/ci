@@ -4,7 +4,6 @@ description: 'build rootfs
 2. either copy "/vmlinux" or download "vmlinux" to "/boot" in image
 3. (FIXME) either copy "/vmlinuz" from build dir or download "vmlinuz" to workspace root
 4. copy hardcoded "selftests" and "travis-ci/vmtest" directory to "/$PROJECT_NAME" in root image
-5. (FIXME) run bpftool check and save result in $GITHUB_WORKSPACE/bpftool_exitstatus
 '
 inputs:
   project-name:
