@@ -5,6 +5,25 @@ trap 'exit 2' ERR
 
 source $(cd $(dirname $0) && pwd)/../helpers.sh
 
+foldable start bpftool_checks "Running bpftool checks..."
+bpftool_exitstatus=0
+if [[ "${KERNEL}" = 'LATEST' ]]; then
+	# "&& true" does not change the return code (it is not executed if the
+	# Python script fails), but it prevents the trap on ERR set at the top
+	# of this file to trigger on failure.
+	"${REPO_ROOT}/${KERNEL_ROOT}/tools/testing/selftests/bpf/test_bpftool_synctypes.py" && true
+	bpftool_exitstatus=$?
+	if [[ $bpftool_exitstatus -eq 0 ]]; then
+		echo "bpftool checks passed successfully."
+	else
+		echo "bpftool checks returned ${bpftool_exitstatus}."
+	fi
+else
+	echo "bpftool checks skipped."
+fi
+bpftool_exitstatus="bpftool:${bpftool_exitstatus}"
+foldable end bpftool_checks
+
 foldable start vm_init "Starting virtual machine..."
 
 echo "Starting VM with $(nproc) CPUs..."
@@ -44,7 +63,7 @@ fi
   -drive file="$IMG",format=raw,index=1,media=disk,if=virtio,cache=none \
   -kernel "$VMLINUZ" -append "root=/dev/vda rw console=$console panic=-1 sysctl.vm.panic_on_oom=1 $APPEND"
 
-exitfile="$(cat $GITHUB_WORKSPACE/bpftool_exitstatus)\n"
+exitfile="${bpftool_exitstatus}\n"
 exitfile+="$(guestfish --ro -a "$IMG" -i cat /exitstatus 2>/dev/null)"
 exitstatus="$(echo -e "$exitfile" | awk --field-separator ':' \
   'BEGIN { s=0 } { if ($2) {s=1} } END { print s }')"

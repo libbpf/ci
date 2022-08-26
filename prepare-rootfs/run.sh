@@ -405,27 +405,6 @@ guestfish --remote \
 
 foldable end vmlinux_setup
 
-foldable start bpftool_checks "Running bpftool checks..."
-bpftool_exitstatus=
-if [[ "${KERNEL}" = 'LATEST' ]]; then
-	# "&& true" does not change the return code (it is not executed if the
-	# Python script fails), but it prevents the trap on ERR set at the top
-	# of this file to trigger on failure.
-	"${REPO_ROOT}/${KERNEL_ROOT}/tools/testing/selftests/bpf/test_bpftool_synctypes.py" && true
-	bpftool_exitstatus=$?
-	if [[ "$bpftool_exitstatus" -eq 0 ]]; then
-		echo "bpftool checks passed successfully."
-	else
-		echo "bpftool checks returned ${bpftool_exitstatus}."
-	fi
-	bpftool_exitstatus="bpftool:${bpftool_exitstatus}"
-else
-	echo "bpftool checks skipped."
-	bpftool_exitstatus="bpftool:0"
-fi
-echo ${bpftool_exitstatus} > $GITHUB_WORKSPACE/bpftool_exitstatus
-foldable end bpftool_checks
-
 foldable start copy_files "Copying files..."
 
 if (( SKIPSOURCE )); then
