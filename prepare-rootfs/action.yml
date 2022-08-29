@@ -14,12 +14,10 @@ inputs:
     description: 'arch'
     required: true
   kernel:
-    description: 'kernel version'
-    default: 'LATEST'
+    description: 'kernel version; use LATEST to use the most recent version'
     required: true
   kernel-root:
     description: 'kernel source dir'
-    default: '.kernel'
     required: true
   image-output:
     description: 'path where to store the generated image'
