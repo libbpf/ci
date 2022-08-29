@@ -16,7 +16,7 @@ runs:
     - name: test
       shell: bash
       env:
-        vmlinuz: ${{ inputs.vmlinuz }}
+        VMLINUZ: ${{ inputs.vmlinuz }}
         IMG: ${{ inputs.img }}
       run: |
         ARCH="${{ inputs.arch }}" ${GITHUB_ACTION_PATH}/run.sh
