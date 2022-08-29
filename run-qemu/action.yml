@@ -10,6 +10,9 @@ inputs:
   vmlinuz:
     description: 'vmlinuz path'
     required: true
+  kernel-root:
+    description: 'kernel source dir'
+    default: '.'
 runs:
   using: "composite"
   steps:
@@ -18,5 +21,6 @@ runs:
       env:
         vmlinuz: ${{ inputs.vmlinuz }}
         IMG: ${{ inputs.img }}
+        KERNEL_ROOT: ${{ inputs.kernel-root }}
       run: |
         ARCH="${{ inputs.arch }}" ${GITHUB_ACTION_PATH}/run.sh
