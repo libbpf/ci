@@ -7,6 +7,9 @@ source $(cd $(dirname $0) && pwd)/../helpers.sh
 
 foldable start bpftool_checks "Running bpftool checks..."
 bpftool_exitstatus=0
+
+# bpftool checks are aimed at checking type names, documentation, shell
+# completion etc. against the current kernel, so only run on LATEST.
 if [[ "${KERNEL}" = 'LATEST' ]]; then
 	# "&& true" does not change the return code (it is not executed if the
 	# Python script fails), but it prevents the trap on ERR set at the top
@@ -21,6 +24,7 @@ if [[ "${KERNEL}" = 'LATEST' ]]; then
 else
 	echo "bpftool checks skipped."
 fi
+
 bpftool_exitstatus="bpftool:${bpftool_exitstatus}"
 foldable end bpftool_checks
 
