@@ -3,7 +3,7 @@ description: 'build rootfs
 1. download base root img to /tmp/root.img (or other path, if provided)
 2. either copy "/vmlinux" or download "vmlinux" to "/boot" in image
 3. (FIXME) either copy "/vmlinuz" from build dir or download "vmlinuz" to workspace root
-4. copy hardcoded "selftests" and "travis-ci/vmtest" directory to "/$PROJECT_NAME" in root image
+4. copy hardcoded "selftests" and "ci/vmtest" directory to "/$PROJECT_NAME" in root image
 '
 inputs:
   project-name:
