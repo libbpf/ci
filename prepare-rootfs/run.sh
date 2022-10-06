@@ -421,10 +421,10 @@ else
 		guestfish --remote \
 			mkdir-p "/${PROJECT_NAME}/selftests" : \
 			chmod 0755 "/${PROJECT_NAME}/selftests" : \
-			mkdir-p "/${PROJECT_NAME}/travis-ci" : \
-			chmod 0755 "/${PROJECT_NAME}/travis-ci"
+			mkdir-p "/${PROJECT_NAME}/ci" : \
+			chmod 0755 "/${PROJECT_NAME}/ci"
 		tar -C "${REPO_ROOT}/selftests" -c bpf | tar_in "/${PROJECT_NAME}/selftests"
-		tar -C "${REPO_ROOT}/travis-ci" -c vmtest  | tar_in "/${PROJECT_NAME}"
+		tar -C "${REPO_ROOT}/ci" -c vmtest  | tar_in "/${PROJECT_NAME}"
 	fi
 fi
 
