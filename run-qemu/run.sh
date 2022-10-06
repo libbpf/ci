@@ -73,6 +73,10 @@ fi
 
 smp=$(( $smp > $MAX_CPU ? $MAX_CPU : $smp ))
 
+if [[ -n ${KERNEL_TEST} ]]; then
+	APPEND+=" run_tests=${KERNEL_TEST}"
+fi
+
 "$qemu" -nodefaults --no-reboot -nographic \
   -chardev stdio,id=char0,mux=on,signal=off,logfile=boot.log \
   -serial chardev:char0 \
