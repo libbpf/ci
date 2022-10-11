@@ -10,7 +10,7 @@ sudo apt-get install -y g++ libelf-dev
 
 LLVM_VERSION=$(llvm_default_version)
 
-echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main" | sudo tee -a /etc/apt/sources.list
+echo "deb https://apt.llvm.org/focal/ llvm-toolchain-focal main" | sudo tee /etc/apt/sources.list.d/llvm.list
 n=0
 while [ $n -lt 5 ]; do
   set +e && \
