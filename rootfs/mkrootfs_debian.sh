@@ -68,8 +68,10 @@ packages=(
 	ethtool
 	iproute2
 	iptables
+	keyutils
 	libcap2
 	libelf1
+	openssl
 	strace
 	zlib1g
 )
