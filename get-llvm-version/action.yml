@@ -9,4 +9,4 @@ runs:
   steps:
     - id: llvm-version
       shell: bash
-      run: echo "::set-output name=version::$(source $GITHUB_ACTION_PATH/../helpers.sh; llvm_default_version)"
+      run: echo "version=$(source $GITHUB_ACTION_PATH/../helpers.sh; llvm_default_version)" >> $GITHUB_OUTPUT
