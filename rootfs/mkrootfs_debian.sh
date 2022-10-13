@@ -17,19 +17,21 @@ if [ "$(id -u)" != 0 ]; then
 	exit 1
 fi
 
+arch=$(dpkg --print-architecture)
+distro="bullseye"
+
 function usage() {
     echo "Usage: $0 [-a | --arch architecture] [-h | --help]
 
 Build a Debian chroot filesystem image for testing libbbpf in a virtual machine.
 By default build an image for the architecture of the host running the script.
 
-    -a | --arch:    architecture to build the image for. Default (amd64)
+    -a | --arch:    architecture to build the image for. Default (${arch})
+    -d | --distro:  distribution to build. Default (${distro})
 "
 }
 
-arch=$(dpkg --print-architecture)
-
-TEMP=$(getopt  -l "arch:,help" -o "a:h" -- "$@")
+TEMP=$(getopt  -l "arch:,distro:,help" -o "a:d:h" -- "$@")
 if [ $? -ne 0 ]; then
     usage
 fi
@@ -39,12 +41,17 @@ unset TEMP
 
 while true; do
     case "$1" in
-        --arch | -a )
+        --arch | -a)
             arch="$2"
+            shift 2
+            ;;
+        --distro | -d)
+            distro="$2"
             shift 2
             ;;
         --help | -h)
             usage
+            exit
             ;;
         --)
             shift
@@ -76,7 +83,7 @@ packages=(
 	zlib1g
 )
 packages=$(IFS=, && echo "${packages[*]}")
-debootstrap --include="$packages" --variant=minbase --arch="${arch}" "$@" bookworm "$root"
+debootstrap --include="$packages" --variant=minbase --arch="${arch}" "$@" "${distro}" "$root"
 
 # Remove the init scripts (tests use their own). Also remove various
 # unnecessary files in order to save space.
@@ -90,6 +97,6 @@ rm -rf \
 "$(dirname "$0")"/mkrootfs_tweak.sh "$root"
 
 # Save the result.
-name="libbpf-vmtest-rootfs-$(date +%Y.%m.%d)-${arch}.tar.zst"
+name="libbpf-vmtest-rootfs-$(date +%Y.%m.%d)-${distro}-${arch}.tar.zst"
 rm -f "$name"
 tar -C "$root" -c . | zstd -T0 -19 -o "$name"
