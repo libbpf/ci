@@ -9,15 +9,11 @@
 # Any arguments that need to be passed to `debootstrap` should be passed after
 # `--`, e.g ./mkrootfs_debian.sh --arch=s390x -- --foo=bar
 
-set -e -u -x -o pipefail
 
-# Check whether we are root now in order to avoid confusing errors later.
-if [ "$(id -u)" != 0 ]; then
-	echo "$0 must run as root" >&2
-	exit 1
-fi
+# table of Debian arch <-> GNU arch matches
+CPUTABLE="${CPUTABLE:-/usr/share/dpkg/cputable}"
 
-arch=$(dpkg --print-architecture)
+deb_arch=$(dpkg --print-architecture)
 distro="bullseye"
 
 function usage() {
@@ -26,9 +22,76 @@ function usage() {
 Build a Debian chroot filesystem image for testing libbbpf in a virtual machine.
 By default build an image for the architecture of the host running the script.
 
-    -a | --arch:    architecture to build the image for. Default (${arch})
+    -a | --arch:    architecture to build the image for. Default (${deb_arch})
     -d | --distro:  distribution to build. Default (${distro})
 "
+}
+
+function error() {
+    echo "ERROR: ${1}" >&2
+}
+
+function debian_to_gnu() {
+    # Funtion to convert an architecture in Debian to its GNU equivalent,
+    # e.g amd64 -> x86_64
+    # CPUTABLE contains a list of debian_arch\tgnu_arch per line
+    # Compare of the first field matches and print the second one.
+    awk -v deb_arch="$1" '$1 ~ deb_arch {print $2}' "${CPUTABLE}"
+}
+
+function qemu_static() {
+    # Given a Debian architecture find the location of the matching
+    # qemu-${gnu_arch}-static binary.
+    gnu_arch=$(debian_to_gnu "${1}")
+    echo "qemu-${gnu_arch}-static"
+}
+
+function check_requirements() {
+    # Checks that all necessary packages are installed on the system.
+    # print an error message explaining what is missing and exits.
+
+    local deb_arch=$1
+    local err=0
+
+    # Check that we can translate from Debian arch to GNU arch.
+    if [[ ! -e "${CPUTABLE}" ]]
+    then
+        error "${CPUTABLE} not found on your system. Make sure dpkg package is installed."
+        err=1
+    fi
+
+    # Check that the architecture is supported  by Debian.
+    if [[ -z $(debian_to_gnu "${deb_arch}") ]]
+    then
+        error "${deb_arch} is not a supported architecture."
+        err=1
+    fi
+
+    # Check that we can install the root image for a foreign arch.
+    qemu=$(qemu_static "${deb_arch}")
+    if [[ -z $(which "${qemu}") ]]
+    then
+        error "${qemu} binary not found on your system. Make sure qemu-user-static package is installed."
+        err=1
+    fi
+
+    # Check that debootrap is installed.
+    if [[ -z "$(which debootstrap 2> /dev/null)" ]]
+    then
+        error "debootstrap binary not found on your system. Make sure debootstrap package is installed."
+        err=1
+    fi
+
+    # Check we are root.
+    if [[ "$(id -u)" != 0 ]]; then
+        error "$0 must run as root"
+        err=1
+    fi
+
+    if [[ ${err} -ne 0 ]]
+    then
+        exit 1
+    fi
 }
 
 TEMP=$(getopt  -l "arch:,distro:,help" -o "a:d:h" -- "$@")
@@ -42,7 +105,7 @@ unset TEMP
 while true; do
     case "$1" in
         --arch | -a)
-            arch="$2"
+            deb_arch="$2"
             shift 2
             ;;
         --distro | -d)
@@ -62,6 +125,11 @@ while true; do
             ;;
     esac
 done
+
+
+check_requirements "${deb_arch}"
+
+set -e -u -x -o pipefail
 
 # Create a working directory and schedule its deletion.
 root=$(mktemp -d -p "$PWD")
@@ -83,7 +151,7 @@ packages=(
 	zlib1g
 )
 packages=$(IFS=, && echo "${packages[*]}")
-debootstrap --include="$packages" --variant=minbase --arch="${arch}" "$@" "${distro}" "$root"
+debootstrap --include="$packages" --variant=minbase --arch="${deb_arch}" "$@" "${distro}" "$root"
 
 # Remove the init scripts (tests use their own). Also remove various
 # unnecessary files in order to save space.
@@ -97,6 +165,6 @@ rm -rf \
 "$(dirname "$0")"/mkrootfs_tweak.sh "$root"
 
 # Save the result.
-name="libbpf-vmtest-rootfs-$(date +%Y.%m.%d)-${distro}-${arch}.tar.zst"
+name="libbpf-vmtest-rootfs-$(date +%Y.%m.%d)-${distro}-${deb_arch}.tar.zst"
 rm -f "$name"
 tar -C "$root" -c . | zstd -T0 -19 -o "$name"
