@@ -25,7 +25,7 @@ set -eux
 /bin/mount proc /proc -t proc
 
 # Mount devtmpfs if not mounted
-if [[ -z $(/bin/mount -t devtmpfs) ]]; then
+if [[ -z "$(/bin/mount -t devtmpfs)" ]]; then
 	/bin/mount devtmpfs /dev -t devtmpfs
 fi
 
@@ -34,7 +34,7 @@ fi
 /bin/mount debugfs /sys/kernel/debug -t debugfs
 
 # Symlink /dev/fd to /proc/self/fd so process substitution works.
-[[ -a /dev/fd ]] || ln -s /proc/self/fd /dev/fd
+[[ -e /dev/fd ]] || ln -s /proc/self/fd /dev/fd
 
 echo 'Listing currently mounted file systems'
 /bin/mount
