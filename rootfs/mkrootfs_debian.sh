@@ -9,6 +9,7 @@
 # Any arguments that need to be passed to `debootstrap` should be passed after
 # `--`, e.g ./mkrootfs_debian.sh --arch=s390x -- --foo=bar
 
+set -e -u -o pipefail
 
 # table of Debian arch <-> GNU arch matches
 CPUTABLE="${CPUTABLE:-/usr/share/dpkg/cputable}"
@@ -48,7 +49,7 @@ function qemu_static() {
 
 function check_requirements() {
     # Checks that all necessary packages are installed on the system.
-    # print an error message explaining what is missing and exits.
+    # Prints an error message explaining what is missing and exits.
 
     local deb_arch=$1
     local err=0
@@ -69,14 +70,14 @@ function check_requirements() {
 
     # Check that we can install the root image for a foreign arch.
     qemu=$(qemu_static "${deb_arch}")
-    if [[ -z $(which "${qemu}") ]]
+    if ! command -v "${qemu}" &> /dev/null
     then
         error "${qemu} binary not found on your system. Make sure qemu-user-static package is installed."
         err=1
     fi
 
     # Check that debootrap is installed.
-    if [[ -z "$(which debootstrap 2> /dev/null)" ]]
+    if ! command -v debootstrap &> /dev/null
     then
         error "debootstrap binary not found on your system. Make sure debootstrap package is installed."
         err=1
@@ -129,7 +130,8 @@ done
 
 check_requirements "${deb_arch}"
 
-set -e -u -x -o pipefail
+# Print out commands ran to make it easier to troubleshoot breakages.
+set -x
 
 # Create a working directory and schedule its deletion.
 root=$(mktemp -d -p "$PWD")
@@ -151,7 +153,22 @@ packages=(
 	zlib1g
 )
 packages=$(IFS=, && echo "${packages[*]}")
-debootstrap --include="$packages" --variant=minbase --arch="${deb_arch}" "$@" "${distro}" "$root"
+
+# Stage 1
+debootstrap --include="$packages" \
+    --foreign \
+    --variant=minbase \
+    --arch="${deb_arch}" \
+    "$@" \
+    "${distro}" \
+    "$root"
+
+qemu=$(which $(qemu_static ${deb_arch}))
+
+cp "${qemu}" "${root}/usr/bin"
+
+# Stage 2
+chroot "${root}" /debootstrap/debootstrap --second-stage
 
 # Remove the init scripts (tests use their own). Also remove various
 # unnecessary files in order to save space.
@@ -159,7 +176,8 @@ rm -rf \
 	"$root"/etc/rcS.d \
 	"$root"/usr/share/{doc,info,locale,man,zoneinfo} \
 	"$root"/var/cache/apt/archives/* \
-	"$root"/var/lib/apt/lists/*
+	"$root"/var/lib/apt/lists/* \
+	"${root}/usr/bin/${qemu}"
 
 # Apply common tweaks.
 "$(dirname "$0")"/mkrootfs_tweak.sh "$root"
