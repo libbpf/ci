@@ -438,7 +438,7 @@ chmod 644 /exitstatus
 HERE
 
 # Create the init scripts.
-if [[ ! -z SETUPCMD ]]; then
+if [[ -n $SETUPCMD ]]; then
 	# Unescape whitespace characters.
 	setup_cmd=$(sed 's/\(\\\)\([[:space:]]\)/\2/g' <<< "${SETUPCMD}")
 	kernel="${KERNELRELEASE}"
