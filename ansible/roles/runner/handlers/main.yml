@@ -1,0 +1,20 @@
+---
+- name: "restart actions-runners"
+  become: yes
+  ansible.builtin.service:
+    name: actions-runner-{{ item.0.normalized }}@{{ item.1 }}
+    state: restarted
+  # Find the systemd resources that were modified and extract the "normalized" attributes
+  loop: "{{ runner_projects.results | selectattr('changed', 'equalto', true) | map(attribute='item') | subelements('workers') }}"
+
+- name: "restart docker_pruning timer"
+  become: yes
+  ansible.builtin.service:
+    name: docker_pruning.timer
+    state: restarted
+
+- name: "restart actions-runner-watchdog timer"
+  become: yes
+  ansible.builtin.service:
+    name: actions-runner-watchdog.timer
+    state: restarted

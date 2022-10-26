@@ -1,0 +1,8 @@
+---
+- name: Install base packages
+  become: true
+  dnf:
+    state: present
+    name: "{{ base_packages }}"
+    update_cache: yes
+  tags: [install]

@@ -1,0 +1,11 @@
+---
+- hosts: all
+  roles:
+    - role: base
+      tags: [base]
+    - role: qemu-user-static
+      tags: [qemu]
+      when: ansible_architecture == "s390x"
+    - role: runner
+      tags: [runner]
+      when: ansible_architecture == "s390x"

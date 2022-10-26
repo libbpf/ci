@@ -1,0 +1,3 @@
+repo={{ item.0.name }}
+access_token={{ runner_gh_tokens[item.0.name] | default(runner_gh_token_default) }}
+runner_name={{ ansible_hostname }}-worker-{{ item.1 }}

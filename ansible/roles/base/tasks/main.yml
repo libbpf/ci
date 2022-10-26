@@ -1,0 +1,9 @@
+---
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Build package list
+  set_fact:
+    base_packages: "{{ __base_packages + __base_distro_packages }}"
+
+- include_tasks: "setup-{{ ansible_os_family }}.yml"

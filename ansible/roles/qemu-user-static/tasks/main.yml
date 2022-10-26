@@ -1,0 +1,31 @@
+---
+- name: Systemd execution of non-native binaries with QEMU
+  become: true
+  copy:
+    dest: /etc/systemd/system/qemu-user-static.service
+    content: |
+      [Unit]
+      Description=Support for transparent execution of non-native binaries with QEMU user emulation
+
+      [Service]
+      Type=oneshot
+      # The source code for iiilinuxibmcom/qemu-user-static is at https://github.com/iii-i/qemu-user-static/tree/v6.1.0-1
+      # TODO: replace it with multiarch/qemu-user-static once version >6.1 is available
+      ExecStart=/usr/bin/docker run --rm --interactive --privileged iiilinuxibmcom/qemu-user-static --reset -p yes
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: 0644
+    owner: root
+    group: root
+  register: qemu_user_static
+
+# Building the image relies on this having started. Force starting the service when this file changes.
+- name: start qemu-user-static
+  become: yes
+  service:
+    name: "qemu-user-static"
+    state: started
+    enabled: true
+    daemon_reload: yes
+  when: qemu_user_static.changed

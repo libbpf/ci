@@ -1,0 +1,12 @@
+---
+- name: Just force systemd to reread configs
+  become: yes
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  listen: "reload systemd daemon"
+
+- name: systemctl reset-failed
+  become: yes
+  ansible.builtin.shell:
+    "systemctl reset-failed"
+  listen: "reset systemd failed"

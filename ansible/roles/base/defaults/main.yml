@@ -1,0 +1,5 @@
+---
+__base_packages:
+  - curl
+  - git
+  - vim
