@@ -71,7 +71,7 @@ fi
 "$qemu" -nodefaults --no-reboot -nographic \
   -chardev stdio,id=char0,mux=on,signal=off,logfile=boot.log \
   -serial chardev:char0 \
-  ${accel} -smp "$smp" -m 6G \
+  "$accel" -smp "$smp" -m 6G \
   -drive file="$IMG",format=raw,index=1,media=disk,if=virtio,cache=none \
   -kernel "$VMLINUZ" -append "root=/dev/vda rw console=$console panic=-1 sysctl.vm.panic_on_oom=1 $APPEND"
 
@@ -91,7 +91,7 @@ foldable end shutdown
 
 # Final summary - Don't use a fold, keep it visible
 echo -e "\033[1;33mTest Results:\033[0m"
-echo -e "$exitfile" | while read result; do
+echo -e "$exitfile" | while read -r result; do
   testgroup=${result%:*}
   status=${result#*:}
   # Print final result for each group of tests

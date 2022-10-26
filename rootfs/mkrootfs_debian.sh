@@ -163,7 +163,7 @@ debootstrap --include="$packages2" \
     "${distro}" \
     "$root"
 
-qemu=$(which "$(qemu_static ${deb_arch})")
+qemu=$(which "$(qemu_static "$deb_arch")")
 
 cp "${qemu}" "${root}/usr/bin"
 

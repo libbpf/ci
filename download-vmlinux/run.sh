@@ -154,6 +154,6 @@ fi
 vmlinux="${GITHUB_WORKSPACE}/vmlinux"
 download "${ARCH}/vmlinux-${KERNELRELEASE}.zst" | zstd -d > "$vmlinux"
 
-echo $vmlinux
+echo "$vmlinux"
 
 foldable end vmlinux_setup

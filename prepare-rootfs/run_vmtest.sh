@@ -14,7 +14,6 @@ sudo apt-get update
 sudo apt-get install -y libguestfs-tools zstd
 foldable stop env
 
-USER=`whoami`
 if [[ ${USER} != 'root' ]]; then
   foldable start adduser_to_kvm "Add user ${USER}"
   sudo adduser "${USER}" kvm

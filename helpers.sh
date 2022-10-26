@@ -6,9 +6,9 @@
 foldable() {
   local YELLOW='\033[1;33m'
   local NOCOLOR='\033[0m'
-  if [ $1 = "start" ]; then
+  if [ "$1" = "start" ]; then
     line="::group::$2"
-    if [ ! -z "${3:-}" ]; then
+    if [ -n "${3:-}" ]; then
       line="$line - ${YELLOW}$3${NOCOLOR}"
     fi
   else
@@ -28,18 +28,18 @@ __print() {
 # $1 - title
 # $2 - message
 print_error() {
-  __print error $1 $2
+  __print error "$1" "$2"
 }
 
 # $1 - title
 # $2 - message
 print_notice() {
-  __print notice $1 $2
+  __print notice "$1" "$2"
 }
 
 # No arguments
 llvm_default_version() {
-  echo "16"
+  echo 16
 }
 
 # $1 - toolchain name
