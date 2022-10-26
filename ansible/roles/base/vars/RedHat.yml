@@ -1,0 +1,4 @@
+---
+
+__base_distro_packages:
+  - podman-docker
