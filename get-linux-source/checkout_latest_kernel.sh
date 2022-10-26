@@ -2,9 +2,7 @@
 
 set -euo pipefail
 
-source $(cd $(dirname $0) && pwd)/../helpers.sh
-
-CWD=$(pwd)
+. "$(cd "$(dirname "$0")" && pwd)/../helpers.sh"
 
 echo KERNEL_ORIGIN = ${KERNEL_ORIGIN}
 echo KERNEL_BRANCH = ${KERNEL_BRANCH}
@@ -26,27 +24,27 @@ if [ ! -d "${REPO_PATH}" ]; then
 	echo
 	foldable start pull_kernel_srcs "Fetching kernel sources"
 
-	mkdir -p $(dirname "${REPO_PATH}")
-	cd $(dirname "${REPO_PATH}")
+	mkdir -p "$(dirname "${REPO_PATH}")"
+	cd "$(dirname "${REPO_PATH}")"
 	# attempt to fetch desired bpf-next repo snapshot
 	if [ -n "${SNAPSHOT_URL}" ] && wget -nv ${SNAPSHOT_URL} && tar xf bpf-next-${LINUX_SHA}.tar.gz --totals ; then
-		mv bpf-next-${LINUX_SHA} $(basename ${REPO_PATH})
+		mv "bpf-next-${LINUX_SHA}" "$(basename ${REPO_PATH})"
 	else
 		# but fallback to git fetch approach if that fails
-		mkdir -p $(basename ${REPO_PATH})
-		cd $(basename ${REPO_PATH})
+		mkdir -p "$(basename ${REPO_PATH})"
+		cd "$(basename ${REPO_PATH})"
 		git init
 		git remote add bpf-next ${KERNEL_ORIGIN}
 		# try shallow clone first
 		git fetch --depth 32 bpf-next
 		# check if desired SHA exists
-		if ! git cat-file -e ${LINUX_SHA}^{commit} ; then
+		if ! git cat-file -e "${LINUX_SHA}^{commit}" ; then
 			# if not, fetch all of bpf-next; slow and painful
 			git fetch bpf-next
 		fi
 		git reset --hard ${LINUX_SHA}
 	fi
-	rm -rf ${REPO_PATH}/.git || true
+	rm -rf "${REPO_PATH}/.git" || :
 
 	foldable end pull_kernel_srcs
 fi

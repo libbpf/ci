@@ -2,13 +2,12 @@
 
 set -eu
 
-source $(cd $(dirname $0) && pwd)/../helpers.sh
+. "$(cd "$(dirname "$0")" && pwd)/../helpers.sh"
 
 foldable start build_pahole "Building pahole"
 
 sudo apt-get update && sudo apt-get install elfutils libelf-dev libdw-dev
 
-CWD=$(pwd)
 PAHOLE_ORIGIN=https://git.kernel.org/pub/scm/devel/pahole/pahole.git
 
 mkdir -p pahole
@@ -25,7 +24,7 @@ make -j$((4*$(nproc)))
 sudo make install
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib
-ldd $(which pahole)
+ldd "$(which pahole)"
 pahole --version
 
 foldable end build_pahole

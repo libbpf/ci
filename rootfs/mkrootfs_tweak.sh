@@ -16,7 +16,7 @@ cat > "$root/etc/inittab" << "EOF"
 EOF
 chmod 644 "$root/etc/inittab"
 
-mkdir -m 755 -p "$root/etc/init.d" "$root/etc/rcS.d"
+mkdir -m 755 "$root/etc/init.d" "$root/etc/rcS.d"
 cat > "$root/etc/rcS.d/S10-mount" << "EOF"
 #!/bin/sh
 

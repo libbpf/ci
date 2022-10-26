@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-source $(cd $(dirname $0) && pwd)/../helpers.sh
+. "$(cd "$(dirname "$0")" && pwd)/../helpers.sh"
 
 # Install required packages
 foldable start install_clang "Installing Clang/LLVM"

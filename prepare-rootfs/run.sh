@@ -3,10 +3,11 @@
 set -euo pipefail
 trap 'exit 2' ERR
 
-source $(cd $(dirname $0) && pwd)/../helpers.sh
+. "$(cd "$(dirname "$0")" && pwd)/../helpers.sh"
 
 usage () {
-	USAGE_STRING="usage: $0 [-k KERNELRELEASE|-b DIR] [[-r ROOTFSVERSION] [-fo]|-I] [-Si] [-d DIR] IMG
+	cat <<EOF
+usage: $0 [-k KERNELRELEASE|-b DIR] [[-r ROOTFSVERSION] [-fo]|-I] [-Si] [-d DIR] IMG
        $0 [-k KERNELRELEASE] -l
        $0 -h
 
@@ -63,14 +64,12 @@ Miscellaneous:
                        The list may be filtered with -k
 
   -h, --help           display this help message and exit"
-
+EOF
 	case "$1" in
 		out)
-			echo "$USAGE_STRING"
 			exit 0
 			;;
 		err)
-			echo "$USAGE_STRING" >&2
 			exit 2
 			;;
 	esac
@@ -202,7 +201,7 @@ matching_kernel_releases() {
 		if [[ $file =~ ^${TARGET_ARCH}/vmlinux-(.*).zst$ ]]; then
 			release="${BASH_REMATCH[1]}"
 			case "$release" in
-				$pattern)
+				"$pattern")
 					# sort -V handles rc versions properly
 					# if we use "~" instead of "-".
 					echo "${release//-rc/~rc}"

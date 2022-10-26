@@ -2,7 +2,7 @@
 
 set -eu
 
-THISDIR="$(cd $(dirname $0) && pwd)"
+THISDIR="$(cd "$(dirname "$0")" && pwd)"
 
 source "${THISDIR}"/../helpers.sh
 

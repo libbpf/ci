@@ -44,9 +44,10 @@ llvm_default_version() {
 
 # $1 - toolchain name
 llvm_version() {
-  local toolchain="$1"
-  local toolchain_name="$(echo $toolchain | cut -d '-' -f 1)"
-  local toolchain_version="$(echo $toolchain | cut -d '-' -f 2)"
+  local toolchain, toolchain_name, toolchain_version
+  toolchain="$1"
+  toolchain_name="$(echo "$toolchain" | cut -d '-' -f 1)"
+  toolchain_version="$(echo "$toolchain" | cut -d '-' -f 2)"
 
   if [ "$toolchain_name" == "llvm" ]; then
     echo "$toolchain_version"

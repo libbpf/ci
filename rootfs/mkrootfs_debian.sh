@@ -152,10 +152,10 @@ packages=(
 	strace
 	zlib1g
 )
-packages=$(IFS=, && echo "${packages[*]}")
+packages2=$(IFS=, && echo "${packages[*]}")
 
 # Stage 1
-debootstrap --include="$packages" \
+debootstrap --include="$packages2" \
     --foreign \
     --variant=minbase \
     --arch="${deb_arch}" \
@@ -163,7 +163,7 @@ debootstrap --include="$packages" \
     "${distro}" \
     "$root"
 
-qemu=$(which $(qemu_static ${deb_arch}))
+qemu=$(which "$(qemu_static ${deb_arch})")
 
 cp "${qemu}" "${root}/usr/bin"
 
@@ -173,11 +173,11 @@ chroot "${root}" /debootstrap/debootstrap --second-stage
 # Remove the init scripts (tests use their own). Also remove various
 # unnecessary files in order to save space.
 rm -rf \
-	"$root"/etc/rcS.d \
-	"$root"/usr/share/{doc,info,locale,man,zoneinfo} \
-	"$root"/var/cache/apt/archives/* \
-	"$root"/var/lib/apt/lists/* \
-	"${root}/usr/bin/${qemu}"
+	"${root:?}"/etc/rcS.d \
+	"${root:?}"/usr/share/{doc,info,locale,man,zoneinfo} \
+	"${root:?}"/var/cache/apt/archives/* \
+	"${root:?}"/var/lib/apt/lists/* \
+	"${root:?}/usr/bin/${qemu}"
 
 # Apply common tweaks.
 "$(dirname "$0")"/mkrootfs_tweak.sh "$root"

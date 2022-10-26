@@ -3,7 +3,7 @@
 set -euo pipefail
 trap 'exit 2' ERR
 
-source $(cd $(dirname $0) && pwd)/../helpers.sh
+. "$(cd "$(dirname "$0")" && pwd)/../helpers.sh"
 
 foldable start bpftool_checks "Running bpftool checks..."
 bpftool_exitstatus=0

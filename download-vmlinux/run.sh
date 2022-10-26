@@ -3,22 +3,15 @@
 set -uo pipefail
 trap 'exit 2' ERR
 
-source $(cd $(dirname $0) && pwd)/../helpers.sh
+. "$(cd "$(dirname "$0")" && pwd)/../helpers.sh"
 
-TEMP=$(getopt -o 'k:b:r:fos:ISid:lh' --long 'kernel:,build:,rootfs:,force,one-shot,setup-cmd,skip-image,skip-source:,interactive,dir:,list,help' -n "$0" -- "$@")
+TEMP=$(getopt -o 'k:b:d:lh' --long 'kernel:,build:,dir:,list,help' -n "$0" -- "$@")
 eval set -- "$TEMP"
 unset TEMP
 
 unset KERNELRELEASE
 unset BUILDDIR
-unset ROOTFSVERSION
 unset IMG
-unset SETUPCMD
-FORCE=0
-ONESHOT=0
-SKIPIMG=0
-SKIPSOURCE=0
-APPEND=""
 DIR="$PWD"
 LIST=0
 
@@ -36,35 +29,6 @@ while true; do
 		-b|--build)
 			BUILDDIR="$2"
 			shift 2
-			;;
-		-r|--rootfs)
-			ROOTFSVERSION="$2"
-			shift 2
-			;;
-		-f|--force)
-			FORCE=1
-			shift
-			;;
-		-o|--one-shot)
-			ONESHOT=1
-			FORCE=1
-			shift
-			;;
-		-s|--setup-cmd)
-			SETUPCMD="$2"
-			shift 2
-			;;
-		-I|--skip-image)
-			SKIPIMG=1
-			shift
-			;;
-		-S|--skip-source)
-			SKIPSOURCE=1
-			shift
-			;;
-		-i|--interactive)
-			APPEND=" single"
-			shift
 			;;
 		-d|--dir)
 			DIR="$2"
@@ -109,7 +73,7 @@ matching_kernel_releases() {
 		if [[ $file =~ ^vmlinux-(.*).zst$ ]]; then
 			release="${BASH_REMATCH[1]}"
 			case "$release" in
-				$pattern)
+				"$pattern")
 					# sort -V handles rc versions properly
 					# if we use "~" instead of "-".
 					echo "${release//-rc/~rc}"
