@@ -1,4 +1,5 @@
 ---
 
 __base_distro_packages:
-  - podman-docker
+  - "{{ 'podman-docker' if ansible_distribution != 'Amazon' else 'docker' }}"
+
