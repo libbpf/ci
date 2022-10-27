@@ -1,8 +1,14 @@
 ---
 - name: Install base packages
   become: true
-  dnf:
+  package:
     state: present
     name: "{{ base_packages }}"
     update_cache: yes
   tags: [install]
+
+- name: Start docker
+  become: true
+  service:
+    name: docker
+    state: started
