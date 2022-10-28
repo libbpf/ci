@@ -65,7 +65,7 @@
 - name: Set runner.service
   become: yes
   ansible.builtin.copy:
-    dest: "{{ runner_base_dir }}/runner.service"
+    dest: "/etc/systemd/system/runner.service"
     content: |
       [Unit]
       Description=Ephemeral GitHub Actions Runner Container
@@ -87,3 +87,10 @@
   notify:
     - reload systemd daemon
     - restart runner
+
+- name: Start and enable runner service
+  become: yes
+  ansible.builtin.service:
+    name: runner
+    state: started
+    enabled: yes
