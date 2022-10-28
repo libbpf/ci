@@ -1,0 +1,209 @@
+---
+
+- name: Get account $HOME
+  shell: "echo $HOME"
+  register: account_homedir
+  changed_when: false
+  check_mode: no
+
+- name: Generate runners facts
+  set_fact:
+    runners: "{{ runners|default([]) + [ {'normalized': item.name | replace('/','-'), 'workers': range(item.instances) | list }  | combine(item) ] }}"
+  with_items: "{{ runner_repo_list }}"
+
+- name: Sync libbpf repo
+  ansible.builtin.git:
+    repo: "{{ runner_libbpf_repo_url }}"
+    update: yes
+    dest: "{{ account_homedir.stdout }}/libbpf"
+    version: "{{ runner_libbpf_repo_branch }}"
+    accept_hostkey: yes
+
+- name: Build runner docker image
+  become: yes
+  shell:
+    "docker build --pull -f actions-runner-libbpf.Dockerfile -t iiilinuxibmcom/actions-runner-{{ item.normalized }} ."
+  args:
+    chdir: "{{ account_homedir.stdout }}/libbpf/ci/rootfs/s390x-self-hosted-builder"
+  with_items: "{{ runners }}"
+
+
+### TODO: Remove this once fully provisioned
+### Removes old service units
+## Old hosts have their libbpf runner called actions-runners-libbpf instead of actions-runners-libbpf-libbpf
+## Add this one manually.
+- name: Generate runners to delete facts
+  set_fact:
+    old_runners: "{{ runners + [ { 'name': 'libbpf', 'normalized': 'libbpf'} ] }}"
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Stop old runner service
+  become: yes
+  ansible.builtin.service:
+    name: actions-runner-{{ item.normalized }}
+    enabled: no
+    state: stopped
+  when: ansible_facts.services[''.join(["actions-runner-", item.normalized, ".service"])] is defined
+  loop: "{{ old_runners }}"
+
+- name: Delete old Runner systemd unit
+  become: yes
+  ansible.builtin.file:
+    path: /etc/systemd/system/actions-runner-{{ item.normalized }}.service
+    state: absent
+  loop: "{{ old_runners }}"
+  notify:
+    - reload systemd daemon
+    - reset systemd failed
+
+- name: Delete old Runner config
+  become: yes
+  ansible.builtin.file:
+    path: /etc/actions-runner-{{ item.normalized }}
+    state: absent
+  loop: "{{ old_runners }}"
+
+
+## New templated systemd units
+- name: Runner configuration file
+  become: yes
+  ansible.builtin.template:
+    src: actions-runner.j2
+    dest: /etc/actions-runner-{{ item.0.normalized }}-worker-{{ item.1 }}
+    mode: 0640
+    owner: root
+    group: root
+  loop: "{{ runners | subelements('workers') }}"
+
+
+- name: Runner systemd unit
+  become: yes
+  ansible.builtin.template:
+    src: actions-runner.service.j2
+    dest: /etc/systemd/system/actions-runner-{{ item.normalized }}@.service
+    mode: 0644
+    owner: root
+    group: root
+  # Register is used to collect the runner projects that were modified.
+  # We can use this information in the handler to restart only the runners that had their
+  # systemd unit modified/created.
+  register: runner_projects
+  with_items: "{{ runners }}"
+  notify:
+    - reload systemd daemon
+    - restart actions-runners
+
+- name: Enable runner service
+  become: yes
+  ansible.builtin.service:
+    name: actions-runner-{{ item.0.normalized }}@{{ item.1 }}
+    enabled: yes
+    state: started
+  loop: "{{ runners | subelements('workers') }}"
+
+
+- name: Set docker pruning service
+  become: yes
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/docker_pruning.service
+    content: |
+      [Unit]
+      Description=Prune unused docker resources
+      Wants=docker_pruning.timer
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/bin/docker system prune --volumes -f
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+    - reload systemd daemon
+    - restart docker_pruning timer
+
+
+- name: Set docker pruning timer
+  become: yes
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/docker_pruning.timer
+    content: |
+      [Unit]
+      Description=Run docker_pruning service daily
+
+      [Timer]
+      # Run at 8:00 UTC daily
+      OnCalendar=*-*-* 08:00:00
+      [Install]
+      WantedBy=timers.target
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+    - reload systemd daemon
+    - restart docker_pruning timer
+
+- name: Enable docker pruning timer
+  become: yes
+  ansible.builtin.service:
+    name: docker_pruning.timer
+    enabled: yes
+    state: started
+
+# Watchdog
+- name: Actions runner watchdog script
+  become: yes
+  ansible.builtin.copy:
+    src: actions-runner-watchdog.sh
+    dest: /usr/local/sbin/actions-runner-watchdog.sh
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Set actions runner watchdog service
+  become: yes
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/actions-runner-watchdog.service
+    content: |
+      [Unit]
+      Description=Kill unhealty actions runner containers
+      Wants=actions-runner-watchdog.timer
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/sbin/actions-runner-watchdog.sh
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+    - reload systemd daemon
+    - restart actions-runner-watchdog timer
+
+- name: Set actions runner watchdog timer
+  become: yes
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/actions-runner-watchdog.timer
+    content: |
+      [Unit]
+      Description=Run actions-runner-watchdog service regularly
+
+      [Timer]
+      # Run two minutes after previous run done
+      OnBootSec=1m
+      OnUnitInactiveSec=2m
+      [Install]
+      WantedBy=timers.target
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+    - reload systemd daemon
+    - restart actions-runner-watchdog timer
+
+- name: Enable actions runner watchdog timer
+  become: yes
+  ansible.builtin.service:
+    name: actions-runner-watchdog.timer
+    enabled: yes
+    state: started
