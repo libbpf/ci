@@ -8,4 +8,3 @@
       when: ansible_architecture == "s390x"
     - role: runner
       tags: [runner]
-      when: ansible_architecture == "s390x"

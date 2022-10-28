@@ -18,3 +18,9 @@
   ansible.builtin.service:
     name: actions-runner-watchdog.timer
     state: restarted
+
+- name: "restart runner"
+  become: yes
+  ansible.builtin.service:
+    name: runner
+    state: restarted
