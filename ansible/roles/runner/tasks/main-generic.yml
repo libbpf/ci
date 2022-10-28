@@ -64,6 +64,11 @@
     username: "{{ runner_gh_user_default }}"
     password: "{{ runner_gh_token_default }}"
 
+- name: Check /dev/kvm exists
+  ansible.builtin.stat:
+    path: /dev/kvm
+  register: has_kvm
+
 - name: Set runner.service
   become: yes
   ansible.builtin.copy:
@@ -82,7 +87,7 @@
       ExecStartPre=-/usr/bin/docker rm %P-%i
       ExecStartPre=-/usr/bin/docker pull ghcr.io/kernel-patches/runner:${DOCKER_TAG}
       ExecStartPre=-/usr/bin/docker system prune -f
-      ExecStart=/usr/bin/docker run --rm --env-file "{{ runner_base_dir }}/runner_%i.env" --name %P-%i ghcr.io/kernel-patches/runner:${DOCKER_TAG}
+      ExecStart=/usr/bin/docker run {{ '--device=/dev/kvm' if has_kvm.stat.exists }} --rm --env-file "{{ runner_base_dir }}/runner_%i.env" --name %P-%i ghcr.io/kernel-patches/runner:${DOCKER_TAG}
     mode: 0700
     owner: root
     group: root
