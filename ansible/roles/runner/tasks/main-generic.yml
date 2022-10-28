@@ -1,0 +1,108 @@
+---
+
+- name: Set runner env
+  become: yes
+  ansible.builtin.copy:
+    dest: "{{ runner_base_dir }}/runner_unit.env"
+    content: |
+      DOCKER_TAG=main
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Generate Env script
+  become: yes
+  ansible.builtin.copy:
+    dest: "{{ runner_base_dir }}/generate-env.sh"
+    content: |
+      #!/bin/bash
+
+      THISDIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+      . $THISDIR/runner_unit.env
+
+
+      echo "ACCESS_TOKEN={{ runner_gh_token_default }}
+      RUNNER_WORKDIR=/tmp/work
+      LABELS=ubuntu-latest,docker-${DOCKER_TAG}
+      EPHEMERAL=true" > $THISDIR/runner.env
+
+      echo "REPO_URL=$($THISDIR/tags.sh Repo)" >> $THISDIR/runner.env
+      echo "RUNNER_NAME=$($THISDIR/instanceid.sh)" >> $THISDIR/runner.env
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Tags script
+  become: yes
+  ansible.builtin.copy:
+    dest: "{{ runner_base_dir }}/tags.sh"
+    content: |
+      #!/bin/bash
+
+      REGION=`curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" -e '{print $4}'`
+      instance_id=$(/usr/bin/curl --silent http://169.254.169.254/latest/meta-data/instance-id)
+
+      if [ -z "$1" ]; then
+              echo $(/usr/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" --region=$REGION --output=json | jq --raw-output \
+              ".Tags[]")
+      else
+              echo $(/usr/bin/aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" --region=$REGION --output=json | jq --raw-output \
+              ".Tags[] | select(.Key==\"$1\") | .Value")
+      fi
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Instanceid script
+  become: yes
+  ansible.builtin.copy:
+    dest: "{{ runner_base_dir }}/instanceid.sh"
+    content: |
+      #!/bin/bash
+
+      /usr/bin/curl --silent http://169.254.169.254/latest/meta-data/instance-id
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Install docker pip
+  become: yes
+  ansible.builtin.pip:
+    name:
+      docker
+    extra_args: --user
+
+- name: Docker GHCR login
+  become: yes
+  docker_login:
+    registry: ghcr.io
+    username: "{{ runner_gh_user_default }}"
+    password: "{{ runner_gh_token_default }}"
+
+- name: Set runner.service
+  become: yes
+  ansible.builtin.copy:
+    dest: "{{ runner_base_dir }}/runner.service"
+    content: |
+      [Unit]
+      Description=Ephemeral GitHub Actions Runner Container
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      TimeoutStartSec=0
+      Restart=always
+      EnvironmentFile={{ runner_base_dir }}/runner_unit.env
+      ExecStartPre=-/usr/bin/docker stop %n
+      ExecStartPre=-/usr/bin/docker rm %n
+      ExecStartPre=-/usr/bin/docker pull ghcr.io/kernel-patches/runner:${DOCKER_TAG}
+      ExecStartPre=-/usr/bin/docker system prune -f
+      ExecStartPre={{ runner_base_dir }}/generate-env.sh
+      ExecStart=/usr/bin/docker run --rm --env-file "{{ runner_base_dir }}/runner.env" --name %n ghcr.io/kernel-patches/runner:${DOCKER_TAG}
+    mode: 0700
+    owner: root
+    group: root
+  notify:
+    - reload systemd daemon
+    - restart runner
