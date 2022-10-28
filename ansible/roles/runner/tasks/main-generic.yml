@@ -31,29 +31,31 @@
         resource: "{{ ansible_ec2_instance_id }}"
       register: instance_tags
 
-    - name: Generate runner env file within AWS
+    - name: Generate runner env file
       become: yes
       ansible.builtin.copy:
-        dest: "{{ runner_base_dir }}/runner.env"
+        dest: "{{ runner_base_dir }}/{{ 'runner_%02d.env' | format(item) }}"
         content: |
           ACCESS_TOKEN={{ runner_gh_token_default }}
           RUNNER_WORKDIR=/tmp/work
           LABELS=ubuntu-latest,docker-{{ runner_docker_tag }}
           EPHEMERAL=true
           REPO_URL={{ instance_tags.tags['Repo'] }}
-          RUNNER_NAME={{ ansible_ec2_instance_id }}
+          RUNNER_NAME={{ ansible_ec2_instance_id }}-{{ 'worker-%02d' | format(item) }}
+      loop: "{{ range(0, runner_workers, 1)|list }}"
   rescue:
     - name: Generate runner env outside AWS
       become: yes
       ansible.builtin.copy:
-        dest: "{{ runner_base_dir }}/runner.env"
+        dest: "{{ runner_base_dir }}/{{ 'runner_%02d.env' | format(item) }}"
         content: |
           ACCESS_TOKEN={{ runner_gh_token_default }}
           RUNNER_WORKDIR=/tmp/work
           LABELS=ubuntu-latest,docker-{{ runner_docker_tag }}
           EPHEMERAL=true
           REPO_URL=https://github.com/{{ runner_repo_list[0].name }}
-          RUNNER_NAME={{ inventory_hostname }}
+          RUNNER_NAME={{ inventory_hostname }}-{{ 'worker-%02d' | format(item) }}
+      loop: "{{ range(0, runner_workers, 1)|list }}"
 
 - name: Docker GHCR login
   become: yes
@@ -65,10 +67,10 @@
 - name: Set runner.service
   become: yes
   ansible.builtin.copy:
-    dest: "/etc/systemd/system/runner.service"
+    dest: "/etc/systemd/system/runner@.service"
     content: |
       [Unit]
-      Description=Ephemeral GitHub Actions Runner Container
+      Description=Ephemeral GitHub Actions Runner Container %i
       After=docker.service
       Requires=docker.service
 
@@ -76,21 +78,21 @@
       TimeoutStartSec=0
       Restart=always
       EnvironmentFile={{ runner_base_dir }}/runner_unit.env
-      ExecStartPre=-/usr/bin/docker stop %n
-      ExecStartPre=-/usr/bin/docker rm %n
+      ExecStartPre=-/usr/bin/docker stop %P-%i
+      ExecStartPre=-/usr/bin/docker rm %P-%i
       ExecStartPre=-/usr/bin/docker pull ghcr.io/kernel-patches/runner:${DOCKER_TAG}
       ExecStartPre=-/usr/bin/docker system prune -f
-      ExecStart=/usr/bin/docker run --rm --env-file "{{ runner_base_dir }}/runner.env" --name %n ghcr.io/kernel-patches/runner:${DOCKER_TAG}
+      ExecStart=/usr/bin/docker run --rm --env-file "{{ runner_base_dir }}/runner_%i.env" --name %P-%i ghcr.io/kernel-patches/runner:${DOCKER_TAG}
     mode: 0700
     owner: root
     group: root
   notify:
     - reload systemd daemon
-    - restart runner
 
-- name: Start and enable runner service
+- name: Start and enable runner services
   become: yes
   ansible.builtin.service:
-    name: runner
+    name: "{{ 'runner@%02d' | format(item) }}"
     state: started
     enabled: yes
+  loop: "{{ range(0, runner_workers, 1)|list }}"
