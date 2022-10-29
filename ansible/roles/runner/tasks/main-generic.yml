@@ -1,12 +1,11 @@
 ---
 
 # Used by ansible modules later
-- name: Install docker/boto3 pip
+- name: Install docker pip
   become: yes
   ansible.builtin.pip:
     name:
       - docker
-      - boto3
     extra_args: --user
 
 - name: Set runner env
@@ -29,38 +28,27 @@
     - name: Load ec2 metadata facts
       amazon.aws.ec2_metadata_facts:
 
-    - name: Retrieve all tags on an instance
-      become: yes
-      amazon.aws.ec2_tag_info:
-        region: "{{ ansible_ec2_placement_region }}"
-        resource: "{{ ansible_ec2_instance_id }}"
-      register: instance_tags
+    - name: Set runner name prefix
+      set_fact:
+        runner_prefix: "{{ ansible_ec2_instance_id }}"
 
-    - name: Generate runner env file
-      become: yes
-      ansible.builtin.copy:
-        dest: "{{ runner_base_dir }}/actions-runner-{{ item.0.normalized }}-{{ 'worker-%02d.env' | format(item.1) }}"
-        content: |
-          ACCESS_TOKEN={{ runner_gh_token_default }}
-          RUNNER_WORKDIR=/tmp/work
-          LABELS=ubuntu-latest,docker-{{ runner_docker_tag }}
-          EPHEMERAL=true
-          REPO_URL=https://github.com/{{ item.0.name }}
-          RUNNER_NAME={{ ansible_ec2_instance_id }}-{{ 'worker-%02d' | format(item.1) }}
-      loop: "{{ runners | subelements('workers') }}"
   rescue:
-    - name: Generate runner env outside AWS
-      become: yes
-      ansible.builtin.copy:
-        dest: "{{ runner_base_dir }}/actions-runner-{{ item.0.normalized }}-{{ 'worker-%02d.env' | format(item.1) }}"
-        content: |
-          ACCESS_TOKEN={{ runner_gh_token_default }}
-          RUNNER_WORKDIR=/tmp/work
-          LABELS=ubuntu-latest,docker-{{ runner_docker_tag }}
-          EPHEMERAL=true
-          REPO_URL=https://github.com/{{ item.0.name }}
-          RUNNER_NAME={{ inventory_hostname }}-{{ 'worker-%02d' | format(item.1) }}
-      loop: "{{ runners | subelements('workers') }}"
+    - name: Set runner name prefix
+      set_fact:
+        runner_prefix: "{{ inventory_hostname }}"
+
+- name: Generate runner env outside AWS
+  become: yes
+  ansible.builtin.copy:
+    dest: "{{ runner_base_dir }}/actions-runner-{{ item.0.normalized }}-{{ 'worker-%02d.env' | format(item.1) }}"
+    content: |
+      ACCESS_TOKEN={{ runner_gh_token_default }}
+      RUNNER_WORKDIR=/tmp/work
+      LABELS=ubuntu-latest,docker-{{ runner_docker_tag }}
+      EPHEMERAL=true
+      REPO_URL=https://github.com/{{ item.0.name }}
+      RUNNER_NAME={{ runner_prefix }}-{{ 'worker-%02d' | format(item.1) }}
+  loop: "{{ runners | subelements('workers') }}"
 
 - name: Docker GHCR login
   become: yes
