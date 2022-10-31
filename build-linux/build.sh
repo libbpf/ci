@@ -17,11 +17,32 @@ fi
 
 foldable start build_kernel "Building kernel with $TOOLCHAIN"
 
+# $1 - path to config file to create/overwrite
+cat_kernel_config() {
+	cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
+	    ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${ARCH} \
+	    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config \
+	    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${ARCH} 2> /dev/null > "${1}"
+}
+
 mkdir -p "${KBUILD_OUTPUT}"
-cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
-    ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${ARCH} \
-    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config \
-    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${ARCH} 2> /dev/null > "${KBUILD_OUTPUT}"/.config && :
+if [ -f "${KBUILD_OUTPUT}"/.config ]; then
+	kbuild_tmp="$(mktemp -d)"
+	cat_kernel_config ${kbuild_tmp}/.config && :
+
+	# Generate a fully blown config to determine whether anything changed.
+	KBUILD_OUTPUT="${kbuild_tmp}" make olddefconfig
+
+	if diff -q "${kbuild_tmp}"/.config "${KBUILD_OUTPUT}"/.config > /dev/null; then
+		echo "Using updated kernel configuration"
+		mv "${kbuild_tmp}"/.config "${KBUILD_OUTPUT}"/.config
+	else
+		echo "Existing kernel configuration is up-to-date"
+	fi
+	rm -rf "${kbuild_tmp}"
+else
+	cat_kernel_config "${KBUILD_OUTPUT}"/.config && :
+fi
 
 make olddefconfig
 make -j $(kernel_build_make_jobs) all || (
