@@ -35,7 +35,7 @@
   rescue:
     - name: Set runner name prefix
       set_fact:
-        runner_prefix: "{{ inventory_hostname }}"
+        runner_prefix: "{{ ansible_hostname }}"
 
 - name: Generate runner env outside AWS
   become: yes
