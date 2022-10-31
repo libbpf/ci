@@ -44,7 +44,7 @@
     content: |
       ACCESS_TOKEN={{ runner_gh_token_default }}
       RUNNER_WORKDIR=/tmp/work
-      LABELS=ubuntu-latest,docker-{{ runner_docker_tag }}
+      LABELS=ubuntu-latest,{{ ansible_architecture }},docker-{{ runner_docker_tag }}
       EPHEMERAL=true
       REPO_URL=https://github.com/{{ item.0.name }}
       RUNNER_NAME={{ runner_prefix }}-{{ 'worker-%02d' | format(item.1) }}
