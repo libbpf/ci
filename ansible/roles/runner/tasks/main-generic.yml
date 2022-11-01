@@ -7,6 +7,7 @@
     name:
       - docker
     extra_args: --user
+    executable: pip3
 
 - name: Set runner env
   become: yes
