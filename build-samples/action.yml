@@ -1,9 +1,10 @@
 name: 'build samples/bpf'
 description: 'Build samples/bpf'
 inputs:
+  # TODO: Unused, remove once no client is providing it anymore.
   vmlinux_btf:
     description: 'path to vmlinux BTF file'
-    required: true
+    default: ''
   kernel:
     description: 'kernel version'
     default: 'LATEST'
@@ -20,4 +21,4 @@ runs:
       shell: bash
       run: |
         kbuild_output="$(realpath ${{ inputs.kbuild-output }})"
-        ${GITHUB_ACTION_PATH}/build_samples.sh "${{ inputs.vmlinux_btf }}" "${{ inputs.kernel }}" "${{ inputs.toolchain }}" "${kbuild_output}"
+        ${GITHUB_ACTION_PATH}/build_samples.sh "${{ inputs.kernel }}" "${{ inputs.toolchain }}" "${kbuild_output}"
