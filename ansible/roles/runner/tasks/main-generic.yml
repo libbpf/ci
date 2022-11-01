@@ -80,7 +80,6 @@
       ExecStartPre=-/usr/bin/docker stop %p-%i
       ExecStartPre=-/usr/bin/docker rm %p-%i
       ExecStartPre=-/usr/bin/docker pull ghcr.io/kernel-patches/runner:${DOCKER_TAG}
-      ExecStartPre=-/usr/bin/docker system prune -f
       ExecStart=/usr/bin/docker run {{ '--device=/dev/kvm' if has_kvm.stat.exists }} \
                   --rm \
                   --env-file "{{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i.env" \
