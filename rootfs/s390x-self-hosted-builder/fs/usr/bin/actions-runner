@@ -33,7 +33,7 @@ registration_token=$(jq --raw-output .token "$token_file")
 ./config.sh \
     --url "https://github.com/$repo" \
     --token "$registration_token" \
-    --labels z15 \
+    --labels z15,s390x \
     --replace \
     --unattended \
     --name "$runner_name" \
