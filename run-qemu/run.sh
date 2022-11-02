@@ -8,6 +8,8 @@ source $(cd $(dirname $0) && pwd)/../helpers.sh
 foldable start bpftool_checks "Running bpftool checks..."
 bpftool_exitstatus=0
 
+MAX_CPU=${MAX_CPU:-$(nproc)}
+
 # bpftool checks are aimed at checking type names, documentation, shell
 # completion etc. against the current kernel, so only run on LATEST.
 if [[ "${KERNEL}" = 'LATEST' ]]; then
@@ -63,13 +65,13 @@ aarch64)
 	;;
 esac
 
-smp=$((smp > 8 ? 8 : smp))
-
 if kvm-ok ; then
   accel=$kvm_accel
 else
   accel=$tcg_accel
 fi
+
+smp=$(( $smp > $MAX_CPU ? $MAX_CPU : $smp ))
 
 "$qemu" -nodefaults --no-reboot -nographic \
   -chardev stdio,id=char0,mux=on,signal=off,logfile=boot.log \

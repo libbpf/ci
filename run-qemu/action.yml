@@ -13,6 +13,9 @@ inputs:
   kernel-root:
     description: 'kernel source dir'
     default: '.'
+  max-cpu:
+    description: 'Maximum number of CPU allocated to a VM (regardless of number of CPUs available on the host). Default is unset, e.g it will default to the number of CPU on the host.'
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -29,5 +32,6 @@ runs:
         VMLINUZ: ${{ inputs.vmlinuz }}
         IMG: ${{ inputs.img }}
         KERNEL_ROOT: ${{ inputs.kernel-root }}
+        MAX_CPU: ${{ inputs.max-cpu }}
       run: |
         ARCH="${{ inputs.arch }}" ${GITHUB_ACTION_PATH}/run.sh
