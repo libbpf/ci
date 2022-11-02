@@ -9,6 +9,26 @@
     extra_args: --user
     executable: pip3
 
+- name: Script to generate APP_TOKEN
+  become: yes
+  ansible.builtin.copy:
+    src: app_token.sh
+    dest: "{{ runner_base_dir }}/app_token.sh"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Write App private key
+  no_log: true
+  become: yes
+  ansible.builtin.copy:
+    content: "{{ item.secret }}"
+    dest: "{{ runner_base_dir }}/{{ item.name }}_{{ item.id }}_priv.pem"
+    mode: 0700
+    owner: root
+    group: root
+  with_items: "{{ runner_gh_apps |default([]) }}"
+
 - name: Set runner env
   become: yes
   ansible.builtin.copy:

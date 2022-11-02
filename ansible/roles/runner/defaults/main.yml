@@ -12,3 +12,12 @@ runner_repo_list:
   - {name: owner1/repository1, instances: 2}
   - {name: owner1/repository2, instances: 1}
   - {name: owner2/repository2, instances: 1}
+
+#runner_gh_apps:
+#  - name: runner-app-name
+#    id: 1234
+#    secret: |
+#      ---START PEM SECRET---
+#      ...
+#      ...
+#      ---END PEM SECRET---
