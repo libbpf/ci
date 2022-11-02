@@ -28,45 +28,6 @@
   with_items: "{{ runners }}"
 
 
-### TODO: Remove this once fully provisioned
-### Removes old service units
-## Old hosts have their libbpf runner called actions-runners-libbpf instead of actions-runners-libbpf-libbpf
-## Add this one manually.
-- name: Generate runners to delete facts
-  set_fact:
-    old_runners: "{{ runners + [ { 'name': 'libbpf', 'normalized': 'libbpf'} ] }}"
-
-- name: Populate service facts
-  ansible.builtin.service_facts:
-
-- name: Stop old runner service
-  become: yes
-  ansible.builtin.service:
-    name: actions-runner-{{ item.normalized }}
-    enabled: no
-    state: stopped
-  when: ansible_facts.services[''.join(["actions-runner-", item.normalized, ".service"])] is defined
-  loop: "{{ old_runners }}"
-
-- name: Delete old Runner systemd unit
-  become: yes
-  ansible.builtin.file:
-    path: /etc/systemd/system/actions-runner-{{ item.normalized }}.service
-    state: absent
-  loop: "{{ old_runners }}"
-  notify:
-    - reload systemd daemon
-    - reset systemd failed
-
-- name: Delete old Runner config
-  become: yes
-  ansible.builtin.file:
-    path: /etc/actions-runner-{{ item.normalized }}
-    state: absent
-  loop: "{{ old_runners }}"
-
-
-## New templated systemd units
 - name: Runner configuration file
   become: yes
   ansible.builtin.template:
