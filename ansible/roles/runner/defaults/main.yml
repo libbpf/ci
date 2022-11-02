@@ -1,4 +1,5 @@
 ---
+runner_base_dir: /etc/actions-runner
 runner_gh_token_default: replace with your token
 runner_gh_tokens:
   owner/repository: gh token for owner/repository

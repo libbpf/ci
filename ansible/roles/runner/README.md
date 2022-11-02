@@ -21,6 +21,7 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 
 | Name | Default Value | Description |
 | ---- | ------------- | ----------- |
+| `runner_base_dir` | /etc/actions-runner | The base directory where actions runner config will go. |
 | `runner_libbpf_ci_repo_url` | https://github.com/libbpf/ci.git | The libbpf repository where to fetch s390x runners installation artifacts from. |
 | `runner_libbpf_ci_repo_branch` | master | Which branch to check out |
 | `runner_repo_list` | [ {name: kernel-patches/bpf, instances: 2}, {name: kernel-patches/vmtest, instances: 1} ] | List of dictionaries of name/instances. The name being the name of the repository to attach to, instances being the number of runners to run on a single host. |
