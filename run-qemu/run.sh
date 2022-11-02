@@ -62,6 +62,9 @@ aarch64)
 	exit 1
 	;;
 esac
+
+smp=$((smp > 8 ? 8 : smp))
+
 if kvm-ok ; then
   accel=$kvm_accel
 else
