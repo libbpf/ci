@@ -11,12 +11,12 @@
     runners: "{{ runners|default([]) + [ {'normalized': item.name | replace('/','-'), 'workers': range(item.instances) | list }  | combine(item) ] }}"
   with_items: "{{ runner_repo_list }}"
 
-- name: Sync libbpf repo
+- name: Sync libbpf/ci repo
   ansible.builtin.git:
-    repo: "{{ runner_libbpf_repo_url }}"
+    repo: "{{ runner_libbpf_ci_repo_url }}"
     update: yes
-    dest: "{{ account_homedir.stdout }}/libbpf"
-    version: "{{ runner_libbpf_repo_branch }}"
+    dest: "{{ account_homedir.stdout }}/libbpf-ci"
+    version: "{{ runner_libbpf_ci_repo_branch }}"
     accept_hostkey: yes
 
 - name: Build runner docker image
@@ -24,7 +24,7 @@
   shell:
     "docker build --pull -f actions-runner-libbpf.Dockerfile -t iiilinuxibmcom/actions-runner-{{ item.normalized }} ."
   args:
-    chdir: "{{ account_homedir.stdout }}/libbpf/ci/rootfs/s390x-self-hosted-builder"
+    chdir: "{{ account_homedir.stdout }}/libbpf-ci/rootfs/s390x-self-hosted-builder"
   with_items: "{{ runners }}"
 
 
