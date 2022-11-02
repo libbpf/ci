@@ -6,7 +6,7 @@ trap 'exit 2' ERR
 source $(cd $(dirname $0) && pwd)/../helpers.sh
 
 usage () {
-	USAGE_STRING="usage: $0 [-k KERNELRELEASE|-b DIR] [[-r ROOTFSVERSION] [-fo]|-I] [-Si] [-d DIR] IMG
+	USAGE_STRING="usage: $0 [-k KERNELRELEASE|-b DIR] [--source DIR] [[-r ROOTFSVERSION] [-fo]|-I] [-Si] [-d DIR] IMG
        $0 [-k KERNELRELEASE] -l
        $0 -h
 
@@ -25,6 +25,8 @@ Versions:
                        kernel release to test. This is a glob pattern; the
                        newest (sorted by version number) release that matches
                        the pattern is used (default: newest available release)
+
+  --source DIR         path to the kernel source directory
 
   -b, --build DIR      use the kernel built in the given directory. This option
                        cannot be combined with -k
@@ -76,11 +78,12 @@ Miscellaneous:
 	esac
 }
 
-TEMP=$(getopt -o 'k:b:r:fos:ISid:lh' --long 'kernel:,build:,rootfs:,force,one-shot,setup-cmd,skip-image,skip-source:,interactive,dir:,list,help' -n "$0" -- "$@")
+TEMP=$(getopt -o 'k:b:r:fos:ISid:lh' --long 'kernel:,source:,build:,rootfs:,force,one-shot,setup-cmd,skip-image,skip-source:,interactive,dir:,list,help' -n "$0" -- "$@")
 eval set -- "$TEMP"
 unset TEMP
 
 unset KERNELRELEASE
+unset KERNELSRC
 unset BUILDDIR
 unset ROOTFSVERSION
 unset IMG
@@ -102,6 +105,10 @@ while true; do
 	case "$1" in
 		-k|--kernel)
 			KERNELRELEASE="$2"
+			shift 2
+			;;
+	        --source)
+			KERNELSRC="$2"
 			shift 2
 			;;
 		-b|--build)
