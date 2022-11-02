@@ -1,5 +1,12 @@
 ---
 
+- name: Create runner directory
+  become: yes
+  ansible.builtin.file:
+    path: "{{ runner_base_dir }}"
+    state: directory
+    mode: 0755
+
 - include_tasks: main-s390x.yml
   when: ansible_architecture == 's390x'
 

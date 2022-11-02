@@ -9,7 +9,7 @@ Type=simple
 Restart=always
 ExecStart=/usr/bin/docker run \
               --device=/dev/kvm \
-              --env-file=/etc/actions-runner-{{ item.normalized }}-worker-%i \
+              --env-file={{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i \
               --init \
               --interactive \
               --name=actions-runner-{{ item.normalized }}-worker-%i \
