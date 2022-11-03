@@ -9,14 +9,17 @@
     extra_args: --user
     executable: pip3
 
-- name: Script to generate APP_TOKEN
+- name: Copy GH application token scripts
   become: yes
   ansible.builtin.copy:
-    src: app_token.sh
-    dest: "{{ runner_base_dir }}/app_token.sh"
+    src: "{{ item }}"
+    dest: "{{ runner_base_dir }}/{{ item }}"
     mode: 0755
     owner: root
     group: root
+  with_items:
+    - app_token.sh
+    - gh_token_generator.sh
 
 - name: Write App private key
   no_log: true
@@ -87,7 +90,12 @@
   become: yes
   ansible.builtin.copy:
     dest: "/etc/systemd/system/actions-runner-{{ item.normalized }}@.service"
+    # The use of `namespace` is needed. See Jinja scoping: https://jinja.palletsprojects.com/en/3.1.x/templates/#assignments
     content: |
+      {% set ns = namespace(ghapp=undefined) %}
+      {% for runner_gh_app in runner_gh_apps if runner_gh_app.id == item.gh_app_id %}
+        {%- set ns.ghapp = runner_gh_app %}
+      {%- endfor %}
       [Unit]
       Description=Ephemeral GitHub Actions Runner Container for {{ item.name }} - %i
       After=docker.service
@@ -100,9 +108,15 @@
       ExecStartPre=-/usr/bin/docker stop %p-%i
       ExecStartPre=-/usr/bin/docker rm %p-%i
       ExecStartPre=-/usr/bin/docker pull ghcr.io/kernel-patches/runner:${DOCKER_TAG}
+      {% if ns.ghapp is defined %}
+      ExecStartPre=-{{ runner_base_dir }}/gh_token_generator.sh {{ ns.ghapp.id }} "{{ runner_base_dir }}/{{ ns.ghapp.name }}_{{ ns.ghapp.id }}_priv.pem" "{{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i-ghtoken.env"
+      {% endif %}
       ExecStart=/usr/bin/docker run {{ '--device=/dev/kvm' if has_kvm.stat.exists }} \
                   --rm \
                   --env-file "{{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i.env" \
+      {% if ns.ghapp is defined %}
+                  --env-file "{{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i-ghtoken.env" \
+      {% endif %}
                   --name %p-%i \
                   ghcr.io/kernel-patches/runner:${DOCKER_TAG}
     mode: 0700
