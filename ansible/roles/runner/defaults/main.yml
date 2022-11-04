@@ -1,6 +1,7 @@
 ---
 runner_base_dir: /etc/actions-runner
 runner_workers: 1
+runner_prefix: ""
 runner_gh_token_default: replace with your token
 runner_gh_user_default: replace with your GH user
 runner_docker_tag: main
