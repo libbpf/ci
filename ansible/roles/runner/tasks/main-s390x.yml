@@ -65,52 +65,6 @@
   loop: "{{ runners | subelements('workers') }}"
 
 
-- name: Set docker pruning service
-  become: yes
-  ansible.builtin.copy:
-    dest: /etc/systemd/system/docker_pruning.service
-    content: |
-      [Unit]
-      Description=Prune unused docker resources
-      Wants=docker_pruning.timer
-
-      [Service]
-      Type=oneshot
-      ExecStart=/usr/bin/docker system prune --volumes -f
-    mode: 0644
-    owner: root
-    group: root
-  notify:
-    - reload systemd daemon
-    - restart docker_pruning timer
-
-
-- name: Set docker pruning timer
-  become: yes
-  ansible.builtin.copy:
-    dest: /etc/systemd/system/docker_pruning.timer
-    content: |
-      [Unit]
-      Description=Run docker_pruning service daily
-
-      [Timer]
-      # Run at 8:00 UTC daily
-      OnCalendar=*-*-* 08:00:00
-      [Install]
-      WantedBy=timers.target
-    mode: 0644
-    owner: root
-    group: root
-  notify:
-    - reload systemd daemon
-    - restart docker_pruning timer
-
-- name: Enable docker pruning timer
-  become: yes
-  ansible.builtin.service:
-    name: docker_pruning.timer
-    enabled: yes
-    state: started
 
 # Watchdog
 - name: Actions runner watchdog script
