@@ -54,12 +54,12 @@
 
     - name: Set runner name prefix
       set_fact:
-        runner_prefix: "{{ ansible_ec2_instance_id }}"
+        runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_ec2_instance_id }}"
 
   rescue:
     - name: Set runner name prefix
       set_fact:
-        runner_prefix: "{{ ansible_hostname }}"
+        runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_hostname }}"
 
 - name: Generate runner env outside AWS
   become: yes
@@ -71,7 +71,7 @@
       LABELS=ubuntu-latest,{{ ansible_architecture }},docker-{{ runner_docker_tag }}
       EPHEMERAL=true
       REPO_URL=https://github.com/{{ item.0.name }}
-      RUNNER_NAME={{ runner_prefix }}-{{ 'worker-%02d' | format(item.1) }}
+      RUNNER_NAME={{ runner_name_prefix }}-{{ 'worker-%02d' | format(item.1) }}
   loop: "{{ runners | subelements('workers') }}"
 
 - name: Docker GHCR login
