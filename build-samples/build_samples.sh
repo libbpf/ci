@@ -35,6 +35,6 @@ make \
 	VMLINUX_BTF="${KBUILD_OUTPUT}/vmlinux" \
 	VMLINUX_H="${VMLINUX_H}" \
 	-C "${REPO_ROOT}/${REPO_PATH}/samples/bpf" \
-	-j $((4*$(nproc)))
+	-j $(kernel_build_make_jobs)
 
 foldable end build_samples

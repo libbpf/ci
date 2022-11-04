@@ -23,6 +23,6 @@ cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
     ${GITHUB_WORKSPACE}/ci/vmtest/configs/config \
     ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${ARCH} 2> /dev/null > "${KBUILD_OUTPUT}"/.config && :
 
-make -j $((4*$(nproc))) olddefconfig all
+make -j $(kernel_build_make_jobs) olddefconfig all
 
 foldable end build_kernel
