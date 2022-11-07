@@ -1,10 +1,6 @@
 name: 'build samples/bpf'
 description: 'Build samples/bpf'
 inputs:
-  # TODO: Unused, remove once no client is providing it anymore.
-  vmlinux_btf:
-    description: 'path to vmlinux BTF file'
-    default: ''
   kernel:
     description: 'kernel version'
     default: 'LATEST'

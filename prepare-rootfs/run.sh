@@ -107,7 +107,7 @@ while true; do
 			KERNELRELEASE="$2"
 			shift 2
 			;;
-	        --source)
+		--source)
 			KERNELSRC="$2"
 			shift 2
 			;;
