@@ -119,6 +119,9 @@
       {% endif %}
                   --name %p-%i \
                   ghcr.io/kernel-patches/runner:${DOCKER_TAG}
+
+      [Install]
+      WantedBy=multi-user.target
     mode: 0700
     owner: root
     group: root
