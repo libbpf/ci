@@ -35,10 +35,7 @@ runs:
         export REPO_ROOT="${{ github.workspace }}"
         export KERNEL="${{ inputs.kernel }}"
         export KERNEL_ROOT="${{ inputs.kernel-root }}"
-        kbuild_output="${{ inputs.kbuild-output }}"
-        # TODO: Stop falling back to $KERNEL_ROOT once all clients provide this
-        #       input parameter.
-        kbuild_output="$(realpath $([ -z "$kbuild_output" ] && echo "$KERNEL_ROOT" || echo "$kbuild_output" ))"
+        kbuild_output="$(realpath ${{ inputs.kbuild-output }})"
         $GITHUB_ACTION_PATH/run_vmtest.sh "${kbuild_output}" ${{ inputs.image-output }} ${{ inputs.test }}
       shell: bash
       env:
