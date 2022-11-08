@@ -67,7 +67,7 @@
     dest: "{{ runner_base_dir }}/actions-runner-{{ item.0.normalized }}-{{ 'worker-%02d.env' | format(item.1) }}"
     content: |
       ACCESS_TOKEN={{ runner_gh_token_default }}
-      RUNNER_WORKDIR=/tmp/work
+      RUNNER_WORKDIR={{ runner_workdir }}
       LABELS=ubuntu-latest,{{ ansible_architecture }},docker-{{ runner_docker_tag }}
       EPHEMERAL=true
       REPO_URL=https://github.com/{{ item.0.name }}
@@ -111,7 +111,7 @@
       {% if ns.ghapp is defined %}
       ExecStartPre=-{{ runner_base_dir }}/gh_token_generator.sh {{ ns.ghapp.id }} "{{ runner_base_dir }}/{{ ns.ghapp.name }}_{{ ns.ghapp.id }}_priv.pem" "{{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i-ghtoken.env"
       {% endif %}
-      ExecStart=/usr/bin/docker run {{ '--device=/dev/kvm' if has_kvm.stat.exists }} \
+      ExecStart=/usr/bin/docker run {{ '--device=/dev/kvm --tmpfs %s:exec' | format(runner_workdir) if has_kvm.stat.exists }} \
                   --rm \
                   --env-file "{{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i.env" \
       {% if ns.ghapp is defined %}
