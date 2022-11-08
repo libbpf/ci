@@ -70,7 +70,13 @@
       RUNNER_WORKDIR={{ runner_workdir }}
       LABELS=ubuntu-latest,{{ ansible_architecture }},docker-{{ runner_docker_tag }}
       EPHEMERAL=true
+      {% if '/' in item.0.name %}
+      {# The presence of a / in the name signifies that we have a repo name, otherwise we assume an organization name. #}
       REPO_URL=https://github.com/{{ item.0.name }}
+      {% else %}
+      RUNNER_SCOPE=org
+      ORG_NAME={{ item.0.name }}
+      {% endif %}
       RUNNER_NAME={{ runner_name_prefix }}-{{ 'worker-%02d' | format(item.1) }}
   loop: "{{ runners | subelements('workers') }}"
 
