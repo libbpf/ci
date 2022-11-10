@@ -77,11 +77,17 @@ if [[ -n ${KERNEL_TEST} ]]; then
 	APPEND+=" run_tests=${KERNEL_TEST}"
 fi
 
+CACHE_OPT=",cache=none"
+img_fs=$(df --output=fstype "${IMG}" | sed 1d)
+if [[ ${img_fs} == "tmpfs" ]]; then
+	CACHE_OPT=""
+fi
+
 "$qemu" -nodefaults --no-reboot -nographic \
   -chardev stdio,id=char0,mux=on,signal=off,logfile=boot.log \
   -serial chardev:char0 \
   ${accel} -smp "$smp" -m 8G \
-  -drive file="$IMG",format=raw,index=1,media=disk,if=virtio,cache=none \
+  -drive file="$IMG",format=raw,index=1,media=disk,if=virtio${CACHE_OPT} \
   -kernel "$VMLINUZ" -append "root=/dev/vda rw console=$console panic=-1 sysctl.vm.panic_on_oom=1 $APPEND"
 
 exitfile="${bpftool_exitstatus}\n"
