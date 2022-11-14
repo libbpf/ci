@@ -9,7 +9,7 @@ inputs:
     default: 'gcc'
   kbuild-output:
     description: 'relative or absolute path to use for storing build artifacts'
-    default: '.'
+    required: true
   max-make-jobs:
     description: 'Maximum number of jobs to use when running make (e.g argument to -j). Default: 4*nproc'
     default: ''
