@@ -20,7 +20,7 @@ inputs:
     required: true
   kbuild-output:
     description: 'relative or absolute path to use for storing build artifacts'
-    default: ''
+    required: true
   image-output:
     description: 'path where to store the generated image'
     required: true
