@@ -129,6 +129,9 @@
       ExecStartPre=-{{ runner_base_dir }}/gh_token_generator.sh {{ ns.ghapp.id }} "{{ runner_base_dir }}/{{ ns.ghapp.name }}_{{ ns.ghapp.id }}_priv.pem" "{{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i-ghtoken.env"
       {% endif %}
       ExecStart=/usr/bin/docker run {{ '--device=/dev/kvm --tmpfs %s:exec' | format(runner_workdir) if has_kvm.stat.exists }} \
+      {% if runner_docker_healthcheck %}
+                  {{ runner_docker_healthcheck }} \
+      {% endif %}
                   --rm \
                   --env-file "{{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i.env" \
       {% if ns.ghapp is defined %}
