@@ -34,10 +34,10 @@ if [ -f "${KBUILD_OUTPUT}"/.config ]; then
 	KBUILD_OUTPUT="${kbuild_tmp}" make olddefconfig
 
 	if diff -q "${kbuild_tmp}"/.config "${KBUILD_OUTPUT}"/.config > /dev/null; then
+		echo "Existing kernel configuration is up-to-date"
+	else
 		echo "Using updated kernel configuration"
 		mv "${kbuild_tmp}"/.config "${KBUILD_OUTPUT}"/.config
-	else
-		echo "Existing kernel configuration is up-to-date"
 	fi
 	rm -rf "${kbuild_tmp}"
 else
