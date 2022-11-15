@@ -1,11 +1,72 @@
 ---
 
+# Used by ansible modules later
+- name: Install docker pip
+  become: yes
+  ansible.builtin.pip:
+    name:
+      - docker
+    extra_args: --user
+    executable: pip3
+
 - name: Create runner directory
   become: yes
   ansible.builtin.file:
     path: "{{ runner_base_dir }}"
     state: directory
     mode: 0755
+
+- name: Copy GH application token scripts
+  become: yes
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ runner_base_dir }}/{{ item }}"
+    mode: 0755
+    owner: root
+    group: root
+  with_items:
+    - app_token.sh
+    - gh_token_generator.sh
+
+- name: Write App private key
+  no_log: true
+  become: yes
+  ansible.builtin.copy:
+    content: "{{ item.secret }}"
+    dest: "{{ runner_base_dir }}/{{ item.name }}_{{ item.id }}_priv.pem"
+    mode: 0700
+    owner: root
+    group: root
+  with_items: "{{ runner_gh_apps |default([]) }}"
+
+- name: Set runner env
+  become: yes
+  ansible.builtin.copy:
+    dest: "{{ runner_base_dir }}/runner_unit.env"
+    content: |
+      DOCKER_TAG={{ runner_docker_tag }}
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Generate runners facts
+  set_fact:
+    runners: "{{ runners|default([]) + [ {'normalized': item.name | replace('/','-'), 'workers': range(item.instances) | list }  | combine(item) ] }}"
+  with_items: "{{ runner_repo_list }}"
+
+- name: Generate runner environment file
+  block:
+    - name: Load ec2 metadata facts
+      amazon.aws.ec2_metadata_facts:
+
+    - name: Set runner name prefix
+      set_fact:
+        runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_ec2_instance_id }}"
+
+  rescue:
+    - name: Set runner name prefix
+      set_fact:
+        runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_hostname }}"
 
 - include_tasks: main-s390x.yml
   when: ansible_architecture == 's390x'
