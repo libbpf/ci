@@ -36,7 +36,9 @@ if [ -f "${KBUILD_OUTPUT}"/.config ]; then
 	if diff -q "${kbuild_tmp}"/.config "${KBUILD_OUTPUT}"/.config > /dev/null; then
 		echo "Existing kernel configuration is up-to-date"
 	else
-		echo "Using updated kernel configuration"
+		echo "Using updated kernel configuration; diff:"
+		diff -u "${KBUILD_OUTPUT}"/.config "${kbuild_tmp}"/.config && :
+
 		mv "${kbuild_tmp}"/.config "${KBUILD_OUTPUT}"/.config
 	fi
 	rm -rf "${kbuild_tmp}"
