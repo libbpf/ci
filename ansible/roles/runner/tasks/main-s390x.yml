@@ -14,49 +14,13 @@
     version: "{{ runner_libbpf_ci_repo_branch }}"
     accept_hostkey: yes
 
+- name: Set docker image URL
+  set_fact:
+    runner_docker_image_url: kernel-patches/runner
+
 - name: Build runner docker image
   become: yes
   shell:
-    "docker build --pull -f actions-runner-libbpf.Dockerfile -t iiilinuxibmcom/actions-runner-{{ item.normalized }} ."
+    "docker build --pull -f actions-runner-libbpf.Dockerfile -t {{ runner_docker_image_url }}:{{ runner_docker_tag }} ."
   args:
     chdir: "{{ account_homedir.stdout }}/libbpf-ci/rootfs/s390x-self-hosted-builder"
-  with_items: "{{ runners }}"
-
-
-- name: Runner configuration file
-  become: yes
-  ansible.builtin.template:
-    src: actions-runner.j2
-    dest: "{{ runner_base_dir }}/actions-runner-{{ item.0.normalized }}-worker-{{ item.1 }}"
-    mode: 0640
-    owner: root
-    group: root
-  loop: "{{ runners | subelements('workers') }}"
-
-
-- name: Runner systemd unit
-  become: yes
-  ansible.builtin.template:
-    src: actions-runner.service.j2
-    dest: /etc/systemd/system/actions-runner-{{ item.normalized }}@.service
-    mode: 0644
-    owner: root
-    group: root
-  # Register is used to collect the runner projects that were modified.
-  # We can use this information in the handler to restart only the runners that had their
-  # systemd unit modified/created.
-  register: runner_projects
-  with_items: "{{ runners }}"
-  notify:
-    - reload systemd daemon
-    - restart actions-runners
-
-- name: Enable runner service
-  become: yes
-  ansible.builtin.service:
-    name: actions-runner-{{ item.0.normalized }}@{{ item.1 }}
-    enabled: yes
-    state: started
-  loop: "{{ runners | subelements('workers') }}"
-
-
