@@ -2,5 +2,6 @@
 __base_packages:
   - curl
   - git
+  - jq
   - python3-pip
   - vim
