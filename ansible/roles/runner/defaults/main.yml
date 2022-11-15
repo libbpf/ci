@@ -6,6 +6,7 @@ runner_workdir: /tmp/work
 runner_gh_token_default: replace with your token
 runner_gh_user_default: replace with your GH user
 runner_docker_tag: main
+runner_docker_image_url: ghcr.io/kernel-patches/runner
 runner_gh_tokens:
   owner/repository: gh token for owner/repository
 runner_libbpf_ci_repo_url: https://github.com/libbpf/ci.git
