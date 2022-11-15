@@ -2,5 +2,4 @@
 
 __base_distro_packages:
   - "{{ 'podman-docker' if ansible_distribution != 'Amazon' else 'docker' }}"
-  - python3-pip
 
