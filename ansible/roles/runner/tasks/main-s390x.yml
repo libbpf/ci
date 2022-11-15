@@ -6,11 +6,6 @@
   changed_when: false
   check_mode: no
 
-- name: Generate runners facts
-  set_fact:
-    runners: "{{ runners|default([]) + [ {'normalized': item.name | replace('/','-'), 'workers': range(item.instances) | list }  | combine(item) ] }}"
-  with_items: "{{ runner_repo_list }}"
-
 - name: Sync libbpf/ci repo
   ansible.builtin.git:
     repo: "{{ runner_libbpf_ci_repo_url }}"
