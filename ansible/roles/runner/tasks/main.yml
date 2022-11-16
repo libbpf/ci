@@ -226,25 +226,6 @@
     owner: root
     group: root
 
-- name: Set actions runner watchdog service
-  become: yes
-  ansible.builtin.copy:
-    dest: /etc/systemd/system/actions-runner-watchdog.service
-    content: |
-      [Unit]
-      Description=Kill unhealty actions runner containers
-      Wants=actions-runner-watchdog.timer
-
-      [Service]
-      Type=oneshot
-      ExecStart=/usr/local/sbin/actions-runner-watchdog.sh
-    mode: 0644
-    owner: root
-    group: root
-  notify:
-    - reload systemd daemon
-    - restart actions-runner-watchdog timer
-
 - name: Set actions runner watchdog timer
   become: yes
   ansible.builtin.copy:
@@ -259,6 +240,25 @@
       OnUnitInactiveSec=2m
       [Install]
       WantedBy=timers.target
+    mode: 0644
+    owner: root
+    group: root
+  notify:
+    - reload systemd daemon
+    - restart actions-runner-watchdog timer
+
+- name: Set actions runner watchdog service
+  become: yes
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/actions-runner-watchdog.service
+    content: |
+      [Unit]
+      Description=Kill unhealty actions runner containers
+      Wants=actions-runner-watchdog.timer
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/sbin/actions-runner-watchdog.sh
     mode: 0644
     owner: root
     group: root
