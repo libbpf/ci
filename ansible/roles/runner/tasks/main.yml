@@ -49,9 +49,15 @@
     owner: root
     group: root
 
+# Generate runners'facts by infering a normalized repo/org name from the repo name,
+# Generate a list of workers to generate, so we can easily iterate over that list.
+# Setting a default `gh_app_id` to 0. If `gh_app_id` is defined in the item, it will be
+# overriden by `combine(item)`, otherwise it will provide a "bogus" value that will never
+# match and actual GH app ID, but allows for the rest of the code to check for `gh_app_id`
+# vs checking its existence.
 - name: Generate runners facts
   set_fact:
-    runners: "{{ runners|default([]) + [ {'normalized': item.name | replace('/','-'), 'workers': range(item.instances) | list }  | combine(item) ] }}"
+    runners: "{{ runners|default([]) + [ {'gh_app_id': 0, 'normalized': item.name | replace('/','-'), 'workers': range(item.instances) | list }  | combine(item) ] }}"
   with_items: "{{ runner_repo_list }}"
 
 - name: Generate runner environment file
