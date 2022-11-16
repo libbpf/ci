@@ -83,7 +83,7 @@
   ansible.builtin.copy:
     dest: "{{ runner_base_dir }}/actions-runner-{{ item.0.normalized }}-{{ 'worker-%02d.env' | format(item.1) }}"
     content: |
-      ACCESS_TOKEN={{ runner_gh_token_default }}
+      ACCESS_TOKEN={{ runner_gh_tokens[item.0.name] | default(runner_gh_token_default) }}
       RUNNER_WORKDIR={{ runner_workdir }}
       LABELS={{ ansible_architecture }},docker-{{ runner_docker_tag }}
       EPHEMERAL=true
