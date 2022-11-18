@@ -44,7 +44,7 @@
   ansible.builtin.copy:
     dest: "{{ runner_base_dir }}/runner_unit.env"
     content: |
-      DOCKER_TAG={{ runner_docker_tag }}
+      DOCKER_TAG={{ runner_docker_tag }}-{{ ansible_architecture }}
     mode: 0700
     owner: root
     group: root
@@ -77,10 +77,6 @@
         runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_ec2_instance_id }}"
   when: ansible_distribution == 'Amazon'
   ignore_errors: yes
-
-# Build docker images
-- include_tasks: main-s390x.yml
-  when: ansible_architecture == 's390x'
 
 - name: Generate runner env
   become: yes
