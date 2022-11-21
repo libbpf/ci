@@ -60,25 +60,29 @@
     runners: "{{ runners|default([]) + [ {'gh_app_id': 0, 'normalized': item.name | replace('/','-'), 'workers': range(item.instances) | list }  | combine(item) ] }}"
   with_items: "{{ runner_repo_list }}"
 
-- name: Generate runner environment file
+- name: Set runner name prefix
+  set_fact:
+    runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_hostname }}"
+
+# When running on Amazon Linux hosts, we override the runner_name_prefix with the ec2's instance ID.
+# When testing in Amazon Linux VMs, the `Load ec2 metadata facts` task will fail and we will fallback
+# on using hostname.
+- name: Set runner_name_prefix to instance ID for Amazon hosts
   block:
     - name: Load ec2 metadata facts
       amazon.aws.ec2_metadata_facts:
 
-    - name: Set runner name prefix
+    - name: Set runner name prefix with instance ID
       set_fact:
         runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_ec2_instance_id }}"
-
-  rescue:
-    - name: Set runner name prefix
-      set_fact:
-        runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_hostname }}"
+  when: ansible_distribution == 'Amazon'
+  ignore_errors: yes
 
 # Build docker images
 - include_tasks: main-s390x.yml
   when: ansible_architecture == 's390x'
 
-- name: Generate runner env outside AWS
+- name: Generate runner env
   become: yes
   ansible.builtin.copy:
     dest: "{{ runner_base_dir }}/actions-runner-{{ item.0.normalized }}-{{ 'worker-%02d.env' | format(item.1) }}"
