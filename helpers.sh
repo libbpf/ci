@@ -39,7 +39,7 @@ print_notice() {
 
 # No arguments
 llvm_default_version() {
-  echo "16"
+  echo "17"
 }
 
 # $1 - toolchain name
