@@ -15,7 +15,7 @@ set -e -u -o pipefail
 CPUTABLE="${CPUTABLE:-/usr/share/dpkg/cputable}"
 
 deb_arch=$(dpkg --print-architecture)
-distro="bullseye"
+distro="bookworm"
 
 function usage() {
     echo "Usage: $0 [-a | --arch architecture] [-h | --help]
