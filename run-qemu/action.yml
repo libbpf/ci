@@ -27,7 +27,7 @@ runs:
       run: |
         source "${GITHUB_ACTION_PATH}/../helpers.sh"
         foldable start install_qemu "Installing QEMU tools"
-        sudo apt-get update && sudo apt-get install -y cpu-checker qemu-kvm qemu-utils qemu-system-x86 qemu-system-s390x qemu-system-arm
+        sudo apt-get update && sudo apt-get install -y cpu-checker qemu-kvm qemu-utils qemu-system-x86 qemu-system-s390x qemu-system-arm qemu-system-misc
         foldable end install_qemu
     - name: test
       shell: bash

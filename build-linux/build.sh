@@ -6,7 +6,7 @@ THISDIR="$(cd $(dirname $0) && pwd)"
 
 source "${THISDIR}"/../helpers.sh
 
-ARCH="$1"
+TARGETARCH="$1"
 TOOLCHAIN="$2"
 export KBUILD_OUTPUT="$3"
 
@@ -15,14 +15,31 @@ if [ $? -eq 0 ]; then
 	export LLVM="-$LLVM_VER"
 fi
 
+if [[ $(uname -m) != "$TARGETARCH" ]]; then
+	# Cross-compiling
+	linuxarch="$TARGETARCH"
+	case "$TARGETARCH" in
+	riscv64)
+		linuxarch="riscv"
+		;;
+	aarch64)
+		linuxarch="arm64"
+		;;
+	*)
+		;;
+	esac
+	export ARCH="$linuxarch"
+	export CROSS_COMPILE="$TARGETARCH-linux-gnu-"
+fi
+
 foldable start build_kernel "Building kernel with $TOOLCHAIN"
 
 # $1 - path to config file to create/overwrite
 cat_kernel_config() {
 	cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
-	    ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${ARCH} \
+	    ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${TARGETARCH} \
 	    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config \
-	    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${ARCH} 2> /dev/null > "${1}"
+	    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${TARGETARCH} 2> /dev/null > "${1}"
 }
 
 mkdir -p "${KBUILD_OUTPUT}"

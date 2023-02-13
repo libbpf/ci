@@ -5,3 +5,4 @@ x86_64/vmlinuz-5.5.0	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinuz
 x86_64/vmlinuz-4.9.0	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinuz-4.9.0
 s390x/libbpf-vmtest-rootfs-2022.10.23-bullseye-s390x.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/libbpf-vmtest-rootfs-2022.10.23-bullseye-s390x.tar.zst
 aarch64/libbpf-vmtest-rootfs-2022.10.23-bullseye-arm64.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/libbpf-vmtest-rootfs-2022.10.23-bullseye-arm64.tar.zst
+riscv64/libbpf-vmtest-rootfs-2023.02.12-jammy-riscv64.tar.zst https://bpfcirootfs.blob.core.windows.net/bpf/libbpf-vmtest-rootfs-2023.02.12-jammy-riscv64.tar.zst

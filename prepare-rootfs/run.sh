@@ -290,9 +290,12 @@ if [[ $FORCE -eq 0 && $SKIPIMG -eq 0 && -e $IMG ]]; then
 	exit 1
 fi
 
+ARCH=$(echo ${TARGET_ARCH} | sed 's/x86_64/x86/' | sed 's/s390x/s390/' | \
+	sed 's/aarch64/arm64/' | sed 's/riscv64/riscv/')
+
 # Only go to the network if it's actually a glob pattern.
 if [[ -v BUILDDIR ]]; then
-	KERNELRELEASE="$(KBUILD_OUTPUT="${BUILDDIR}" make -C "${KERNELSRC:-$BUILDDIR}" -s kernelrelease)"
+	KERNELRELEASE="$(KBUILD_OUTPUT="${BUILDDIR}" make ARCH=${ARCH} -C "${KERNELSRC:-$BUILDDIR}" -s kernelrelease)"
 elif [[ ! $KERNELRELEASE =~ ^([^\\*?[]|\\[*?[])*\\?$ ]]; then
 	# We need to cache the list of URLs outside of the command
 	# substitution, which happens in a subshell.
@@ -333,7 +336,7 @@ cleanup() {
 trap cleanup EXIT
 
 if [[ -v BUILDDIR ]]; then
-	vmlinuz="$BUILDDIR/$(KBUILD_OUTPUT="${BUILDDIR}" make -C "${KERNELSRC:-$BUILDDIR}" -s image_name)"
+	vmlinuz="$BUILDDIR/$(KBUILD_OUTPUT="${BUILDDIR}" make ARCH=${ARCH} -C "${KERNELSRC:-$BUILDDIR}" -s image_name)"
 else
 	vmlinuz="${ARCH_DIR}/vmlinuz-${KERNELRELEASE}"
 	if [[ ! -e $vmlinuz ]]; then

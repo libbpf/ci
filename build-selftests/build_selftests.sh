@@ -9,10 +9,28 @@ source "${THISDIR}"/../helpers.sh
 KERNEL="$1"
 TOOLCHAIN="$2"
 export KBUILD_OUTPUT="$3"
+TARGETARCH="$4"
 
 LLVM_VER="$(llvm_version $TOOLCHAIN)" && :
 if [ $? -eq 0 ]; then
 	export LLVM="-$LLVM_VER"
+fi
+
+if [[ $(uname -m) != "$TARGETARCH" ]]; then
+	# Cross-compiling
+	linuxarch="$TARGETARCH"
+	case "$TARGETARCH" in
+	riscv64)
+		linuxarch="riscv"
+		;;
+	aarch64)
+		linuxarch="arm64"
+		;;
+	*)
+		;;
+	esac
+	export ARCH="$linuxarch"
+	export CROSS_COMPILE="$TARGETARCH-linux-gnu-"
 fi
 
 foldable start build_selftests "Building selftests with $TOOLCHAIN"

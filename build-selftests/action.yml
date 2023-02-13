@@ -1,6 +1,9 @@
 name: 'build selftests'
 description: 'Build BPF selftests'
 inputs:
+  arch:
+    description: 'arch'
+    required: true
   kernel:
     description: 'kernel version'
     default: 'LATEST'
@@ -20,6 +23,6 @@ runs:
       shell: bash
       run: |
         kbuild_output="$(realpath ${{ inputs.kbuild-output }})"
-        ${GITHUB_ACTION_PATH}/build_selftests.sh "${{ inputs.kernel }}" "${{ inputs.toolchain }}" "${kbuild_output}"
+        ${GITHUB_ACTION_PATH}/build_selftests.sh "${{ inputs.kernel }}" "${{ inputs.toolchain }}" "${kbuild_output}" "${{ inputs.arch }}"
       env:
         MAX_MAKE_JOBS: ${{ inputs.max-make-jobs }}

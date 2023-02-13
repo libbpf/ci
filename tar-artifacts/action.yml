@@ -1,0 +1,22 @@
+name: 'tar-artifacts'
+description: 'Tars artifacts'
+inputs:
+  arch:
+    description: 'arch'
+    required: true
+  github-repo:
+    description: 'github-repo'
+    required: true
+  toolchain:
+    description: 'what toolchain to use'
+    default: 'gcc'
+  kbuild-output:
+    description: 'relative or absolute path to use for storing build artifacts'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Tar artifacts
+      shell: bash
+      run: |
+        ${{ github.action_path }}/tar-artifacts.sh '${{ inputs.arch }}' '${{ inputs.github-repo }}' '${{ inputs.toolchain }}' '${{ inputs.kbuild-output }}'
