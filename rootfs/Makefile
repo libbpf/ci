@@ -8,4 +8,5 @@ all:
 			sudo ./mkrootfs_debian.sh --arch "$${arch}" --distro "$${distro}" ; \
 		done \
 	done
+	sudo ./mkrootfs_ubuntu.sh --arch riscv64 --distro jammy
 
