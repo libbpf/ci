@@ -2,6 +2,9 @@
 
 set -eu
 
+PAHOLE_BRANCH=${PAHOLE_BRANCH:-master}
+PAHOLE_ORIGIN=${PAHOLE_ORIGIN:-https://git.kernel.org/pub/scm/devel/pahole/pahole.git}
+
 source $(cd $(dirname $0) && pwd)/../helpers.sh
 
 foldable start build_pahole "Building pahole"
@@ -9,14 +12,13 @@ foldable start build_pahole "Building pahole"
 sudo apt-get update && sudo apt-get install elfutils libelf-dev libdw-dev
 
 CWD=$(pwd)
-PAHOLE_ORIGIN=https://git.kernel.org/pub/scm/devel/pahole/pahole.git
 
 mkdir -p pahole
 cd pahole
 git init
 git remote add origin ${PAHOLE_ORIGIN}
-git fetch --depth=1 origin
-git checkout master
+git fetch --depth=1 origin "${PAHOLE_BRANCH}"
+git checkout "${PAHOLE_BRANCH}"
 
 mkdir -p build
 cd build
