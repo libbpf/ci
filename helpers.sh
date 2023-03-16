@@ -39,7 +39,7 @@ print_notice() {
 
 # No arguments
 llvm_default_version() {
-  echo "17"
+  echo "16"
 }
 
 # No arguments
