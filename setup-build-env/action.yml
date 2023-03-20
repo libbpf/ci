@@ -9,6 +9,10 @@ inputs:
     description: 'pahole repo'
     required: true
     default: 'https://git.kernel.org/pub/scm/devel/pahole/pahole.git'
+  llvm-version:
+    description: 'llvm version'
+    required: false
+    default: '16'
 runs:
   using: "composite"
   steps:
@@ -22,6 +26,7 @@ runs:
     - name: Install clang
       shell: bash
       run: |
+        export LLVM_VERSION=${{ inputs.llvm-version }}
         ${GITHUB_ACTION_PATH}/install_clang.sh
     - name: Install pahole
       shell: bash
