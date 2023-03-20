@@ -47,21 +47,6 @@ llvm_latest_version() {
   echo "17"
 }
 
-# $1 - toolchain name
-llvm_version() {
-  local toolchain="$1"
-  local toolchain_name="$(echo $toolchain | cut -d '-' -f 1)"
-  local toolchain_version="$(echo $toolchain | cut -d '-' -f 2)"
-
-  if [ "$toolchain_name" == "llvm" ]; then
-    echo "$toolchain_version"
-    return 0
-  else
-    llvm_default_version
-    return 1
-  fi
-}
-
 # No arguments
 kernel_build_make_jobs() {
   # returns the number of processes to use when building kernel/selftests/samples

@@ -8,13 +8,10 @@ foldable start install_clang "Installing Clang/LLVM"
 sudo apt-get update
 sudo apt-get install -y g++ libelf-dev
 
-LLVM_VERSION=$(llvm_default_version)
-
-REPO_DISTRO_SUFFIX="-${LLVM_VERSION}"
-
-if [[ "${LLVM_VERSION}" == $(llvm_latest_version) ]]
-then
+if [[ "${LLVM_VERSION}" == $(llvm_latest_version) ]] ; then
     REPO_DISTRO_SUFFIX=""
+else
+    REPO_DISTRO_SUFFIX="-${LLVM_VERSION}"
 fi
 
 echo "deb https://apt.llvm.org/focal/ llvm-toolchain-focal${REPO_DISTRO_SUFFIX} main" | sudo tee /etc/apt/sources.list.d/llvm.list

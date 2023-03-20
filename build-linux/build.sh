@@ -10,9 +10,9 @@ ARCH="$1"
 TOOLCHAIN="$2"
 export KBUILD_OUTPUT="$3"
 
-LLVM_VER="$(llvm_version $TOOLCHAIN)" && :
-if [ $? -eq 0 ]; then
-	export LLVM="-$LLVM_VER"
+if [ $TOOLCHAIN = "llvm" ]; then
+	export LLVM="-$LLVM_VERSION"
+	TOOLCHAIN="llvm-$LLVM_VERSION"
 fi
 
 foldable start build_kernel "Building kernel with $TOOLCHAIN"
