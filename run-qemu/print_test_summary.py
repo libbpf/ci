@@ -69,9 +69,7 @@ def test_error_console_log(test_error: str, test_message: str) -> str:
     error_msg = error(test_error)
     if test_message:
         error_msg += "\n" + test_message.strip()
-        return group(error_msg, title=test_error)
-    else:
-        return error_msg
+    return group(error_msg, title="\033[1;31mError: \033[0m" + test_error)
 
 
 if __name__ == "__main__":
