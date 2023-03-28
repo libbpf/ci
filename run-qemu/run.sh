@@ -111,37 +111,7 @@ then
     if [ $? ]
     then
         ## Job summary
-        echo "# Tests summary" >> "${GITHUB_STEP_SUMMARY}"
-        read -r T_SUCCESS T_SUCCESS_SUBTEST T_SKIPPED T_FAILED < \
-            <(jq -r < "${KERNEL_TEST}.json" '"\(.success) \(.success_subtest) \(.skipped) \(.failed)"')
-        echo "- :heavy_check_mark: Success: ${T_SUCCESS}/${T_SUCCESS_SUBTEST}
-- :next_track_button: Skipped: ${T_SKIPPED}
-- :x: Failed: ${T_FAILED}" >> "${GITHUB_STEP_SUMMARY}"
-
-        summary_annotation="Success: ${T_SUCCESS}/${T_SUCCESS_SUBTEST}, Skipped: ${T_SKIPPED}, Failed: ${T_FAILED}"
-        echo "::notice::${summary_annotation}"
-
-        # Print failed tests to summary/annotations
-        if [ "${T_FAILED}" -gt 0 ]
-        then
-            echo "# Failed tests" >> "${GITHUB_STEP_SUMMARY}"
-            jq -r < "${KERNEL_TEST}.json" \
-                '.results | map([
-                    if .failed then "#\(.number) \(.name)" else empty end,
-                    (
-                        . as {name: $tname, number: $tnum} | .subtests | map(
-                            if .failed then "#\($tnum)/\(.number) \($tname)/\(.name)" else empty end
-                        )
-                    )
-                ]) | flatten | .[]' | \
-                while read -r line
-                do
-                    # Job summary
-                    echo "${line}" >> "${GITHUB_STEP_SUMMARY}"
-                    # Annotations
-                    echo "::error::${line}"
-                done
-        fi
+        "${GITHUB_ACTION_PATH}/print_test_summary.py" -s "${GITHUB_STEP_SUMMARY}" -j "${KERNEL_TEST}.json"
     fi
 fi
 # Final summary - Don't use a fold, keep it visible
