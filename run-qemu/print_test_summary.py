@@ -10,7 +10,7 @@
 import argparse
 import json
 
-from typing import Tuple
+from typing import Tuple, Dict, Optional
 
 
 def parse_args():
@@ -45,7 +45,7 @@ def error(text: str) -> str:
 
 def markdown_summary(json_summary: json):
     return f"""- :heavy_check_mark: Success: {json_summary['success']}/{json_summary['success_subtest']}
-- :next_track_button: Skipped: ${json_summary['skipped']}
+- :next_track_button: Skipped: {json_summary['skipped']}
 - :x: Failed: {json_summary['failed']}"""
 
 
@@ -70,29 +70,41 @@ def test_error_console_log(test_error: str, test_message: str) -> str:
         return error_msg
 
 
+def build_summaries_for_test(
+    test: Dict, parent_name: Optional[str] = None, parent_number: Optional[int] = None
+) -> Optional[Tuple[str, str]]:
+    if not test["failed"]:
+        return None
+    test_log = f"#{test['number']} {test['name']}"
+    if parent_number and parent_name:
+        test_log = f"#{parent_number}/{test['number']} {parent_name}/{test['name']}"
+    gh_summary = test_log
+    console_summary = test_error_console_log(test_log, test["message"])
+    return (gh_summary, console_summary)
+
+
 def build_summaries(json_summary) -> Tuple[str, str]:
+    """
+    Given a json summary, return strings formatted for the GH summary and GH test step console respectively.
+    """
     gh_summary = ["# Tests summary"]
     gh_summary.append(markdown_summary(json_summary))
 
     console_summary = [notice(log_summary(json_summary))]
 
     for test in json_summary["results"]:
-        test_name = test["name"]
-        test_number = test["number"]
-        if test["failed"]:
-            test_log = f"#{test_number} {test_name}"
-            gh_summary.append(test_log)
-            console_summary.append(test_error_console_log(test_log, test["message"]))
+        test_summaries = build_summaries_for_test(test, None, None)
+        if test_summaries:
+            gh_summary.append(test_summaries[0])
+            console_summary.append(test_summaries[1])
 
         for subtest in test["subtests"]:
-            if subtest["failed"]:
-                subtest_log = (
-                    f"#{test_number}/{subtest['number']} {test_name}/{subtest['name']}"
-                )
-                gh_summary.append(subtest_log)
-                console_summary.append(
-                    test_error_console_log(subtest_log, subtest["message"])
-                )
+            subtest_summaries = build_summaries_for_test(
+                subtest, parent_name=test["name"], parent_number=test["number"]
+            )
+            if subtest_summaries:
+                gh_summary.append(subtest_summaries[0])
+                console_summary.append(subtest_summaries[1])
 
     return "\n".join(gh_summary), "\n".join(console_summary)
 
