@@ -15,4 +15,5 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Test print_test_summary
-        run: ./run-qemu/print_test_summary.py  -j run-qemu/fixtures/test_progs.json -s "${GITHUB_STEP_SUMMARY}"
+        working-directory: run-qemu
+        run: python3 -m unittest tests/test_run_qemu.py
