@@ -31,14 +31,19 @@ else
 fi
 
 cd ${REPO_ROOT}/${REPO_PATH}
-make \
-	CLANG=clang-${LLVM_VERSION} \
-	LLC=llc-${LLVM_VERSION} \
-	LLVM_STRIP=llvm-strip-${LLVM_VERSION} \
-	VMLINUX_BTF="${KBUILD_OUTPUT}/vmlinux" \
-	VMLINUX_H="${VMLINUX_H}" \
-	-C "${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf" \
-	-j $(kernel_build_make_jobs)
+
+MAKE_OPTS=$(cat <<EOF
+	CLANG=clang-${LLVM_VERSION}
+	LLC=llc-${LLVM_VERSION}
+	LLVM_STRIP=llvm-strip-${LLVM_VERSION}
+	VMLINUX_BTF=${KBUILD_OUTPUT}/vmlinux
+	VMLINUX_H=${VMLINUX_H}
+	-C ${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf
+EOF
+)
+make ${MAKE_OPTS} clean
+make ${MAKE_OPTS} -j $(kernel_build_make_jobs)
+
 cd -
 mkdir "${LIBBPF_PATH}"/selftests
 cp -R "${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf" \
