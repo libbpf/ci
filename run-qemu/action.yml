@@ -19,6 +19,11 @@ inputs:
   kernel-test:
     description: 'Test to run'
     default: ''
+  output-dir:
+    description: |
+      Some sub-commands produce output dir within VM file system (/command_output/).
+      If this option is set that dir's content would be copied to corresponding location.
+    default: ''
 runs:
   using: "composite"
   steps:
@@ -37,5 +42,6 @@ runs:
         KERNEL_ROOT: ${{ inputs.kernel-root }}
         MAX_CPU: ${{ inputs.max-cpu }}
         KERNEL_TEST: ${{ inputs.kernel-test }}
+        OUTPUT_DIR: ${{ inputs.output-dir }}
       run: |
         ARCH="${{ inputs.arch }}" ${GITHUB_ACTION_PATH}/run.sh
