@@ -13,8 +13,8 @@
       # https://github.com/multiarch/qemu-user-static does not support host arch != x86_64
       # see https://github.com/multiarch/qemu-user-static/issues/174
       # In the meantime use https://dbhi.github.io/qus/
-      ExecStartPre=/usr/bin/docker run --rm --interactive --privileged aptman/qus -s -- -r
-      ExecStart=/usr/bin/docker run --rm --interactive --privileged aptman/qus -s -- -p
+      ExecStartPre=/usr/bin/docker run --rm --interactive --privileged {{ qus_container_name }}:{{ qus_container_tag }} -s -- -r
+      ExecStart=/usr/bin/docker run --rm --interactive --privileged {{ qus_container_name }}:{{ qus_container_tag }} -s -- -p
 
       [Install]
       WantedBy=multi-user.target
