@@ -38,11 +38,15 @@ MAKE_OPTS=$(cat <<EOF
 	LLVM_STRIP=llvm-strip-${LLVM_VERSION}
 	VMLINUX_BTF=${KBUILD_OUTPUT}/vmlinux
 	VMLINUX_H=${VMLINUX_H}
+EOF
+)
+SELF_OPTS=$(cat <<EOF
 	-C ${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf
 EOF
 )
-make ${MAKE_OPTS} clean
-make ${MAKE_OPTS} -j $(kernel_build_make_jobs)
+make ${MAKE_OPTS} headers
+make ${MAKE_OPTS} ${SELF_OPTS} clean
+make ${MAKE_OPTS} ${SELF_OPTS} -j $(kernel_build_make_jobs)
 
 cd -
 mkdir "${LIBBPF_PATH}"/selftests
