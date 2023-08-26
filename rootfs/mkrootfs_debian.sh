@@ -156,6 +156,7 @@ packages=$(IFS=, && echo "${packages[*]}")
 
 # Stage 1
 debootstrap --include="$packages" \
+    --components=main,universe \
     --foreign \
     --variant=minbase \
     --arch="${deb_arch}" \
