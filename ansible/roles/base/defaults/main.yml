@@ -1,7 +1,10 @@
 ---
 __base_packages:
+  - atop
   - curl
   - git
   - jq
   - python3-pip
   - vim
+
+atop_interval: 10
