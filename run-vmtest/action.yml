@@ -1,0 +1,64 @@
+name: 'run vmtest'
+description: 'Run vmtest and print summary'
+inputs:
+  arch:
+    description: 'arch'
+    required: true
+  img:
+    description: 'img path'
+    required: true
+  vmlinuz:
+    description: 'vmlinuz path'
+    required: true
+  kernel-root:
+    description: 'kernel source dir'
+    default: '.'
+  max-cpu:
+    description: 'Maximum number of CPU allocated to a VM (regardless of number of CPUs available on the host). Default is unset, e.g it will default to the number of CPU on the host.'
+    default: ''
+  kernel-test:
+    description: 'Test to run'
+    default: ''
+  output-dir:
+    description: |
+      Some sub-commands produce output dir within VM file system (/command_output/).
+      If this option is set that dir's content would be copied to corresponding location.
+    default: ''
+runs:
+  using: "composite"
+  steps:
+    - name: Find kernel
+      id: find-kernel
+      shell: bash
+      run: |
+        BUILDDIR=$(realpath kbuild-output)
+        vmlinuz="$BUILDDIR/$(KBUILD_OUTPUT="${BUILDDIR}" make -C "${{ inputs.kernel-root }}" -s image_name)"
+        cp "$vmlinuz" ${{ inputs.vmlinuz }}
+    - name: Download vmtest
+      shell: bash
+      # FIXME: move to proper release
+      run: |
+        curl -L https://github.com/chantra/danobi-vmtest/releases/download/v2.2.0/vmtest-$(uname -m) > /usr/bin/vmtest && chmod 755 /usr/bin/vmtest
+    - name: install qemu tools and selftest dependencies
+      shell: bash
+      run: |
+        source "${GITHUB_ACTION_PATH}/../helpers.sh"
+        foldable start install_qemu "Installing QEMU tools"
+        # need gawk to support `--field-separator`
+        sudo apt-get update && sudo apt-get install -y cpu-checker qemu-kvm qemu-utils qemu-system-x86 qemu-system-s390x qemu-system-arm qemu-guest-agent \
+          ethtool keyutils iptables \
+          gawk
+        foldable end install_qemu
+    - name: Run vmtest
+      shell: bash
+      env:
+        VMLINUZ: ${{ inputs.vmlinuz }}
+        IMG: ${{ inputs.img }}
+        KERNEL_ROOT: ${{ inputs.kernel-root }}
+        MAX_CPU: ${{ inputs.max-cpu }}
+        KERNEL_TEST: ${{ inputs.kernel-test }}
+        OUTPUT_DIR: ${{ inputs.output-dir }}
+        PROJECT_NAME: "/mnt/vmtest"
+      run: |
+        ${GITHUB_ACTION_PATH}/run.sh
+
