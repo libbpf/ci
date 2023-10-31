@@ -20,6 +20,7 @@ foldable start build_kernel "Building kernel with $TOOLCHAIN"
 # $1 - path to config file to create/overwrite
 cat_kernel_config() {
 	cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
+	    ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.vm \
 	    ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${ARCH} \
 	    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config \
 	    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${ARCH} 2> /dev/null > "${1}"
