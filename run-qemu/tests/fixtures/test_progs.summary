@@ -1,0 +1,193 @@
+# Tests summary
+- :heavy_check_mark: Success: 29/23
+- :next_track_button: Skipped: 3
+- :x: Failed: 28
+#10 bpf_cookie
+#10/2 bpf_cookie/multi_kprobe_link_api
+#10/3 bpf_cookie/multi_kprobe_attach_api
+#10/8 bpf_cookie/lsm
+#15 bpf_mod_race
+#15/1 bpf_mod_race/ksym (used_btfs UAF)
+#15/2 bpf_mod_race/kfunc (kfunc_btf_tab UAF)
+#36 cgroup_hierarchical_stats
+#61 deny_namespace
+#61/1 deny_namespace/unpriv_userns_create_no_bpf
+#73 fexit_stress
+#83 get_func_ip_test
+#99 kfunc_dynptr_param
+#99/1 kfunc_dynptr_param/dynptr_data_null
+#99/4 kfunc_dynptr_param/dynptr_data_null
+#100 kprobe_multi_bench_attach
+#100/1 kprobe_multi_bench_attach/kernel
+#100/2 kprobe_multi_bench_attach/modules
+#101 kprobe_multi_test
+#101/1 kprobe_multi_test/skel_api
+#101/2 kprobe_multi_test/link_api_addrs
+#101/3 kprobe_multi_test/link_api_syms
+#101/4 kprobe_multi_test/attach_api_pattern
+#101/5 kprobe_multi_test/attach_api_addrs
+#101/6 kprobe_multi_test/attach_api_syms
+#108 libbpf_get_fd_by_id_opts
+#114 linked_list
+#114/1 linked_list/kptr_missing_lock_push_front
+#114/2 linked_list/kptr_missing_lock_push_back
+#114/3 linked_list/kptr_missing_lock_pop_front
+#114/4 linked_list/kptr_missing_lock_pop_back
+#114/5 linked_list/global_missing_lock_push_front
+#114/6 linked_list/global_missing_lock_push_back
+#114/7 linked_list/global_missing_lock_pop_front
+#114/8 linked_list/global_missing_lock_pop_back
+#114/9 linked_list/map_missing_lock_push_front
+#114/10 linked_list/map_missing_lock_push_back
+#114/11 linked_list/map_missing_lock_pop_front
+#114/12 linked_list/map_missing_lock_pop_back
+#114/13 linked_list/inner_map_missing_lock_push_front
+#114/14 linked_list/inner_map_missing_lock_push_back
+#114/15 linked_list/inner_map_missing_lock_pop_front
+#114/16 linked_list/inner_map_missing_lock_pop_back
+#114/17 linked_list/kptr_kptr_incorrect_lock_push_front
+#114/18 linked_list/kptr_global_incorrect_lock_push_front
+#114/19 linked_list/kptr_map_incorrect_lock_push_front
+#114/20 linked_list/kptr_inner_map_incorrect_lock_push_front
+#114/21 linked_list/kptr_kptr_incorrect_lock_push_back
+#114/22 linked_list/kptr_global_incorrect_lock_push_back
+#114/23 linked_list/kptr_map_incorrect_lock_push_back
+#114/24 linked_list/kptr_inner_map_incorrect_lock_push_back
+#114/25 linked_list/kptr_kptr_incorrect_lock_pop_front
+#114/26 linked_list/kptr_global_incorrect_lock_pop_front
+#114/27 linked_list/kptr_map_incorrect_lock_pop_front
+#114/28 linked_list/kptr_inner_map_incorrect_lock_pop_front
+#114/29 linked_list/kptr_kptr_incorrect_lock_pop_back
+#114/30 linked_list/kptr_global_incorrect_lock_pop_back
+#114/31 linked_list/kptr_map_incorrect_lock_pop_back
+#114/32 linked_list/kptr_inner_map_incorrect_lock_pop_back
+#114/33 linked_list/global_kptr_incorrect_lock_push_front
+#114/34 linked_list/global_global_incorrect_lock_push_front
+#114/35 linked_list/global_map_incorrect_lock_push_front
+#114/36 linked_list/global_inner_map_incorrect_lock_push_front
+#114/37 linked_list/global_kptr_incorrect_lock_push_back
+#114/38 linked_list/global_global_incorrect_lock_push_back
+#114/39 linked_list/global_map_incorrect_lock_push_back
+#114/40 linked_list/global_inner_map_incorrect_lock_push_back
+#114/41 linked_list/global_kptr_incorrect_lock_pop_front
+#114/42 linked_list/global_global_incorrect_lock_pop_front
+#114/43 linked_list/global_map_incorrect_lock_pop_front
+#114/44 linked_list/global_inner_map_incorrect_lock_pop_front
+#114/45 linked_list/global_kptr_incorrect_lock_pop_back
+#114/46 linked_list/global_global_incorrect_lock_pop_back
+#114/47 linked_list/global_map_incorrect_lock_pop_back
+#114/48 linked_list/global_inner_map_incorrect_lock_pop_back
+#114/49 linked_list/map_kptr_incorrect_lock_push_front
+#114/50 linked_list/map_global_incorrect_lock_push_front
+#114/51 linked_list/map_map_incorrect_lock_push_front
+#114/52 linked_list/map_inner_map_incorrect_lock_push_front
+#114/53 linked_list/map_kptr_incorrect_lock_push_back
+#114/54 linked_list/map_global_incorrect_lock_push_back
+#114/55 linked_list/map_map_incorrect_lock_push_back
+#114/56 linked_list/map_inner_map_incorrect_lock_push_back
+#114/57 linked_list/map_kptr_incorrect_lock_pop_front
+#114/58 linked_list/map_global_incorrect_lock_pop_front
+#114/59 linked_list/map_map_incorrect_lock_pop_front
+#114/60 linked_list/map_inner_map_incorrect_lock_pop_front
+#114/61 linked_list/map_kptr_incorrect_lock_pop_back
+#114/62 linked_list/map_global_incorrect_lock_pop_back
+#114/63 linked_list/map_map_incorrect_lock_pop_back
+#114/64 linked_list/map_inner_map_incorrect_lock_pop_back
+#114/65 linked_list/inner_map_kptr_incorrect_lock_push_front
+#114/66 linked_list/inner_map_global_incorrect_lock_push_front
+#114/67 linked_list/inner_map_map_incorrect_lock_push_front
+#114/68 linked_list/inner_map_inner_map_incorrect_lock_push_front
+#114/69 linked_list/inner_map_kptr_incorrect_lock_push_back
+#114/70 linked_list/inner_map_global_incorrect_lock_push_back
+#114/71 linked_list/inner_map_map_incorrect_lock_push_back
+#114/72 linked_list/inner_map_inner_map_incorrect_lock_push_back
+#114/73 linked_list/inner_map_kptr_incorrect_lock_pop_front
+#114/74 linked_list/inner_map_global_incorrect_lock_pop_front
+#114/75 linked_list/inner_map_map_incorrect_lock_pop_front
+#114/76 linked_list/inner_map_inner_map_incorrect_lock_pop_front
+#114/77 linked_list/inner_map_kptr_incorrect_lock_pop_back
+#114/78 linked_list/inner_map_global_incorrect_lock_pop_back
+#114/79 linked_list/inner_map_map_incorrect_lock_pop_back
+#114/80 linked_list/inner_map_inner_map_incorrect_lock_pop_back
+#114/81 linked_list/map_compat_kprobe
+#114/82 linked_list/map_compat_kretprobe
+#114/83 linked_list/map_compat_tp
+#114/84 linked_list/map_compat_perf
+#114/85 linked_list/map_compat_raw_tp
+#114/86 linked_list/map_compat_raw_tp_w
+#114/87 linked_list/obj_type_id_oor
+#114/88 linked_list/obj_new_no_composite
+#114/89 linked_list/obj_new_no_struct
+#114/90 linked_list/obj_drop_non_zero_off
+#114/91 linked_list/new_null_ret
+#114/92 linked_list/obj_new_acq
+#114/93 linked_list/use_after_drop
+#114/94 linked_list/ptr_walk_scalar
+#114/95 linked_list/direct_read_lock
+#114/96 linked_list/direct_write_lock
+#114/97 linked_list/direct_read_head
+#114/98 linked_list/direct_write_head
+#114/99 linked_list/direct_read_node
+#114/100 linked_list/direct_write_node
+#114/101 linked_list/use_after_unlock_push_front
+#114/102 linked_list/use_after_unlock_push_back
+#114/103 linked_list/double_push_front
+#114/104 linked_list/double_push_back
+#114/105 linked_list/no_node_value_type
+#114/106 linked_list/incorrect_value_type
+#114/107 linked_list/incorrect_node_var_off
+#114/108 linked_list/incorrect_node_off1
+#114/109 linked_list/incorrect_node_off2
+#114/110 linked_list/no_head_type
+#114/111 linked_list/incorrect_head_var_off1
+#114/112 linked_list/incorrect_head_var_off2
+#114/113 linked_list/incorrect_head_off1
+#114/114 linked_list/incorrect_head_off2
+#114/115 linked_list/pop_front_off
+#114/116 linked_list/pop_back_off
+#114/117 linked_list/btf: too many locks
+#114/118 linked_list/btf: missing lock
+#114/119 linked_list/btf: bad offset
+#114/120 linked_list/btf: missing contains:
+#114/121 linked_list/btf: missing struct
+#114/122 linked_list/btf: missing node
+#114/123 linked_list/btf: node incorrect type
+#114/124 linked_list/btf: multiple bpf_list_node with name b
+#114/125 linked_list/btf: owning | owned AA cycle
+#114/126 linked_list/btf: owning | owned ABA cycle
+#114/129 linked_list/btf: owning | owned -> owning | owned -> owned
+#114/130 linked_list/btf: owning -> owning | owned -> owning | owned -> owned
+#114/131 linked_list/btf: list_node and rb_node in same struct
+#124 lru_bug
+#135 module_attach
+#136 module_fentry_shadow
+#137 mptcp
+#137/1 mptcp/base
+#164 rcu_read_lock
+#164/1 rcu_read_lock/success
+#164/2 rcu_read_lock/rcuptr_acquire
+#169 ringbuf
+#169/2 ringbuf/ringbuf_map_key
+#175 setget_sockopt
+#213 task_local_storage
+#213/3 task_local_storage/recursion
+#222 test_bprm_opts
+#224 test_ima
+#225 test_local_storage
+#226 test_lsm
+#231 timer
+#239 tracing_struct
+#240 trampoline_count
+#248 user_ringbuf
+#248/2 user_ringbuf/test_user_ringbuf_post_misaligned
+#248/3 user_ringbuf/test_user_ringbuf_post_producer_wrong_offset
+#248/4 user_ringbuf/test_user_ringbuf_post_larger_than_ringbuf_sz
+#248/5 user_ringbuf/test_user_ringbuf_basic
+#248/6 user_ringbuf/test_user_ringbuf_sample_full_ring_buffer
+#248/7 user_ringbuf/test_user_ringbuf_post_alignment_autoadjust
+#248/8 user_ringbuf/test_user_ringbuf_overfill
+#248/9 user_ringbuf/test_user_ringbuf_discards_properly_ignored
+#248/10 user_ringbuf/test_user_ringbuf_loop
+#248/11 user_ringbuf/test_user_ringbuf_msg_protocol
+#248/12 user_ringbuf/test_user_ringbuf_blocking_reserve
+#279 verify_pkcs7_sig

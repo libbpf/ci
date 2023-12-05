@@ -1,0 +1,2350 @@
+::notice::Success: 29/23, Skipped: 3, Failed: 28
+::group::[1;31mError:[0m #10 bpf_cookie
+::error::#10 bpf_cookie
+test_bpf_cookie:PASS:skel_open 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #10/2 bpf_cookie/multi_kprobe_link_api
+::error::#10/2 bpf_cookie/multi_kprobe_link_api
+kprobe_multi_link_api_subtest:PASS:load_kallsyms 0 nsec
+libbpf: extern 'bpf_testmod_fentry_test1' (strong): not resolved
+libbpf: failed to load object 'kprobe_multi'
+libbpf: failed to load BPF skeleton 'kprobe_multi': -3
+kprobe_multi_link_api_subtest:FAIL:fentry_raw_skel_load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #10/3 bpf_cookie/multi_kprobe_attach_api
+::error::#10/3 bpf_cookie/multi_kprobe_attach_api
+libbpf: extern 'bpf_testmod_fentry_test1' (strong): not resolved
+libbpf: failed to load object 'kprobe_multi'
+libbpf: failed to load BPF skeleton 'kprobe_multi': -3
+kprobe_multi_attach_api_subtest:FAIL:fentry_raw_skel_load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #10/8 bpf_cookie/lsm
+::error::#10/8 bpf_cookie/lsm
+lsm_subtest:PASS:lsm.link_create 0 nsec
+lsm_subtest:FAIL:stack_mprotect unexpected stack_mprotect: actual 0 != expected -1
+::endgroup::
+::error::#15 bpf_mod_race
+::group::[1;31mError:[0m #15/1 bpf_mod_race/ksym (used_btfs UAF)
+::error::#15/1 bpf_mod_race/ksym (used_btfs UAF)
+test_bpf_mod_race_config:PASS:mmap for uffd registration 0 nsec
+test_bpf_mod_race_config:FAIL:unload bpf_testmod unexpected error: -1 (errno 2)
+::endgroup::
+::group::[1;31mError:[0m #15/2 bpf_mod_race/kfunc (kfunc_btf_tab UAF)
+::error::#15/2 bpf_mod_race/kfunc (kfunc_btf_tab UAF)
+test_bpf_mod_race_config:PASS:mmap for uffd registration 0 nsec
+test_bpf_mod_race_config:FAIL:unload bpf_testmod unexpected error: -1 (errno 2)
+::endgroup::
+::group::[1;31mError:[0m #36 cgroup_hierarchical_stats
+::error::#36 cgroup_hierarchical_stats
+setup_bpffs:PASS:mount 0 nsec
+setup_cgroups:PASS:setup_cgroup_environment 0 nsec
+setup_cgroups:PASS:get_root_cgroup 0 nsec
+setup_cgroups:PASS:create_and_get_cgroup 0 nsec
+setup_cgroups:PASS:create_and_get_cgroup 0 nsec
+setup_cgroups:PASS:create_and_get_cgroup 0 nsec
+setup_cgroups:PASS:create_and_get_cgroup 0 nsec
+setup_cgroups:PASS:create_and_get_cgroup 0 nsec
+setup_cgroups:PASS:create_and_get_cgroup 0 nsec
+setup_cgroups:PASS:create_and_get_cgroup 0 nsec
+libbpf: prog 'counter': BPF program load failed: Permission denied
+libbpf: prog 'counter': -- BEGIN PROG LOAD LOG --
+R1 type=ctx expected=fp
+0: R1=ctx(off=0,imm=0) R10=fp0
+; int BPF_PROG(counter, struct cgroup *dst_cgrp, struct task_struct *leader,
+0: (79) r6 = *(u64 *)(r1 +0)
+func 'cgroup_attach_task' arg0 has btf_id 1839 type STRUCT 'cgroup'
+1: R1=ctx(off=0,imm=0) R6_w=ptr_cgroup(off=0,imm=0)
+; return cgrp->kn->id;
+1: (79) r1 = *(u64 *)(r6 +248)        ; R1_w=ptr_kernfs_node(off=0,imm=0) R6_w=ptr_cgroup(off=0,imm=0)
+; return cgrp->kn->id;
+2: (79) r1 = *(u64 *)(r1 +104)        ; R1_w=scalar()
+; __u64 cg_id = cgroup_id(dst_cgrp);
+3: (7b) *(u64 *)(r10 -32) = r1        ; R1_w=scalar() R10=fp0 fp-32_w=mmmmmmmm
+4: (bf) r2 = r10                      ; R2_w=fp0 R10=fp0
+; 
+5: (07) r2 += -32                     ; R2_w=fp-32
+; struct percpu_attach_counter *pcpu_counter = bpf_map_lookup_elem(
+6: (18) r1 = 0xffff8886c3e94400       ; R1_w=map_ptr(off=0,ks=8,vs=16,imm=0)
+8: (85) call bpf_map_lookup_elem#1    ; R0_w=map_value_or_null(id=1,off=0,ks=8,vs=16,imm=0)
+; if (pcpu_counter)
+9: (15) if r0 == 0x0 goto pc+4        ; R0_w=map_value(off=0,ks=8,vs=16,imm=0)
+; pcpu_counter->state += 1;
+10: (79) r1 = *(u64 *)(r0 +8)         ; R0_w=map_value(off=0,ks=8,vs=16,imm=0) R1_w=scalar()
+11: (07) r1 += 1                      ; R1_w=scalar()
+12: (7b) *(u64 *)(r0 +8) = r1         ; R0_w=map_value(off=0,ks=8,vs=16,imm=0) R1_w=scalar()
+13: (05) goto pc+15
+; cgroup_rstat_updated(dst_cgrp, bpf_get_smp_processor_id());
+29: (85) call bpf_get_smp_processor_id#8      ; R0_w=scalar()
+; cgroup_rstat_updated(dst_cgrp, bpf_get_smp_processor_id());
+30: (bf) r1 = r6                      ; R1_w=ptr_cgroup(off=0,imm=0) R6=ptr_cgroup(off=0,imm=0)
+31: (bc) w2 = w0                      ; R0_w=scalar() R2_w=scalar(umax=4294967295,var_off=(0x0; 0xffffffff))
+32: (85) call cgroup_rstat_updated#21503
+calling kernel function cgroup_rstat_updated is not allowed
+processed 17 insns (limit 1000000) max_states_per_insn 0 total_states 1 peak_states 1 mark_read 1
+-- END PROG LOAD LOG --
+libbpf: prog 'counter': failed to load: -13
+libbpf: failed to load object 'cgroup_hierarchical_stats'
+libbpf: failed to load BPF skeleton 'cgroup_hierarchical_stats': -13
+setup_progs:FAIL:open_and_load unexpected error: -13
+destroy_progs:FAIL:remove cgroup_iter pin unexpected error: -1 (errno 2)
+destroy_progs:FAIL:remove cgroup_iter pin unexpected error: -1 (errno 2)
+destroy_progs:FAIL:remove cgroup_iter pin unexpected error: -1 (errno 2)
+destroy_progs:FAIL:remove cgroup_iter pin unexpected error: -1 (errno 2)
+destroy_progs:FAIL:remove cgroup_iter pin unexpected error: -1 (errno 2)
+destroy_progs:FAIL:remove cgroup_iter pin unexpected error: -1 (errno 2)
+destroy_progs:FAIL:remove cgroup_iter pin unexpected error: -1 (errno 2)
+destroy_progs:FAIL:remove cgroup_iter root pin unexpected error: -1 (errno 2)
+cleanup_bpffs:FAIL:rmdir /sys/fs/bpf/attach_counters/ unexpected error: -1 (errno 2)
+::endgroup::
+::error::#61 deny_namespace
+::group::[1;31mError:[0m #61/1 deny_namespace/unpriv_userns_create_no_bpf
+::error::#61/1 deny_namespace/unpriv_userns_create_no_bpf
+test_unpriv_userns_create_no_bpf:PASS:no-bpf unpriv new user ns 0 nsec
+libbpf: prog 'test_userns_create': failed to find kernel BTF type ID of 'userns_create': -3
+libbpf: prog 'test_userns_create': failed to prepare load attributes: -3
+libbpf: prog 'test_userns_create': failed to load: -3
+libbpf: failed to load object 'test_deny_namespace'
+libbpf: failed to load BPF skeleton 'test_deny_namespace': -3
+test_deny_namespace:FAIL:skel load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #73 fexit_stress
+::error::#73 fexit_stress
+get_bpf_max_tramp_links:PASS:vmlinux btf 0 nsec
+serial_test_fexit_stress:FAIL:bpf_max_tramp_links unexpected bpf_max_tramp_links: actual -1 < expected 1
+::endgroup::
+::group::[1;31mError:[0m #83 get_func_ip_test
+::error::#83 get_func_ip_test
+test_function_entry:PASS:get_func_ip_test__open 0 nsec
+test_function_entry:PASS:get_func_ip_test__load 0 nsec
+test_function_entry:PASS:get_func_ip_test__attach 0 nsec
+test_function_entry:PASS:test_run 0 nsec
+test_function_entry:PASS:test_run 0 nsec
+test_function_entry:PASS:test_run 0 nsec
+test_function_entry:PASS:test1_result 0 nsec
+test_function_entry:PASS:test2_result 0 nsec
+test_function_entry:PASS:test3_result 0 nsec
+test_function_entry:PASS:test4_result 0 nsec
+test_function_entry:PASS:test5_result 0 nsec
+test_function_body:PASS:get_func_ip_test__open 0 nsec
+test_function_body:PASS:get_func_ip_test__load 0 nsec
+test_function_body:PASS:link6 0 nsec
+test_function_body:PASS:test_run 0 nsec
+test_function_body:PASS:test_run 0 nsec
+test_function_body:FAIL:test6_result unexpected test6_result: actual 0 != expected 1
+::endgroup::
+::group::[1;31mError:[0m #99 kfunc_dynptr_param
+::error::#99 kfunc_dynptr_param
+has_pkcs7_kfunc_support:PASS:test_kfunc_dynptr_param__open 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #99/1 kfunc_dynptr_param/dynptr_data_null
+::error::#99/1 kfunc_dynptr_param/dynptr_data_null
+verify_success:PASS:test_kfunc_dynptr_param__open 0 nsec
+libbpf: extern (func ksym) 'bpf_key_put': not found in kernel or module BTFs
+libbpf: failed to load object 'test_kfunc_dynptr_param'
+libbpf: failed to load BPF skeleton 'test_kfunc_dynptr_param': -22
+verify_success:FAIL:test_kfunc_dynptr_param__load unexpected error: -22 (errno 22)
+tester_init:PASS:tester_log_buf 0 nsec
+run_subtest:PASS:obj_open_mem 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #99/4 kfunc_dynptr_param/dynptr_data_null
+::error::#99/4 kfunc_dynptr_param/dynptr_data_null
+run_subtest:PASS:parse_test_spec 0 nsec
+run_subtest:PASS:obj_open_mem 0 nsec
+libbpf: extern (func ksym) 'bpf_key_put': not found in kernel or module BTFs
+libbpf: failed to load object 'test_kfunc_dynptr_param'
+run_subtest:FAIL:unexpected_load_failure unexpected error: -22 (errno 22)
+VERIFIER LOG:
+=============
+=============
+::endgroup::
+::error::#100 kprobe_multi_bench_attach
+::group::[1;31mError:[0m #100/1 kprobe_multi_bench_attach/kernel
+::error::#100/1 kprobe_multi_bench_attach/kernel
+test_kprobe_multi_bench_attach:PASS:get_syms 0 nsec
+test_kprobe_multi_bench_attach:PASS:kprobe_multi_empty__open_and_load 0 nsec
+libbpf: prog 'test_kprobe_empty': failed to attach: No such process
+test_kprobe_multi_bench_attach:FAIL:bpf_program__attach_kprobe_multi_opts unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #100/2 kprobe_multi_bench_attach/modules
+::error::#100/2 kprobe_multi_bench_attach/modules
+test_kprobe_multi_bench_attach:PASS:get_syms 0 nsec
+test_kprobe_multi_bench_attach:PASS:kprobe_multi_empty__open_and_load 0 nsec
+libbpf: prog 'test_kprobe_empty': failed to attach: No such process
+test_kprobe_multi_bench_attach:FAIL:bpf_program__attach_kprobe_multi_opts unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #101 kprobe_multi_test
+::error::#101 kprobe_multi_test
+test_kprobe_multi_test:PASS:load_kallsyms 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #101/1 kprobe_multi_test/skel_api
+::error::#101/1 kprobe_multi_test/skel_api
+libbpf: extern 'bpf_testmod_fentry_test1' (strong): not resolved
+libbpf: failed to load object 'kprobe_multi'
+libbpf: failed to load BPF skeleton 'kprobe_multi': -3
+test_skel_api:FAIL:kprobe_multi__open_and_load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #101/2 kprobe_multi_test/link_api_addrs
+::error::#101/2 kprobe_multi_test/link_api_addrs
+libbpf: extern 'bpf_testmod_fentry_test1' (strong): not resolved
+libbpf: failed to load object 'kprobe_multi'
+libbpf: failed to load BPF skeleton 'kprobe_multi': -3
+test_link_api:FAIL:fentry_raw_skel_load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #101/3 kprobe_multi_test/link_api_syms
+::error::#101/3 kprobe_multi_test/link_api_syms
+test_link_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test1" 0 nsec
+test_link_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test2" 0 nsec
+test_link_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test3" 0 nsec
+test_link_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test4" 0 nsec
+test_link_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test5" 0 nsec
+test_link_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test6" 0 nsec
+test_link_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test7" 0 nsec
+test_link_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test8" 0 nsec
+libbpf: extern 'bpf_testmod_fentry_test1' (strong): not resolved
+libbpf: failed to load object 'kprobe_multi'
+libbpf: failed to load BPF skeleton 'kprobe_multi': -3
+test_link_api:FAIL:fentry_raw_skel_load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #101/4 kprobe_multi_test/attach_api_pattern
+::error::#101/4 kprobe_multi_test/attach_api_pattern
+libbpf: extern 'bpf_testmod_fentry_test1' (strong): not resolved
+libbpf: failed to load object 'kprobe_multi'
+libbpf: failed to load BPF skeleton 'kprobe_multi': -3
+test_attach_api:FAIL:fentry_raw_skel_load unexpected error: -3
+libbpf: extern 'bpf_testmod_fentry_test1' (strong): not resolved
+libbpf: failed to load object 'kprobe_multi'
+libbpf: failed to load BPF skeleton 'kprobe_multi': -3
+test_attach_api:FAIL:fentry_raw_skel_load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #101/5 kprobe_multi_test/attach_api_addrs
+::error::#101/5 kprobe_multi_test/attach_api_addrs
+test_attach_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test1" 0 nsec
+test_attach_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test2" 0 nsec
+test_attach_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test3" 0 nsec
+test_attach_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test4" 0 nsec
+test_attach_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test5" 0 nsec
+test_attach_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test6" 0 nsec
+test_attach_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test7" 0 nsec
+test_attach_api_addrs:PASS:kallsyms load failed for "bpf_fentry_test8" 0 nsec
+libbpf: extern 'bpf_testmod_fentry_test1' (strong): not resolved
+libbpf: failed to load object 'kprobe_multi'
+libbpf: failed to load BPF skeleton 'kprobe_multi': -3
+test_attach_api:FAIL:fentry_raw_skel_load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #101/6 kprobe_multi_test/attach_api_syms
+::error::#101/6 kprobe_multi_test/attach_api_syms
+libbpf: extern 'bpf_testmod_fentry_test1' (strong): not resolved
+libbpf: failed to load object 'kprobe_multi'
+libbpf: failed to load BPF skeleton 'kprobe_multi': -3
+test_attach_api:FAIL:fentry_raw_skel_load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #108 libbpf_get_fd_by_id_opts
+::error::#108 libbpf_get_fd_by_id_opts
+test_libbpf_get_fd_by_id_opts:PASS:test_libbpf_get_fd_by_id_opts__open_and_load 0 nsec
+test_libbpf_get_fd_by_id_opts:PASS:test_libbpf_get_fd_by_id_opts__attach 0 nsec
+test_libbpf_get_fd_by_id_opts:PASS:bpf_map_get_info_by_fd 0 nsec
+test_libbpf_get_fd_by_id_opts:FAIL:bpf_map_get_fd_by_id unexpected bpf_map_get_fd_by_id: actual 31 >= expected 0
+::endgroup::
+::error::#114 linked_list
+::group::[1;31mError:[0m #114/1 linked_list/kptr_missing_lock_push_front
+::error::#114/1 linked_list/kptr_missing_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/2 linked_list/kptr_missing_lock_push_back
+::error::#114/2 linked_list/kptr_missing_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/3 linked_list/kptr_missing_lock_pop_front
+::error::#114/3 linked_list/kptr_missing_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/4 linked_list/kptr_missing_lock_pop_back
+::error::#114/4 linked_list/kptr_missing_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/5 linked_list/global_missing_lock_push_front
+::error::#114/5 linked_list/global_missing_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/6 linked_list/global_missing_lock_push_back
+::error::#114/6 linked_list/global_missing_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/7 linked_list/global_missing_lock_pop_front
+::error::#114/7 linked_list/global_missing_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/8 linked_list/global_missing_lock_pop_back
+::error::#114/8 linked_list/global_missing_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/9 linked_list/map_missing_lock_push_front
+::error::#114/9 linked_list/map_missing_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/10 linked_list/map_missing_lock_push_back
+::error::#114/10 linked_list/map_missing_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/11 linked_list/map_missing_lock_pop_front
+::error::#114/11 linked_list/map_missing_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/12 linked_list/map_missing_lock_pop_back
+::error::#114/12 linked_list/map_missing_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/13 linked_list/inner_map_missing_lock_push_front
+::error::#114/13 linked_list/inner_map_missing_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/14 linked_list/inner_map_missing_lock_push_back
+::error::#114/14 linked_list/inner_map_missing_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/15 linked_list/inner_map_missing_lock_pop_front
+::error::#114/15 linked_list/inner_map_missing_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/16 linked_list/inner_map_missing_lock_pop_back
+::error::#114/16 linked_list/inner_map_missing_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/17 linked_list/kptr_kptr_incorrect_lock_push_front
+::error::#114/17 linked_list/kptr_kptr_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/18 linked_list/kptr_global_incorrect_lock_push_front
+::error::#114/18 linked_list/kptr_global_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/19 linked_list/kptr_map_incorrect_lock_push_front
+::error::#114/19 linked_list/kptr_map_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/20 linked_list/kptr_inner_map_incorrect_lock_push_front
+::error::#114/20 linked_list/kptr_inner_map_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/21 linked_list/kptr_kptr_incorrect_lock_push_back
+::error::#114/21 linked_list/kptr_kptr_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/22 linked_list/kptr_global_incorrect_lock_push_back
+::error::#114/22 linked_list/kptr_global_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/23 linked_list/kptr_map_incorrect_lock_push_back
+::error::#114/23 linked_list/kptr_map_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/24 linked_list/kptr_inner_map_incorrect_lock_push_back
+::error::#114/24 linked_list/kptr_inner_map_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/25 linked_list/kptr_kptr_incorrect_lock_pop_front
+::error::#114/25 linked_list/kptr_kptr_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/26 linked_list/kptr_global_incorrect_lock_pop_front
+::error::#114/26 linked_list/kptr_global_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/27 linked_list/kptr_map_incorrect_lock_pop_front
+::error::#114/27 linked_list/kptr_map_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/28 linked_list/kptr_inner_map_incorrect_lock_pop_front
+::error::#114/28 linked_list/kptr_inner_map_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/29 linked_list/kptr_kptr_incorrect_lock_pop_back
+::error::#114/29 linked_list/kptr_kptr_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/30 linked_list/kptr_global_incorrect_lock_pop_back
+::error::#114/30 linked_list/kptr_global_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/31 linked_list/kptr_map_incorrect_lock_pop_back
+::error::#114/31 linked_list/kptr_map_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/32 linked_list/kptr_inner_map_incorrect_lock_pop_back
+::error::#114/32 linked_list/kptr_inner_map_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/33 linked_list/global_kptr_incorrect_lock_push_front
+::error::#114/33 linked_list/global_kptr_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/34 linked_list/global_global_incorrect_lock_push_front
+::error::#114/34 linked_list/global_global_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/35 linked_list/global_map_incorrect_lock_push_front
+::error::#114/35 linked_list/global_map_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/36 linked_list/global_inner_map_incorrect_lock_push_front
+::error::#114/36 linked_list/global_inner_map_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/37 linked_list/global_kptr_incorrect_lock_push_back
+::error::#114/37 linked_list/global_kptr_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/38 linked_list/global_global_incorrect_lock_push_back
+::error::#114/38 linked_list/global_global_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/39 linked_list/global_map_incorrect_lock_push_back
+::error::#114/39 linked_list/global_map_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/40 linked_list/global_inner_map_incorrect_lock_push_back
+::error::#114/40 linked_list/global_inner_map_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/41 linked_list/global_kptr_incorrect_lock_pop_front
+::error::#114/41 linked_list/global_kptr_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/42 linked_list/global_global_incorrect_lock_pop_front
+::error::#114/42 linked_list/global_global_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/43 linked_list/global_map_incorrect_lock_pop_front
+::error::#114/43 linked_list/global_map_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/44 linked_list/global_inner_map_incorrect_lock_pop_front
+::error::#114/44 linked_list/global_inner_map_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/45 linked_list/global_kptr_incorrect_lock_pop_back
+::error::#114/45 linked_list/global_kptr_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/46 linked_list/global_global_incorrect_lock_pop_back
+::error::#114/46 linked_list/global_global_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/47 linked_list/global_map_incorrect_lock_pop_back
+::error::#114/47 linked_list/global_map_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/48 linked_list/global_inner_map_incorrect_lock_pop_back
+::error::#114/48 linked_list/global_inner_map_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/49 linked_list/map_kptr_incorrect_lock_push_front
+::error::#114/49 linked_list/map_kptr_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/50 linked_list/map_global_incorrect_lock_push_front
+::error::#114/50 linked_list/map_global_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/51 linked_list/map_map_incorrect_lock_push_front
+::error::#114/51 linked_list/map_map_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/52 linked_list/map_inner_map_incorrect_lock_push_front
+::error::#114/52 linked_list/map_inner_map_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/53 linked_list/map_kptr_incorrect_lock_push_back
+::error::#114/53 linked_list/map_kptr_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/54 linked_list/map_global_incorrect_lock_push_back
+::error::#114/54 linked_list/map_global_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/55 linked_list/map_map_incorrect_lock_push_back
+::error::#114/55 linked_list/map_map_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/56 linked_list/map_inner_map_incorrect_lock_push_back
+::error::#114/56 linked_list/map_inner_map_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/57 linked_list/map_kptr_incorrect_lock_pop_front
+::error::#114/57 linked_list/map_kptr_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/58 linked_list/map_global_incorrect_lock_pop_front
+::error::#114/58 linked_list/map_global_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/59 linked_list/map_map_incorrect_lock_pop_front
+::error::#114/59 linked_list/map_map_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/60 linked_list/map_inner_map_incorrect_lock_pop_front
+::error::#114/60 linked_list/map_inner_map_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/61 linked_list/map_kptr_incorrect_lock_pop_back
+::error::#114/61 linked_list/map_kptr_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/62 linked_list/map_global_incorrect_lock_pop_back
+::error::#114/62 linked_list/map_global_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/63 linked_list/map_map_incorrect_lock_pop_back
+::error::#114/63 linked_list/map_map_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/64 linked_list/map_inner_map_incorrect_lock_pop_back
+::error::#114/64 linked_list/map_inner_map_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/65 linked_list/inner_map_kptr_incorrect_lock_push_front
+::error::#114/65 linked_list/inner_map_kptr_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/66 linked_list/inner_map_global_incorrect_lock_push_front
+::error::#114/66 linked_list/inner_map_global_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/67 linked_list/inner_map_map_incorrect_lock_push_front
+::error::#114/67 linked_list/inner_map_map_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/68 linked_list/inner_map_inner_map_incorrect_lock_push_front
+::error::#114/68 linked_list/inner_map_inner_map_incorrect_lock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/69 linked_list/inner_map_kptr_incorrect_lock_push_back
+::error::#114/69 linked_list/inner_map_kptr_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/70 linked_list/inner_map_global_incorrect_lock_push_back
+::error::#114/70 linked_list/inner_map_global_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/71 linked_list/inner_map_map_incorrect_lock_push_back
+::error::#114/71 linked_list/inner_map_map_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/72 linked_list/inner_map_inner_map_incorrect_lock_push_back
+::error::#114/72 linked_list/inner_map_inner_map_incorrect_lock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/73 linked_list/inner_map_kptr_incorrect_lock_pop_front
+::error::#114/73 linked_list/inner_map_kptr_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/74 linked_list/inner_map_global_incorrect_lock_pop_front
+::error::#114/74 linked_list/inner_map_global_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/75 linked_list/inner_map_map_incorrect_lock_pop_front
+::error::#114/75 linked_list/inner_map_map_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/76 linked_list/inner_map_inner_map_incorrect_lock_pop_front
+::error::#114/76 linked_list/inner_map_inner_map_incorrect_lock_pop_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/77 linked_list/inner_map_kptr_incorrect_lock_pop_back
+::error::#114/77 linked_list/inner_map_kptr_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=32 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/78 linked_list/inner_map_global_incorrect_lock_pop_back
+::error::#114/78 linked_list/inner_map_global_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=16 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/79 linked_list/inner_map_map_incorrect_lock_pop_back
+::error::#114/79 linked_list/inner_map_map_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/80 linked_list/inner_map_inner_map_incorrect_lock_pop_back
+::error::#114/80 linked_list/inner_map_inner_map_incorrect_lock_pop_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: held lock and object are not in the same allocation
+bpf_spin_lock at off=0 must be held for bpf_list_head
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/81 linked_list/map_compat_kprobe
+::error::#114/81 linked_list/map_compat_kprobe
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: tracing progs cannot use bpf_{list_head,rb_root} yet
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/82 linked_list/map_compat_kretprobe
+::error::#114/82 linked_list/map_compat_kretprobe
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: tracing progs cannot use bpf_{list_head,rb_root} yet
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/83 linked_list/map_compat_tp
+::error::#114/83 linked_list/map_compat_tp
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: tracing progs cannot use bpf_{list_head,rb_root} yet
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/84 linked_list/map_compat_perf
+::error::#114/84 linked_list/map_compat_perf
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: tracing progs cannot use bpf_{list_head,rb_root} yet
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/85 linked_list/map_compat_raw_tp
+::error::#114/85 linked_list/map_compat_raw_tp
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: tracing progs cannot use bpf_{list_head,rb_root} yet
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/86 linked_list/map_compat_raw_tp_w
+::error::#114/86 linked_list/map_compat_raw_tp_w
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: tracing progs cannot use bpf_{list_head,rb_root} yet
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/87 linked_list/obj_type_id_oor
+::error::#114/87 linked_list/obj_type_id_oor
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: local type ID argument must be in range [0, U32_MAX]
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/88 linked_list/obj_new_no_composite
+::error::#114/88 linked_list/obj_new_no_composite
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_obj_new type ID argument must be of a struct
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/89 linked_list/obj_new_no_struct
+::error::#114/89 linked_list/obj_new_no_struct
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_obj_new type ID argument must be of a struct
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/90 linked_list/obj_drop_non_zero_off
+::error::#114/90 linked_list/obj_drop_non_zero_off
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: R1 must have zero offset when passed to release func
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/91 linked_list/new_null_ret
+::error::#114/91 linked_list/new_null_ret
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: R0 invalid mem access 'ptr_or_null_'
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/92 linked_list/obj_new_acq
+::error::#114/92 linked_list/obj_new_acq
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: Unreleased reference id=
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/93 linked_list/use_after_drop
+::error::#114/93 linked_list/use_after_drop
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: invalid mem access 'scalar'
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/94 linked_list/ptr_walk_scalar
+::error::#114/94 linked_list/ptr_walk_scalar
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: type=scalar expected=percpu_ptr_
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/95 linked_list/direct_read_lock
+::error::#114/95 linked_list/direct_read_lock
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: direct access to bpf_spin_lock is disallowed
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/96 linked_list/direct_write_lock
+::error::#114/96 linked_list/direct_write_lock
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: direct access to bpf_spin_lock is disallowed
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/97 linked_list/direct_read_head
+::error::#114/97 linked_list/direct_read_head
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: direct access to bpf_list_head is disallowed
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/98 linked_list/direct_write_head
+::error::#114/98 linked_list/direct_write_head
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: direct access to bpf_list_head is disallowed
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/99 linked_list/direct_read_node
+::error::#114/99 linked_list/direct_read_node
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: direct access to bpf_list_node is disallowed
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/100 linked_list/direct_write_node
+::error::#114/100 linked_list/direct_write_node
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: direct access to bpf_list_node is disallowed
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/101 linked_list/use_after_unlock_push_front
+::error::#114/101 linked_list/use_after_unlock_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: invalid mem access 'scalar'
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/102 linked_list/use_after_unlock_push_back
+::error::#114/102 linked_list/use_after_unlock_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: invalid mem access 'scalar'
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/103 linked_list/double_push_front
+::error::#114/103 linked_list/double_push_front
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: arg#1 expected pointer to allocated object
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/104 linked_list/double_push_back
+::error::#114/104 linked_list/double_push_back
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: arg#1 expected pointer to allocated object
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/105 linked_list/no_node_value_type
+::error::#114/105 linked_list/no_node_value_type
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_list_node not found at offset=0
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/106 linked_list/incorrect_value_type
+::error::#114/106 linked_list/incorrect_value_type
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: operation on bpf_list_head expects arg#1 bpf_list_node at offset=0 in struct foo, but arg is at offset=0 in struct bar
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/107 linked_list/incorrect_node_var_off
+::error::#114/107 linked_list/incorrect_node_var_off
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: variable ptr_ access var_off=(0x0; 0xffffffff) disallowed
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/108 linked_list/incorrect_node_off1
+::error::#114/108 linked_list/incorrect_node_off1
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_list_node not found at offset=1
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/109 linked_list/incorrect_node_off2
+::error::#114/109 linked_list/incorrect_node_off2
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: arg#1 offset=40, but expected bpf_list_node at offset=0 in struct foo
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/110 linked_list/no_head_type
+::error::#114/110 linked_list/no_head_type
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_list_head not found at offset=0
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/111 linked_list/incorrect_head_var_off1
+::error::#114/111 linked_list/incorrect_head_var_off1
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: R1 doesn't have constant offset
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/112 linked_list/incorrect_head_var_off2
+::error::#114/112 linked_list/incorrect_head_var_off2
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: variable ptr_ access var_off=(0x0; 0xffffffff) disallowed
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/113 linked_list/incorrect_head_off1
+::error::#114/113 linked_list/incorrect_head_off1
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_list_head not found at offset=17
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/114 linked_list/incorrect_head_off2
+::error::#114/114 linked_list/incorrect_head_off2
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: bpf_list_head not found at offset=1
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/115 linked_list/pop_front_off
+::error::#114/115 linked_list/pop_front_off
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: 15: (bf) r1 = r6                      ; R1_w=ptr_or_null_foo(id=4,ref_obj_id=4,off=40,imm=0) R6_w=ptr_or_null_foo(id=4,ref_obj_id=4,off=40,imm=0) refs=2,4
+16: (85) call bpf_this_cpu_ptr#154
+R1 type=ptr_or_null_ expected=percpu_ptr_
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/116 linked_list/pop_back_off
+::error::#114/116 linked_list/pop_back_off
+test_linked_list_fail_prog:PASS:linked_list_fail__open_opts 0 nsec
+test_linked_list_fail_prog:PASS:bpf_object__find_program_by_name 0 nsec
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list_fail'
+libbpf: failed to load BPF skeleton 'linked_list_fail': -22
+test_linked_list_fail_prog:PASS:linked_list_fail__load must fail 0 nsec
+test_linked_list_fail_prog:FAIL:expected error message unexpected error: -22
+Expected: 15: (bf) r1 = r6                      ; R1_w=ptr_or_null_foo(id=4,ref_obj_id=4,off=40,imm=0) R6_w=ptr_or_null_foo(id=4,ref_obj_id=4,off=40,imm=0) refs=2,4
+16: (85) call bpf_this_cpu_ptr#154
+R1 type=ptr_or_null_ expected=percpu_ptr_
+Verifier:
+::endgroup::
+::group::[1;31mError:[0m #114/117 linked_list/btf: too many locks
+::error::#114/117 linked_list/btf: too many locks
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_struct foo::a 0 nsec
+test_btf:PASS:btf__add_struct foo::a 0 nsec
+test_btf:PASS:btf__add_struct foo::a 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -7
+::endgroup::
+::group::[1;31mError:[0m #114/118 linked_list/btf: missing lock
+::error::#114/118 linked_list/btf: missing lock
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_struct foo::a 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:baz:a 0 nsec
+test_btf:PASS:btf__add_struct baz 0 nsec
+test_btf:PASS:btf__add_field baz::a 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -22
+::endgroup::
+::group::[1;31mError:[0m #114/119 linked_list/btf: bad offset
+::error::#114/119 linked_list/btf: bad offset
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_field foo::c 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:foo:b 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -17
+::endgroup::
+::group::[1;31mError:[0m #114/120 linked_list/btf: missing contains:
+::error::#114/120 linked_list/btf: missing contains:
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -22
+::endgroup::
+::group::[1;31mError:[0m #114/121 linked_list/btf: missing struct
+::error::#114/121 linked_list/btf: missing struct
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:bar:bar 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -2
+::endgroup::
+::group::[1;31mError:[0m #114/122 linked_list/btf: missing node
+::error::#114/122 linked_list/btf: missing node
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:foo:c 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -2
+::endgroup::
+::group::[1;31mError:[0m #114/123 linked_list/btf: node incorrect type
+::error::#114/123 linked_list/btf: node incorrect type
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:bar:a 0 nsec
+test_btf:PASS:btf__add_struct bar 0 nsec
+test_btf:PASS:btf__add_field bar::a 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -22
+::endgroup::
+::group::[1;31mError:[0m #114/124 linked_list/btf: multiple bpf_list_node with name b
+::error::#114/124 linked_list/btf: multiple bpf_list_node with name b
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_field foo::c 0 nsec
+test_btf:PASS:btf__add_field foo::d 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:foo:b 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -22
+::endgroup::
+::group::[1;31mError:[0m #114/125 linked_list/btf: owning | owned AA cycle
+::error::#114/125 linked_list/btf: owning | owned AA cycle
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_field foo::c 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:foo:b 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -40
+::endgroup::
+::group::[1;31mError:[0m #114/126 linked_list/btf: owning | owned ABA cycle
+::error::#114/126 linked_list/btf: owning | owned ABA cycle
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_field foo::c 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:bar:b 0 nsec
+test_btf:PASS:btf__add_struct bar 0 nsec
+test_btf:PASS:btf__add_field bar::a 0 nsec
+test_btf:PASS:btf__add_field bar::b 0 nsec
+test_btf:PASS:btf__add_field bar::c 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:foo:b 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -40
+::endgroup::
+::group::[1;31mError:[0m #114/129 linked_list/btf: owning | owned -> owning | owned -> owned
+::error::#114/129 linked_list/btf: owning | owned -> owning | owned -> owned
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_field foo::c 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:bar:b 0 nsec
+test_btf:PASS:btf__add_struct bar 0 nsec
+test_btf:PASS:btf__add_field bar:a 0 nsec
+test_btf:PASS:btf__add_field bar:b 0 nsec
+test_btf:PASS:btf__add_field bar:c 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:baz:a 0 nsec
+test_btf:PASS:btf__add_struct baz 0 nsec
+test_btf:PASS:btf__add_field baz:a 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -40
+::endgroup::
+::group::[1;31mError:[0m #114/130 linked_list/btf: owning -> owning | owned -> owning | owned -> owned
+::error::#114/130 linked_list/btf: owning -> owning | owned -> owning | owned -> owned
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:bar:b 0 nsec
+test_btf:PASS:btf__add_struct bar 0 nsec
+test_btf:PASS:btf__add_field bar::a 0 nsec
+test_btf:PASS:btf__add_field bar::b 0 nsec
+test_btf:PASS:btf__add_field bar::c 0 nsec
+test_btf:PASS:btf__add_decl_tag 0 nsec
+test_btf:PASS:btf__add_struct baz 0 nsec
+test_btf:PASS:btf__add_field bar::a 0 nsec
+test_btf:PASS:btf__add_field bar::b 0 nsec
+test_btf:PASS:btf__add_field bar::c 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:bam:a 0 nsec
+test_btf:PASS:btf__add_struct bam 0 nsec
+test_btf:PASS:btf__add_field bam::a 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -40
+::endgroup::
+::group::[1;31mError:[0m #114/131 linked_list/btf: list_node and rb_node in same struct
+::error::#114/131 linked_list/btf: list_node and rb_node in same struct
+init_btf:PASS:btf__new_empty 0 nsec
+init_btf:PASS:btf__add_int 0 nsec
+init_btf:PASS:btf__add_struct bpf_spin_lock 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_head 0 nsec
+init_btf:PASS:btf__add_struct bpf_list_node 0 nsec
+test_btf:PASS:init_btf 0 nsec
+test_btf:PASS:btf__add_struct bpf_rb_node 0 nsec
+test_btf:PASS:btf__add_struct bar 0 nsec
+test_btf:PASS:btf__add_field bar::a 0 nsec
+test_btf:PASS:btf__add_field bar::c 0 nsec
+test_btf:PASS:btf__add_struct foo 0 nsec
+test_btf:PASS:btf__add_field foo::a 0 nsec
+test_btf:PASS:btf__add_field foo::b 0 nsec
+test_btf:PASS:btf__add_decl_tag contains:bar:a 0 nsec
+test_btf:FAIL:check btf unexpected check btf: actual 0 != expected -22
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list'
+libbpf: failed to load BPF skeleton 'linked_list': -22
+test_linked_list_success:FAIL:linked_list__open_and_load unexpected error: -22
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list'
+libbpf: failed to load BPF skeleton 'linked_list': -22
+test_linked_list_success:FAIL:linked_list__open_and_load unexpected error: -22
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list'
+libbpf: failed to load BPF skeleton 'linked_list': -22
+test_linked_list_success:FAIL:linked_list__open_and_load unexpected error: -22
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list'
+libbpf: failed to load BPF skeleton 'linked_list': -22
+test_linked_list_success:FAIL:linked_list__open_and_load unexpected error: -22
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list'
+libbpf: failed to load BPF skeleton 'linked_list': -22
+test_linked_list_success:FAIL:linked_list__open_and_load unexpected error: -22
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list'
+libbpf: failed to load BPF skeleton 'linked_list': -22
+test_linked_list_success:FAIL:linked_list__open_and_load unexpected error: -22
+libbpf: extern (func ksym) 'bpf_list_pop_back': not found in kernel or module BTFs
+libbpf: failed to load object 'linked_list'
+libbpf: failed to load BPF skeleton 'linked_list': -22
+test_linked_list_success:FAIL:linked_list__open_and_load unexpected error: -22
+::endgroup::
+::group::[1;31mError:[0m #124 lru_bug
+::error::#124 lru_bug
+test_lru_bug:PASS:lru_bug__open_and_load 0 nsec
+test_lru_bug:PASS:lru_bug__attach 0 nsec
+test_lru_bug:FAIL:prealloc_lru_pop doesn't call check_and_init_map_value unexpected error: 1 (errno 2)
+::endgroup::
+::group::[1;31mError:[0m #135 module_attach
+::error::#135 module_attach
+test_module_attach:PASS:skel_open 0 nsec
+test_module_attach:FAIL:set_attach_target unexpected error: -3 (errno 3)
+libbpf: prog 'handle_raw_tp': BPF program load failed: Invalid argument
+libbpf: prog 'handle_raw_tp': -- BEGIN PROG LOAD LOG --
+R1 type=ctx expected=fp
+0: R1=ctx(off=0,imm=0) R10=fp0
+; int BPF_PROG(handle_raw_tp,
+0: <invalid CO-RE relocation>
+failed to resolve CO-RE relocation <byte_off> [6] struct bpf_testmod_test_read_ctx.len (0:2 @ offset 16)
+processed 1 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+libbpf: prog 'handle_raw_tp': failed to load: -22
+libbpf: failed to load object 'test_module_attach'
+libbpf: failed to load BPF skeleton 'test_module_attach': -22
+test_module_attach:FAIL:skel_load failed to load skeleton
+::endgroup::
+::group::[1;31mError:[0m #136 module_fentry_shadow
+::error::#136 module_fentry_shadow
+test_module_fentry_shadow:PASS:load_vmlinux_btf 0 nsec
+(/data/users/chantra/bpf-next/tools/testing/selftests/bpf/prog_tests/module_fentry_shadow.c:21: errno: No such file or directory) failed to iterate BTF objects
+test_module_fentry_shadow:FAIL:get_bpf_testmod_btf_fd unexpected get_bpf_testmod_btf_fd: actual -2 < expected 0
+::endgroup::
+::error::#137 mptcp
+::group::[1;31mError:[0m #137/1 mptcp/base
+::error::#137/1 mptcp/base
+test_base:PASS:test__join_cgroup 0 nsec
+test_base:PASS:ip netns add mptcp_ns 0 nsec
+test_base:PASS:ip -net mptcp_ns link set dev lo up 0 nsec
+open_netns:PASS:malloc token 0 nsec
+open_netns:PASS:open /proc/self/ns/net 0 nsec
+open_netns:PASS:open netns fd 0 nsec
+open_netns:PASS:setns 0 nsec
+test_base:PASS:open_netns 0 nsec
+test_base:PASS:start_server 0 nsec
+libbpf: prog 'trace_mptcp_pm_new_connection': failed to find kernel BTF type ID of 'mptcp_pm_new_connection': -3
+libbpf: prog 'trace_mptcp_pm_new_connection': failed to prepare load attributes: -3
+libbpf: prog 'trace_mptcp_pm_new_connection': failed to load: -3
+libbpf: failed to load object 'mptcp_sock'
+libbpf: failed to load BPF skeleton 'mptcp_sock': -3
+run_test:FAIL:skel_open_load unexpected error: -3
+test_base:FAIL:run_test tcp unexpected error: -5 (errno 3)
+(network_helpers.c:88: errno: Protocol not supported) Failed to create server socket
+test_base:FAIL:start_mptcp_server unexpected start_mptcp_server: actual -1 < expected 0
+close_netns:PASS:setns 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #164 rcu_read_lock
+::error::#164 rcu_read_lock
+test_rcu_read_lock:PASS:join_cgroup /rcu_read_lock 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #164/1 rcu_read_lock/success
+::error::#164/1 rcu_read_lock/success
+test_success:PASS:skel_open 0 nsec
+libbpf: extern (func ksym) 'bpf_key_put': not found in kernel or module BTFs
+libbpf: failed to load object 'rcu_read_lock'
+libbpf: failed to load BPF skeleton 'rcu_read_lock': -22
+test_success:FAIL:skel_load unexpected error: -22 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #164/2 rcu_read_lock/rcuptr_acquire
+::error::#164/2 rcu_read_lock/rcuptr_acquire
+test_rcuptr_acquire:PASS:skel_open 0 nsec
+libbpf: extern (func ksym) 'bpf_key_put': not found in kernel or module BTFs
+libbpf: failed to load object 'rcu_read_lock'
+libbpf: failed to load BPF skeleton 'rcu_read_lock': -22
+test_rcuptr_acquire:FAIL:skel_load unexpected error: -22 (errno 22)
+::endgroup::
+::error::#169 ringbuf
+::group::[1;31mError:[0m #169/2 ringbuf/ringbuf_map_key
+::error::#169/2 ringbuf/ringbuf_map_key
+ringbuf_map_key_subtest:PASS:test_ringbuf_map_key_lskel__open 0 nsec
+ringbuf_map_key_subtest:FAIL:test_ringbuf_map_key_lskel__load unexpected error: -13 (errno 13)
+::endgroup::
+::group::[1;31mError:[0m #175 setget_sockopt
+::error::#175 setget_sockopt
+create_netns:PASS:create netns 0 nsec
+create_netns:PASS:set lo up 0 nsec
+create_netns:PASS:add veth 0 nsec
+create_netns:PASS:bring veth up 0 nsec
+test_setget_sockopt:PASS:open skel 0 nsec
+test_setget_sockopt:PASS:if_nametoindex 0 nsec
+libbpf: prog 'socket_post_create': BPF program load failed: Invalid argument
+libbpf: prog 'socket_post_create': -- BEGIN PROG LOAD LOG --
+processed 0 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+libbpf: prog 'socket_post_create': failed to load: -22
+libbpf: failed to load object 'setget_sockopt'
+libbpf: failed to load BPF skeleton 'setget_sockopt': -22
+test_setget_sockopt:FAIL:load skel unexpected error: -22 (errno 22)
+::endgroup::
+::error::#213 task_local_storage
+::group::[1;31mError:[0m #213/3 task_local_storage/recursion
+::error::#213/3 task_local_storage/recursion
+test_recursion:PASS:sys_pidfd_open 0 nsec
+test_recursion:PASS:skel_open_and_load 0 nsec
+test_recursion:PASS:skel_attach 0 nsec
+test_recursion:PASS:lookup map_a 0 nsec
+test_recursion:FAIL:map_a value unexpected map_a value: actual 200 != expected 201
+test_recursion:FAIL:bpf_task_storage_delete busy unexpected bpf_task_storage_delete busy: actual 0 != expected 1
+test_recursion:PASS:lookup map_b 0 nsec
+test_recursion:PASS:map_b value 0 nsec
+test_recursion:PASS:get prog info 0 nsec
+test_recursion:FAIL:on_lookup prog recursion unexpected on_lookup prog recursion: actual 0 <= expected 0
+test_recursion:PASS:get prog info 0 nsec
+test_recursion:PASS:on_update prog recursion 0 nsec
+test_recursion:PASS:get prog info 0 nsec
+test_recursion:PASS:on_enter prog recursion 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #222 test_bprm_opts
+::error::#222 test_bprm_opts
+test_test_bprm_opts:PASS:skel_load 0 nsec
+test_test_bprm_opts:PASS:attach 0 nsec
+test_test_bprm_opts:PASS:run_set_secureexec:0 0 nsec
+test_test_bprm_opts:FAIL:run_set_secureexec:1 err = -22
+::endgroup::
+::group::[1;31mError:[0m #224 test_ima
+::error::#224 test_ima
+test_test_ima:PASS:skel_load 0 nsec
+test_test_ima:PASS:ringbuf 0 nsec
+test_test_ima:PASS:attach 0 nsec
+test_test_ima:PASS:mkdtemp 0 nsec
+test_test_ima:FAIL:failed to run command ./ima_setup.sh setup /tmp/ima_measuredO4XC5Q, errno = 2
+test_test_ima:PASS:failed to run command 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #225 test_local_storage
+::error::#225 test_local_storage
+libbpf: prog 'socket_bind': BPF program load failed: Invalid argument
+libbpf: prog 'socket_bind': -- BEGIN PROG LOAD LOG --
+R1 type=ctx expected=fp
+0: R1=ctx(off=0,imm=0) R10=fp0
+; int BPF_PROG(socket_bind, struct socket *sock, struct sockaddr *address,
+0: (79) r6 = *(u64 *)(r1 +0)
+func 'bpf_lsm_socket_bind' arg0 has btf_id 3290 type STRUCT 'socket'
+1: R1=ctx(off=0,imm=0) R6_w=ptr_socket(off=0,imm=0)
+; __u32 pid = bpf_get_current_pid_tgid() >> 32;
+1: (85) call bpf_get_current_pid_tgid#14      ; R0_w=scalar()
+; if (pid != monitored_pid)
+2: (18) r1 = 0xffffc90001693000       ; R1_w=map_value(off=0,ks=4,vs=4,imm=0)
+4: (61) r1 = *(u32 *)(r1 +0)          ; R1_w=scalar(umax=4294967295,var_off=(0x0; 0xffffffff))
+; __u32 pid = bpf_get_current_pid_tgid() >> 32;
+5: (77) r0 >>= 32                     ; R0_w=scalar(umax=4294967295,var_off=(0x0; 0xffffffff))
+; if (pid != monitored_pid)
+6: (5e) if w1 != w0 goto pc+48        ; R0_w=scalar(umax=4294967295,var_off=(0x0; 0xffffffff)) R1_w=scalar(umax=4294967295,var_off=(0x0; 0xffffffff))
+; storage = bpf_sk_storage_get(&sk_storage_map, sock->sk, 0, 0);
+7: (79) r2 = *(u64 *)(r6 +24)         ; R2_w=ptr_sock(off=0,imm=0) R6_w=ptr_socket(off=0,imm=0)
+; storage = bpf_sk_storage_get(&sk_storage_map, sock->sk, 0, 0);
+8: (18) r1 = 0xffff88812b8be000       ; R1_w=map_ptr(off=0,ks=4,vs=16,imm=0)
+10: (b7) r3 = 0                       ; R3_w=0
+11: (b7) r4 = 0                       ; R4_w=0
+12: (85) call bpf_sk_storage_get#107          ; R0=map_value_or_null(id=1,off=0,ks=4,vs=16,imm=0)
+; if (!storage)
+13: (15) if r0 == 0x0 goto pc+41      ; R0=map_value(off=0,ks=4,vs=16,imm=0)
+; sk_storage_result = -1;
+14: (18) r1 = 0xffffc90001696004      ; R1_w=map_value(off=4,ks=4,vs=8,imm=0)
+16: (b4) w2 = -1                      ; R2_w=4294967295
+17: (63) *(u32 *)(r1 +0) = r2         ; R1_w=map_value(off=4,ks=4,vs=8,imm=0) R2_w=4294967295
+; if (storage->value != DUMMY_STORAGE_VALUE)
+18: (61) r1 = *(u32 *)(r0 +8)         ; R0=map_value(off=0,ks=4,vs=16,imm=0) R1_w=scalar(umax=4294967295,var_off=(0x0; 0xffffffff))
+; if (storage->value != DUMMY_STORAGE_VALUE)
+19: (56) if w1 != 0xdeadbeef goto pc+35       ; R1_w=3735928559
+; storage = bpf_sk_storage_get(&sk_storage_map2, sock->sk, 0,
+20: (79) r2 = *(u64 *)(r6 +24)        ; R2_w=ptr_sock(off=0,imm=0) R6=ptr_socket(off=0,imm=0)
+; storage = bpf_sk_storage_get(&sk_storage_map2, sock->sk, 0,
+21: (18) r1 = 0xffff88812b8bde00      ; R1_w=map_ptr(off=0,ks=4,vs=16,imm=0)
+23: (b7) r3 = 0                       ; R3_w=0
+24: (b7) r4 = 1                       ; R4_w=1
+25: (85) call bpf_sk_storage_get#107          ; R0=map_value_or_null(id=2,off=0,ks=4,vs=16,imm=0)
+; if (!storage)
+26: (15) if r0 == 0x0 goto pc+28      ; R0=map_value(off=0,ks=4,vs=16,imm=0)
+; if (bpf_sk_storage_delete(&sk_storage_map2, sock->sk))
+27: (79) r2 = *(u64 *)(r6 +24)        ; R2_w=ptr_sock(off=0,imm=0) R6=ptr_socket(off=0,imm=0)
+; if (bpf_sk_storage_delete(&sk_storage_map2, sock->sk))
+28: (18) r1 = 0xffff88812b8bde00      ; R1_w=map_ptr(off=0,ks=4,vs=16,imm=0)
+30: (85) call bpf_sk_storage_delete#108       ; R0_w=scalar()
+; if (bpf_sk_storage_delete(&sk_storage_map2, sock->sk))
+31: (55) if r0 != 0x0 goto pc+23      ; R0_w=0
+; storage = bpf_sk_storage_get(&sk_storage_map2, sock->sk, 0,
+32: (79) r2 = *(u64 *)(r6 +24)        ; R2_w=ptr_sock(off=0,imm=0) R6=ptr_socket(off=0,imm=0)
+; storage = bpf_sk_storage_get(&sk_storage_map2, sock->sk, 0,
+33: (18) r1 = 0xffff88812b8bde00      ; R1_w=map_ptr(off=0,ks=4,vs=16,imm=0)
+35: (b7) r3 = 0                       ; R3_w=0
+36: (b7) r4 = 1                       ; R4_w=1
+37: (85) call bpf_sk_storage_get#107          ; R0=map_value_or_null(id=3,off=0,ks=4,vs=16,imm=0)
+; if (!storage)
+38: (15) if r0 == 0x0 goto pc+16      ; R0=map_value(off=0,ks=4,vs=16,imm=0)
+; if (bpf_sk_storage_delete(&sk_storage_map, sock->sk))
+39: (79) r2 = *(u64 *)(r6 +24)        ; R2_w=ptr_sock(off=0,imm=0) R6=ptr_socket(off=0,imm=0)
+; if (bpf_sk_storage_delete(&sk_storage_map, sock->sk))
+40: (18) r1 = 0xffff88812b8be000      ; R1_w=map_ptr(off=0,ks=4,vs=16,imm=0)
+42: (85) call bpf_sk_storage_delete#108       ; R0_w=scalar()
+; if (bpf_sk_storage_delete(&sk_storage_map, sock->sk))
+43: (55) if r0 != 0x0 goto pc+11      ; R0_w=0
+; if (!sock->sk->sk_bpf_storage || sock->sk->sk_bpf_storage->smap)
+44: (79) r1 = *(u64 *)(r6 +24)        ; R1_w=ptr_sock(off=0,imm=0) R6=ptr_socket(off=0,imm=0)
+; if (!sock->sk->sk_bpf_storage || sock->sk->sk_bpf_storage->smap)
+45: (79) r1 = *(u64 *)(r1 +728)       ; R1_w=ptr_bpf_local_storage(off=0,imm=0)
+; if (!sock->sk->sk_bpf_storage || sock->sk->sk_bpf_storage->smap)
+46: (15) if r1 == 0x0 goto pc+8       ; R1_w=ptr_bpf_local_storage(off=0,imm=0)
+; if (!sock->sk->sk_bpf_storage || sock->sk->sk_bpf_storage->smap)
+47: (79) r1 = *(u64 *)(r6 +24)        ; R1_w=ptr_sock(off=0,imm=0) R6=ptr_socket(off=0,imm=0)
+; if (!sock->sk->sk_bpf_storage || sock->sk->sk_bpf_storage->smap)
+48: (79) r1 = *(u64 *)(r1 +728)       ; R1_w=ptr_bpf_local_storage(off=0,imm=0)
+; if (!sock->sk->sk_bpf_storage || sock->sk->sk_bpf_storage->smap)
+49: <invalid CO-RE relocation>
+failed to resolve CO-RE relocation <byte_off> [1821] struct bpf_local_storage.smap (0:1 @ offset 128)
+processed 43 insns (limit 1000000) max_states_per_insn 0 total_states 3 peak_states 3 mark_read 1
+-- END PROG LOAD LOG --
+libbpf: prog 'socket_bind': failed to load: -22
+libbpf: failed to load object 'local_storage'
+libbpf: failed to load BPF skeleton 'local_storage': -22
+test_test_local_storage:FAIL:skel_load unexpected error: -22
+::endgroup::
+::group::[1;31mError:[0m #226 test_lsm
+::error::#226 test_lsm
+test_test_lsm:PASS:lsm_skel_load 0 nsec
+test_lsm:PASS:attach 0 nsec
+libbpf: prog 'test_int_hook': failed to attach: Device or resource busy
+test_lsm:PASS:attach_link 0 nsec
+test_lsm:PASS:exec_cmd 0 nsec
+test_lsm:FAIL:bprm_count unexpected bprm_count: actual 0 != expected 1
+test_lsm:FAIL:stack_mprotect unexpected stack_mprotect: actual 0 != expected -1
+test_test_lsm:PASS:test_lsm_first_attach 0 nsec
+test_lsm:PASS:attach 0 nsec
+libbpf: prog 'test_int_hook': failed to attach: Device or resource busy
+test_lsm:PASS:attach_link 0 nsec
+test_lsm:PASS:exec_cmd 0 nsec
+test_lsm:FAIL:bprm_count unexpected bprm_count: actual 0 != expected 1
+test_lsm:FAIL:stack_mprotect unexpected stack_mprotect: actual 0 != expected -1
+test_test_lsm:PASS:test_lsm_second_attach 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #231 timer
+::error::#231 timer
+serial_test_timer:PASS:timer_skel_load 0 nsec
+timer:PASS:timer_attach 0 nsec
+timer:PASS:callback_check1 0 nsec
+timer:PASS:callback2_check1 0 nsec
+timer:PASS:test_run 0 nsec
+timer:PASS:test_run 0 nsec
+timer:PASS:callback_check2 0 nsec
+timer:PASS:callback2_check2 0 nsec
+timer:PASS:bss_data 0 nsec
+timer:FAIL:abs_data unexpected abs_data: actual 0 != expected 12
+timer:PASS:err 0 nsec
+timer:PASS:ok 0 nsec
+serial_test_timer:PASS:timer 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #239 tracing_struct
+::error::#239 tracing_struct
+libbpf: prog 'test_struct_arg_1': failed to find kernel BTF type ID of 'bpf_testmod_test_struct_arg_1': -3
+libbpf: prog 'test_struct_arg_1': failed to prepare load attributes: -3
+libbpf: prog 'test_struct_arg_1': failed to load: -3
+libbpf: failed to load object 'tracing_struct'
+libbpf: failed to load BPF skeleton 'tracing_struct': -3
+test_fentry:FAIL:tracing_struct__open_and_load unexpected error: -3
+::endgroup::
+::group::[1;31mError:[0m #240 trampoline_count
+::error::#240 trampoline_count
+get_bpf_max_tramp_links:PASS:vmlinux btf 0 nsec
+serial_test_trampoline_count:FAIL:bpf_max_tramp_links unexpected bpf_max_tramp_links: actual -1 < expected 1
+::endgroup::
+::error::#248 user_ringbuf
+::group::[1;31mError:[0m #248/2 user_ringbuf/test_user_ringbuf_post_misaligned
+::error::#248/2 user_ringbuf/test_user_ringbuf_post_misaligned
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+test_user_ringbuf_post_misaligned:FAIL:misaligned_skel unexpected error: -12 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/3 user_ringbuf/test_user_ringbuf_post_producer_wrong_offset
+::error::#248/3 user_ringbuf/test_user_ringbuf_post_producer_wrong_offset
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+test_user_ringbuf_post_producer_wrong_offset:FAIL:wrong_offset_skel unexpected error: -12 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/4 user_ringbuf/test_user_ringbuf_post_larger_than_ringbuf_sz
+::error::#248/4 user_ringbuf/test_user_ringbuf_post_larger_than_ringbuf_sz
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+test_user_ringbuf_post_larger_than_ringbuf_sz:FAIL:huge_sample_skel unexpected error: -12 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/5 user_ringbuf/test_user_ringbuf_basic
+::error::#248/5 user_ringbuf/test_user_ringbuf_basic
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+test_user_ringbuf_basic:FAIL:ringbuf_basic_skel unexpected error: -12 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/6 user_ringbuf/test_user_ringbuf_sample_full_ring_buffer
+::error::#248/6 user_ringbuf/test_user_ringbuf_sample_full_ring_buffer
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+test_user_ringbuf_sample_full_ring_buffer:FAIL:ringbuf_full_sample_skel unexpected error: -12 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/7 user_ringbuf/test_user_ringbuf_post_alignment_autoadjust
+::error::#248/7 user_ringbuf/test_user_ringbuf_post_alignment_autoadjust
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+test_user_ringbuf_post_alignment_autoadjust:FAIL:ringbuf_align_autoadjust_skel unexpected error: -12 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/8 user_ringbuf/test_user_ringbuf_overfill
+::error::#248/8 user_ringbuf/test_user_ringbuf_overfill
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/9 user_ringbuf/test_user_ringbuf_discards_properly_ignored
+::error::#248/9 user_ringbuf/test_user_ringbuf_discards_properly_ignored
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/10 user_ringbuf/test_user_ringbuf_loop
+::error::#248/10 user_ringbuf/test_user_ringbuf_loop
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/11 user_ringbuf/test_user_ringbuf_msg_protocol
+::error::#248/11 user_ringbuf/test_user_ringbuf_msg_protocol
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+test_user_ringbuf_msg_protocol:FAIL:create_ringbufs unexpected error: -12 (errno 22)
+::endgroup::
+::group::[1;31mError:[0m #248/12 user_ringbuf/test_user_ringbuf_blocking_reserve
+::error::#248/12 user_ringbuf/test_user_ringbuf_blocking_reserve
+open_load_ringbuf_skel:PASS:skel_open 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+open_load_ringbuf_skel:PASS:set_max_entries 0 nsec
+libbpf: map 'user_ringbuf': failed to create: Invalid argument(-22)
+libbpf: failed to load object 'user_ringbuf_success'
+libbpf: failed to load BPF skeleton 'user_ringbuf_success': -22
+open_load_ringbuf_skel:FAIL:skel_load unexpected error: -22 (errno 22)
+tester_init:PASS:tester_log_buf 0 nsec
+run_subtest:PASS:obj_open_mem 0 nsec
+::endgroup::
+::group::[1;31mError:[0m #279 verify_pkcs7_sig
+::error::#279 verify_pkcs7_sig
+test_verify_pkcs7_sig:PASS:mkdtemp 0 nsec
+test_verify_pkcs7_sig:PASS:_run_setup_process 0 nsec
+test_verify_pkcs7_sig:PASS:test_verify_pkcs7_sig__open 0 nsec
+libbpf: extern (func ksym) 'bpf_key_put': not found in kernel or module BTFs
+libbpf: failed to load object 'test_verify_pkcs7_sig'
+libbpf: failed to load BPF skeleton 'test_verify_pkcs7_sig': -22
+test_verify_pkcs7_sig:FAIL:test_verify_pkcs7_sig__load unexpected error: -22 (errno 22)
+::endgroup::
