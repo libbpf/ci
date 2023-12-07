@@ -1,0 +1,73 @@
+all:
+  children:
+    linuxone:
+      children:
+        s390x:
+          children:
+            repo_and_org_runner:
+              hosts:
+                ci_runner_s390x_1: null
+                ci_runner_s390x_3: null
+              vars:
+                runner_repo_list:
+                - name: a-github-org
+                  instances: 1
+                  gh_app_id: a-github-app-id
+                - name: a-github-org/a-github-repo
+                  instances: 1
+          hosts:
+            ci_runner_s390x_1:
+              ansible_host: 192.0.2.1
+            ci_runner_s390x_2:
+              ansible_host: 192.0.2.2
+            ci_runner_s390x_3:
+              ansible_host: 192.0.2.3
+      vars:
+        ansible_user: host_user
+        runner_docker_healthcheck: |-
+          --health-cmd='(ss -ntp -H dport = :443 | grep -q ESTAB) || exit 1' \
+          --health-start-period=60s --health-interval=30s \
+          --health-timeout=5s --health-retries=3
+        runner_repo_list:
+        - name: a-github-org
+          instances: 1
+          gh_app_id: a-github-app-id
+    aws:
+      children:
+        x86_64:
+          hosts:
+            ci_runner_x86_64_1:
+              ansible_host: 192.0.2.11
+            ci_runner_x86_64_2:
+              ansible_host: 192.0.2.12
+        aarch64:
+          hosts:
+            ci_runner_arm64_1:
+              ansible_host: 192.0.2.21
+            ci_runner_arm64_2:
+              ansible_host: 192.0.2.22
+          vars:
+            runner_repo_list:
+            - name: a-github-org
+              instances: 8
+              gh_app_id: a-github-app-id
+      vars:
+        ansible_user: host_user
+        runner_repo_list:
+        - name: a-github-org
+          instances: 10
+          gh_app_id: a-github-app-id
+        runner_prefix: some-prefixes
+  vars:
+    ansible_ssh_common_args: -o 'ProxyCommand ......'
+    runner_libbpf_ci_repo_url: https://github.com/libbpf/ci
+    runner_libbpf_ci_repo_branch: master
+    runner_gh_apps:
+    - name: kernel-patches-runner
+      id: a-github-app-id
+      secret: '{{ lookup(''ansible.builtin.pipe'', ''command to get a-github-app-id secret'') }}'
+    runner_gh_token_default: '{{ lookup(''ansible.builtin.pipe'', ''scommand to get the default github-user-token'') }}'
+    runner_gh_user_default: kernel-patches-bot
+    runner_gh_tokens:
+      a-github-org/a-github-repo: '{{ lookup(''ansible.builtin.pipe'', ''command to get a repo specific github-user-token'') }}'
+
