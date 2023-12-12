@@ -135,7 +135,7 @@ set -x
 
 # Create a working directory and schedule its deletion.
 root=$(mktemp -d -p "$PWD")
-trap 'rm -r "$root"' EXIT
+trap '[[ "$?" -eq "0" ]] && rm -r "$root"' EXIT
 
 # Install packages.
 packages=(
