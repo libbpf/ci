@@ -142,7 +142,7 @@
       {% if runner_docker_mount_volume %}
                   --volume=actions-runner-{{ item.normalized }}-worker-%i:{{ runner_workdir }} \
       {% else %}
-                  {{ '--tmpfs %s:exec' | format(runner_workdir) }} \
+                  {{ '--tmpfs %s:%s' | format(runner_workdir, runner_tmpfs_options | join(',')) }} \
       {% endif %}
                   --rm \
                   --env-file "{{ runner_base_dir }}/actions-runner-{{ item.normalized }}-worker-%i.env" \
