@@ -1,4 +1,4 @@
-ARCHS = amd64 arm64 s390x
+ARCHS = amd64 arm64 s390x ppc64el
 DISTROS = bullseye
 
 .PHONY: all
