@@ -111,7 +111,7 @@ then
     if [ $? ]
     then
         ## Job summary
-        "${GITHUB_ACTION_PATH}/print_test_summary.py" -s "${GITHUB_STEP_SUMMARY}" -j "${KERNEL_TEST}.json"
+        "${GITHUB_ACTION_PATH}/../run-vmtest/print_test_summary.py" -s "${GITHUB_STEP_SUMMARY}" -j "${KERNEL_TEST}.json"
     fi
 fi
 

@@ -8,11 +8,11 @@ on:
       - master
 
 jobs:
-  test_run_qemu:
-    name: Test run-qemu
+  test_run_vmtest:
+    name: Test run-vmtest
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Test print_test_summary
-        run: ./run-qemu/print_test_summary.py  -j run-qemu/fixtures/test_progs.json -s "${GITHUB_STEP_SUMMARY}"
+        run: ./run-vmtest/print_test_summary.py  -j run-vmtest/fixtures/test_progs.json -s "${GITHUB_STEP_SUMMARY}"
