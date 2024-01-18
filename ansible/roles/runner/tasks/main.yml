@@ -5,6 +5,8 @@
   become: yes
   ansible.builtin.pip:
     name:
+      # AL2 python's version is compiled against openssl 1.0, urllib3>=2.0 needs openssl 1.1.1
+      - urllib3<2.0
       - docker
     extra_args: --user
     executable: pip3
