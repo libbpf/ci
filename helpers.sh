@@ -44,7 +44,7 @@ llvm_default_version() {
 
 # No arguments
 llvm_latest_version() {
-  echo "18"
+  echo "19"
 }
 
 # No arguments
