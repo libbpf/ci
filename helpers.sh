@@ -55,3 +55,40 @@ kernel_build_make_jobs() {
   MAX_MAKE_JOBS=${MAX_MAKE_JOBS:-$smp}
   echo $(( smp > MAX_MAKE_JOBS ? MAX_MAKE_JOBS : smp ))
 }
+
+# Convert a platform (as returned by uname -m) to the kernel
+# arch (as expected by ARCH= env).
+platform_to_kernel_arch() {
+  case $1 in
+    s390x)
+      echo "s390"
+      ;;
+    aarch64)
+      echo "arm64"
+      ;;
+    riscv64)
+      echo "riscv"
+      ;;
+    x86_64)
+      echo "x86"
+      ;;
+    *)
+      echo "$1"
+      ;;
+  esac
+}
+
+# Convert a platform (as returned by uname -m) to its debian equivalent.
+platform_to_deb_arch() {
+  case $1 in
+    aarch64)
+      echo "arm64"
+      ;;
+    x86_64)
+      echo "amd64"
+      ;;
+    *)
+      echo "$1"
+      ;;
+  esac
+}
