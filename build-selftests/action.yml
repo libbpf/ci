@@ -17,6 +17,10 @@ inputs:
     description: 'llvm version'
     required: false
     default: '16'
+  arch:
+    description: 'arch'
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -25,6 +29,6 @@ runs:
       run: |
         kbuild_output="$(realpath ${{ inputs.kbuild-output }})"
         export LLVM_VERSION=${{ inputs.llvm-version }}
-        ${GITHUB_ACTION_PATH}/build_selftests.sh "${{ inputs.kernel }}" "${{ inputs.toolchain }}" "${kbuild_output}"
+        ${GITHUB_ACTION_PATH}/build_selftests.sh "${{ inputs.arch }}" "${{ inputs.kernel }}" "${{ inputs.toolchain }}" "${kbuild_output}"
       env:
         MAX_MAKE_JOBS: ${{ inputs.max-make-jobs }}
