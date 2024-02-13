@@ -13,6 +13,9 @@ inputs:
     description: 'llvm version'
     required: false
     default: '16'
+  arch:
+    description: 'arch'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -38,3 +41,7 @@ runs:
       shell: bash
       run: |
         echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib" >> $GITHUB_ENV
+    - name: Install cross compilation toolchain
+      shell: bash
+      run: |
+         ${GITHUB_ACTION_PATH}/install_cross_compilation_toolchain.sh ${{ inputs.arch }}
