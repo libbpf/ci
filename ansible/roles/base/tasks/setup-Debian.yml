@@ -7,6 +7,9 @@
     update_cache: yes
   tags: [install]
 
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+
 # Auditd is spamming the logs when the workers are busy.
 # Disable for now
 - name: Disable auditd
@@ -16,3 +19,4 @@
     state: stopped
     enabled: no
     masked: yes
+  when: "'auditd' in ansible_facts.packages"
