@@ -38,7 +38,7 @@ runs:
       shell: bash
       # FIXME: move to proper release
       run: |
-        curl -L https://github.com/chantra/danobi-vmtest/releases/download/v2.2.0/vmtest-$(uname -m) > /usr/bin/vmtest && chmod 755 /usr/bin/vmtest
+        curl -L https://github.com/danobi/vmtest/releases/download/v0.12.0/vmtest-$(uname -m) > /usr/bin/vmtest && chmod 755 /usr/bin/vmtest
     - name: install qemu tools and selftest dependencies
       shell: bash
       run: |
