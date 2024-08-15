@@ -24,6 +24,10 @@ inputs:
       Some sub-commands produce output dir within VM file system (/command_output/).
       If this option is set that dir's content would be copied to corresponding location.
     default: ''
+  toolchain:
+    required: true
+    type: string
+    description: The toolchain, e.g gcc, llvm
 runs:
   using: "composite"
   steps:
@@ -47,7 +51,7 @@ runs:
         # need gawk to support `--field-separator`
         sudo apt-get update && sudo apt-get install -y cpu-checker qemu-kvm qemu-utils qemu-system-x86 qemu-system-s390x qemu-system-arm qemu-guest-agent \
           ethtool keyutils iptables \
-          gawk
+          gawk libpcap-dev
         foldable end install_qemu
     - name: Configure KVM group perms
       shell: bash
@@ -74,4 +78,9 @@ runs:
         PROJECT_NAME: "/mnt/vmtest"
       run: |
         ${GITHUB_ACTION_PATH}/run.sh
+    - uses: actions/upload-artifact@v4
+      with:
+        name: tmon-logs-${{ inputs.arch }}-${{ inputs.toolchain }}-${{ inputs.kernel-test }}
+        if-no-files-found: ignore
+        path: tmon-logs
 
