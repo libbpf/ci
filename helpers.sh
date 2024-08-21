@@ -56,10 +56,10 @@ kernel_build_make_jobs() {
   echo $(( smp > MAX_MAKE_JOBS ? MAX_MAKE_JOBS : smp ))
 }
 
-distro_codename() {
-    DISTRO_CODENAME="noble"
+distrib_codename() {
+    DISTRIB_CODENAME="noble"
     test -f /etc/lsb-release && . /etc/lsb-release
-    echo "${DISTRO_CODENAME}"
+    echo "${DISTRIB_CODENAME}"
 }
 
 # Convert a platform (as returned by uname -m) to the kernel
