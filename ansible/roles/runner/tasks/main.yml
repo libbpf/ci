@@ -96,7 +96,7 @@
     content: |
       ACCESS_TOKEN={{ runner_gh_tokens[item.0.name] | default(runner_gh_token_default) }}
       RUNNER_WORKDIR={{ runner_workdir }}
-      LABELS={{ ansible_architecture }},docker-{{ runner_docker_tag }}
+      LABELS={{ ansible_architecture }},docker-{{ runner_docker_ubuntu_version }}-{{ runner_docker_tag }}
       EPHEMERAL=true
       {% if '/' in item.0.name %}
       {# The presence of a / in the name signifies that we have a repo name, otherwise we assume an organization name. #}
