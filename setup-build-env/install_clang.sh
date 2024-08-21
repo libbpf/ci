@@ -14,9 +14,9 @@ else
     REPO_DISTRO_SUFFIX="-${LLVM_VERSION}"
 fi
 
-DISTRO_CODENAME=$(distro_codename)
+DISTRIB_CODENAME=$(distrib_codename)
 
-echo "deb https://apt.llvm.org/${DISTRO_CODENAME}/ llvm-toolchain-${DISTRO_CODENAME}${REPO_DISTRO_SUFFIX} main" | sudo tee /etc/apt/sources.list.d/llvm.list
+echo "deb https://apt.llvm.org/${DISTRIB_CODENAME}/ llvm-toolchain-${DISTRIB_CODENAME}${REPO_DISTRO_SUFFIX} main" | sudo tee /etc/apt/sources.list.d/llvm.list
 n=0
 while [ $n -lt 5 ]; do
   set +e && \
