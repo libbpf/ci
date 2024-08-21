@@ -140,6 +140,8 @@
       TimeoutStartSec=0
       Restart=always
       EnvironmentFile={{ runner_base_dir }}/runner_unit.env
+      # Optionally loaded file. Use this to override per runner environment
+      EnvironmentFile=-{{ runner_base_dir }}/runner_unit-%i.env
       ExecStartPre=-/usr/bin/docker stop %p-%i
       ExecStartPre=-/usr/bin/docker rm %p-%i
       ExecStartPre=-/usr/bin/docker pull {{ runner_docker_image_url }}:${DOCKER_TAG}
