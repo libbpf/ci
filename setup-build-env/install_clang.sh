@@ -14,7 +14,9 @@ else
     REPO_DISTRO_SUFFIX="-${LLVM_VERSION}"
 fi
 
-echo "deb https://apt.llvm.org/focal/ llvm-toolchain-focal${REPO_DISTRO_SUFFIX} main" | sudo tee /etc/apt/sources.list.d/llvm.list
+DISTRO_CODENAME=$(distro_codename)
+
+echo "deb https://apt.llvm.org/${DISTRO_CODENAME}/ llvm-toolchain-${DISTRO_CODENAME}${REPO_DISTRO_SUFFIX} main" | sudo tee /etc/apt/sources.list.d/llvm.list
 n=0
 while [ $n -lt 5 ]; do
   set +e && \
