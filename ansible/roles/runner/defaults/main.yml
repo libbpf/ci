@@ -8,6 +8,7 @@ runner_tmpfs_options:
 runner_gh_token_default: replace with your token
 runner_gh_user_default: replace with your GH user
 runner_docker_tag: main
+runner_docker_ubuntu_version: noble
 runner_docker_image_url: ghcr.io/kernel-patches/runner
 runner_docker_healthcheck: ""
 runner_docker_mount_volume: false
