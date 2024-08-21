@@ -55,7 +55,7 @@
   ansible.builtin.copy:
     dest: "{{ runner_base_dir }}/runner_unit.env"
     content: |
-      DOCKER_TAG={{ runner_docker_tag }}-{{ ansible_architecture }}
+      DOCKER_TAG={{ runner_docker_tag }}-{{ runner_docker_ubuntu_version }}-{{ ansible_architecture }}
     mode: 0700
     owner: root
     group: root
