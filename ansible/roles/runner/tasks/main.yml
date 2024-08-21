@@ -1,7 +1,7 @@
 ---
 
 # Used by ansible modules later
-- name: Install docker pip
+- name: Install docker pip on Amazon Linux
   become: yes
   ansible.builtin.pip:
     name:
@@ -10,6 +10,15 @@
       - docker
     extra_args: --user
     executable: pip3
+  when: ansible_distribution == 'Amazon'
+
+- name: Install python3-docker on Ubuntu
+  become: yes
+  ansible.builtin.apt:
+    state: present
+    name: python3-docker
+    update_cache: yes
+  when: ansible_os_family == 'Debian'
 
 - name: Create runner directory
   become: yes
