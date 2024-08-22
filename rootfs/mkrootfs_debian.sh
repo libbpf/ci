@@ -150,7 +150,7 @@ packages=(
 	iptables
 	keyutils
 	libcap2
-	libelf1
+	libelf1t64
 	openssl
 	strace
 	zlib1g
