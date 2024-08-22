@@ -10,9 +10,11 @@ TARGET_ARCH="$1"
 KERNEL="$2"
 TOOLCHAIN="$3"
 export KBUILD_OUTPUT="$4"
+BPF_TOOLCHAIN="$5"
 
 ARCH="$(platform_to_kernel_arch ${TARGET_ARCH})"
 CROSS_COMPILE=""
+BPF_GCC_BIN="${GITHUB_WORKSPACE}/install_bpf_gcc/bin/bpf-unknown-none-gcc"
 
 if [[ "${TARGET_ARCH}" != "$(uname -m)" ]]
 then
@@ -51,6 +53,12 @@ MAKE_OPTS=$(cat <<EOF
 	VMLINUX_H=${VMLINUX_H}
 EOF
 )
+
+if [[ "${BPF_TOOLCHAIN}" == 'gcc' ]]
+then
+	MAKE_OPTS="${MAKE_OPTS} BPF_GCC=${BPF_GCC_BIN}"
+fi
+
 SELF_OPTS=$(cat <<EOF
 	-C ${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf
 EOF
