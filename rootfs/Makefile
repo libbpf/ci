@@ -1,5 +1,5 @@
-ARCHS = amd64 arm64 s390x ppc64el
-DISTROS = bullseye
+ARCHS = amd64 arm64 s390x
+DISTROS = noble
 
 .PHONY: all
 all:
