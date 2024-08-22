@@ -1,7 +1,7 @@
-x86_64/libbpf-vmtest-rootfs-2022.10.23-bullseye-amd64.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/libbpf-vmtest-rootfs-2022.10.23-bullseye-amd64.tar.zst
+x86_64/libbpf-vmtest-rootfs-2024.08.22-noble-amd64.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/libbpf-vmtest-rootfs-2024.08.22-noble-amd64.tar.zst
 x86_64/vmlinux-4.9.0.zst	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinux-4.9.0.zst
 x86_64/vmlinux-5.5.0.zst	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinux-5.5.0.zst
 x86_64/vmlinuz-5.5.0	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinuz-5.5.0
 x86_64/vmlinuz-4.9.0	https://libbpf-ci.s3-us-west-1.amazonaws.com/x86_64/vmlinuz-4.9.0
-s390x/libbpf-vmtest-rootfs-2022.10.23-bullseye-s390x.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/libbpf-vmtest-rootfs-2022.10.23-bullseye-s390x.tar.zst
-aarch64/libbpf-vmtest-rootfs-2022.10.23-bullseye-arm64.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/libbpf-vmtest-rootfs-2022.10.23-bullseye-arm64.tar.zst
+s390x/libbpf-vmtest-rootfs-2024.08.22-noble-s390x.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/libbpf-vmtest-rootfs-2024.08.22-noble-s390x.tar.zst
+aarch64/libbpf-vmtest-rootfs-2024.08.22-noble-arm64.tar.zst	https://libbpf-ci.s3.us-west-1.amazonaws.com/libbpf-vmtest-rootfs-2024.08.22-noble-arm64.tar.zst
