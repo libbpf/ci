@@ -55,8 +55,6 @@ SELF_OPTS=$(cat <<EOF
 	-C ${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf
 EOF
 )
-export LLVM_CONFIG=llvm-config-${LLVM_VERSION}
-
 make ${MAKE_OPTS} headers
 make ${MAKE_OPTS} ${SELF_OPTS} clean
 make ${MAKE_OPTS} ${SELF_OPTS} -j $(kernel_build_make_jobs)
