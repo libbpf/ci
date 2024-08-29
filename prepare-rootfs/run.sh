@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+set +x
 trap 'exit 2' ERR
 
 source $(cd $(dirname $0) && pwd)/../helpers.sh
@@ -292,7 +293,7 @@ fi
 
 # Only go to the network if it's actually a glob pattern.
 if [[ -v BUILDDIR ]]; then
-	KERNELRELEASE="$(KBUILD_OUTPUT="${BUILDDIR}" make -C "${KERNELSRC:-$BUILDDIR}" -s kernelrelease)"
+	KERNELRELEASE="$(KBUILD_OUTPUT=\"${BUILDDIR}\" make -C \"${KERNELSRC:-$BUILDDIR}\" -s kernelrelease)"
 elif [[ ! $KERNELRELEASE =~ ^([^\\*?[]|\\[*?[])*\\?$ ]]; then
 	# We need to cache the list of URLs outside of the command
 	# substitution, which happens in a subshell.
