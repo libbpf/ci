@@ -1,4 +1,4 @@
-ARCHS = amd64 arm64 s390x
+ARCHS = amd64 arm64 s390x riscv64
 DISTROS = noble
 
 .PHONY: all
