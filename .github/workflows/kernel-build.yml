@@ -86,7 +86,6 @@ jobs:
           bash .github/scripts/prepare-incremental-builds.sh ${{ steps.get-commit-metadata.outputs.commit }}
       - uses:  ./patch-kernel
         with:
-          patches-root: '${{ github.workspace }}/ci/diffs'
           repo-root: '${{ github.workspace }}'
       - name: Setup build environment
         uses: ./setup-build-env
