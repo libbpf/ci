@@ -13,7 +13,7 @@ set -euo pipefail
 source "$(cd "$(dirname "$0")" && pwd)/helpers.sh"
 
 ARCH=$(uname -m)
-DEPLOYMENT=$(if [[ "$GITHUB_REPOSITORY" == *"-rc" ]]; then echo "rc"; else echo "prod"; fi)
+DEPLOYMENT=$(if [[ "$GITHUB_REPOSITORY" == "kernel-patches/bpf" ]]; then echo "prod"; else echo "rc"; fi)
 
 STATUS_FILE=/mnt/vmtest/exitstatus
 OUTPUT_DIR=/mnt/vmtest
