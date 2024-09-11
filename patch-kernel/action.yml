@@ -4,6 +4,7 @@ inputs:
   patches-root:
     description: "Directory to find patches"
     required: true
+    default: ./ci/diffs
   repo-root:
     description: "Directory to apply patch to"
     required: true
