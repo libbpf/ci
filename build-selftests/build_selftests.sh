@@ -52,6 +52,7 @@ MAKE_OPTS=$(cat <<EOF
 EOF
 )
 SELF_OPTS=$(cat <<EOF
+	KHDR_INCLUDES=-I${KBUILD_OUTPUT}/usr/include
 	-C ${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf
 EOF
 )
