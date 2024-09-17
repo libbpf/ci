@@ -52,7 +52,7 @@ jobs:
         BASE_BRANCH: >-
           ${{ github.event_name == 'push' && github.ref_name
               || github.base_ref
-              || 'bpf-next_base'
+              || 'bpf-next'
           }}
     steps:
       - uses: actions/checkout@v4
