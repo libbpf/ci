@@ -1,0 +1,69 @@
+name: Workflow to test prepare-incremental-build action
+
+on:
+  push:
+    paths:
+      - 'prepare-incremental-build/**'
+      - '.github/**'
+  workflow_dispatch:
+    inputs:
+      arch:
+        required: true
+        type: string
+        default: x86_64
+      toolchain_full:
+        required: true
+        type: string
+        default: llvm-17
+      runs_on:
+        required: true
+        type: string
+        default: ubuntu-24.04
+      kernel-repo:
+        required: true
+        type: string
+        default: kernel-patches/bpf
+      kernel-branch:
+        required: true
+        type: string
+        default: bpf-next
+
+jobs:
+  test-job:
+    name: Test prepare-incremental-build action
+    runs-on: ${{ inputs.runs_on || 'ubuntu-24.04' }}
+    timeout-minutes: 100
+    env:
+        ARCH: ${{ inputs.arch || 'x86_64' }}
+        TOOLCHAIN_FULL: ${{ inputs.toolchain_full || 'llvm-17' }}
+        KERNEL_REPO: ${{ inputs.kernel-repo || 'kernel-patches/bpf' }}
+        KERNEL_BRANCH: ${{ inputs.kernel-branch || 'bpf-next' }}
+        REPO_ROOT: ${{ github.workspace }}/linux
+        KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
+    steps:
+
+      - uses: actions/checkout@v4
+        name: Checkout libbpf/ci
+
+      - uses: actions/checkout@v4
+        name: Checkout ${{ env.KERNEL_REPO }}
+        with:
+          repository: ${{ env.KERNEL_REPO }}
+          path: ${{ env.REPO_ROOT }}
+
+      - name: Run prepare-incremental-build action
+        uses: ./prepare-incremental-build
+        with:
+          repo-root: ${{ env.REPO_ROOT }}
+          base-branch: ${{ env.KERNEL_BRANCH }}
+          arch: ${{ env.ARCH }}
+          toolchain_full: ${{ env.TOOLCHAIN_FULL }}
+          kbuild-output: ${{ env.KBUILD_OUTPUT }}
+          cache-key-prefix: 'test-prepare-incremental-build-action'
+
+      - name: Put something in KBUILD_OUTPUT to trigger caching
+        shell: bash
+        run: |
+          mkdir -p $KBUILD_OUTPUT/path/to
+          echo "$ARCH $TOOLCHAIN_FULL $KERNEL" > $KBUILD_OUTPUT/path/to/output.txt
+
