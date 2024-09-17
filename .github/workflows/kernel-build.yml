@@ -48,7 +48,7 @@ jobs:
         KERNEL: ${{ inputs.kernel }}
         REPO_ROOT: ${{ github.workspace }}
         REPO_PATH: ""
-        KBUILD_OUTPUT: kbuild-output/
+        KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
         BASE_BRANCH: >-
           ${{ github.event_name == 'push' && github.ref_name
               || github.base_ref
@@ -78,6 +78,7 @@ jobs:
           base-branch: ${{ env.BASE_BRANCH }}
           arch: ${{ inputs.arch }}
           toolchain_full: ${{ inputs.toolchain_full }}
+          kbuild-output: ${{ env.KBUILD_OUTPUT }}
       - uses:  ./patch-kernel
         with:
           repo-root: '${{ github.workspace }}'
