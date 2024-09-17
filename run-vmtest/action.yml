@@ -24,6 +24,12 @@ inputs:
       Some sub-commands produce output dir within VM file system (/command_output/).
       If this option is set that dir's content would be copied to corresponding location.
     default: ''
+  kbuild-output:
+    description: 'Path to KBUILD_OUTPUT'
+    required: false
+    type: string
+    default: 'kbuild-output'
+
 runs:
   using: "composite"
   steps:
@@ -31,7 +37,7 @@ runs:
       id: find-kernel
       shell: bash
       run: |
-        BUILDDIR=$(realpath kbuild-output)
+        BUILDDIR=$(realpath ${{ inputs.kbuild-output }})
         vmlinuz="$BUILDDIR/$(KBUILD_OUTPUT="${BUILDDIR}" make -C "${{ inputs.kernel-root }}" -s image_name)"
         cp "$vmlinuz" ${{ inputs.vmlinuz }}
     - name: Download vmtest
