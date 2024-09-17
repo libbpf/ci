@@ -41,7 +41,7 @@ jobs:
       KERNEL: ${{ inputs.kernel }}
       REPO_ROOT: ${{ github.workspace }}
       REPO_PATH: ""
-      KBUILD_OUTPUT: kbuild-output/
+      KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
       # https://github.com/actions/runner/issues/1483#issuecomment-1031671517
       # booleans are weird in GH.
       CONTINUE_ON_ERROR: ${{ inputs.continue_on_error }}
