@@ -127,6 +127,7 @@ jobs:
           max-make-jobs: 32
           llvm-version: ${{ inputs.llvm-version }}
       - name: Tar artifacts
+        working-directory: ${{ env.REPO_ROOT }}
         run: |
           bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }} 1
       - if: ${{ github.event_name != 'push' }}

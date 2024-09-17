@@ -45,25 +45,33 @@ if [ $archive_make_helpers -ne 0 ]; then
   # 'make kernelrelease' and bpf tool checks later on.
   mapfile -t additional_file_list < <(find . -iname Makefile)
   additional_file_list+=(
-    "scripts/" 
-    "tools/testing/selftests/bpf/" 
-    "tools/include/" 
+    "scripts/"
+    "tools/testing/selftests/bpf/"
+    "tools/include/"
     "tools/bpf/bpftool/"
   )
 fi
 
 image_name=$(make ARCH="$(platform_to_kernel_arch "${arch}")" -s image_name)
 
-# zstd is installed by default in the runner images.
-tar -cf - \
-  "${KBUILD_OUTPUT}/.config" \
-  "${KBUILD_OUTPUT}/${image_name}" \
-  "${KBUILD_OUTPUT}/include/config/auto.conf" \
-  "${KBUILD_OUTPUT}/include/generated/autoconf.h" \
-  "${KBUILD_OUTPUT}/vmlinux" \
-  "${additional_file_list[@]}" \
-  --exclude '*.cmd' \
-  --exclude '*.d' \
-  --exclude '*.h' \
-  --exclude '*.output' \
-  selftests/bpf/ | zstd -T0 -19 -o "vmlinux-${arch}-${toolchain}.tar.zst"
+kbuild_output_file_list=(
+  ".config"
+  "${image_name}"
+  "include/config/auto.conf"
+  "include/generated/autoconf.h"
+  "vmlinux"
+)
+
+# Assumptions:
+#   - $(pwd) is the root of kernel repo we're tarring
+#   - zstd is installed by default in the runner images
+tar -cf -                              \
+    -C "$KBUILD_OUTPUT"                \
+       "${kbuild_output_file_list[@]}" \
+    -C "$(pwd)"                        \
+       "${additional_file_list[@]}"    \
+       --exclude '*.cmd'               \
+       --exclude '*.d'                 \
+       --exclude '*.output'            \
+       selftests/bpf/                  \
+  | zstd -T0 -19 -o "vmlinux-${arch}-${toolchain}.tar.zst"

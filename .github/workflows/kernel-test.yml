@@ -64,7 +64,7 @@ jobs:
           arch: ${{ inputs.arch }}
           img: '/tmp/root.img'
           vmlinuz: '${{ github.workspace }}/vmlinuz'
-          kernel-root: '.'
+          kernel-root: ${{ env.REPO_ROOT }}
           max-cpu: 8
           kernel-test: ${{ inputs.test }}
           kbuild-output: ${{ env.KBUILD_OUTPUT }}
