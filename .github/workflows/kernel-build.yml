@@ -45,6 +45,7 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: 100
     env:
+        ARCHIVE_MAKE_HELPERS: ${{ github.repository != 'kernel-patches/bpf' && '1' || '0' }}
         KERNEL: ${{ inputs.kernel }}
         REPO_ROOT: ${{ github.workspace }}
         REPO_PATH: ""
@@ -129,7 +130,7 @@ jobs:
       - name: Tar artifacts
         working-directory: ${{ env.REPO_ROOT }}
         run: |
-          bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }} 1
+          bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }} ${{ env.ARCHIVE_MAKE_HELPERS }}
       - if: ${{ github.event_name != 'push' }}
         name: Remove KBUILD_OUTPUT content
         shell: bash
