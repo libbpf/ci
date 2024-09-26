@@ -1,0 +1,53 @@
+name: 'Prepare incremental kernel build'
+description: 'Pull cached kernel build output from previous runs and prepare the repo for incremental build'
+inputs:
+  repo-root:
+    description: "Path to the root of the kernel repository"
+    required: true
+  base-branch:
+    description: "Branch for cache lookup"
+    required: true
+  arch:
+    required: true
+    type: string
+    description: "Part of cache lookup key"
+  toolchain_full:
+    required: true
+    type: string
+    description: "Part of cache lookup key"
+  kbuild-output:
+    required: true
+    type: string
+    description: "Path to KBUILD_OUTPUT"
+  cache-key-prefix:
+    required: false
+    type: string
+    default: "kbuild-output"
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Get commit meta-data for cache lookup
+      id: get-commit-metadata
+      working-directory: ${{ inputs.repo-root }}
+      shell: bash
+      run: ${GITHUB_ACTION_PATH}/get-commit-metadata.sh ${{ inputs.base-branch }}
+
+    - name: Pull recent KBUILD_OUTPUT contents
+      uses: actions/cache@v4
+      with:
+        path: ${{ inputs.kbuild-output }}
+        key: ${{ inputs.cache-key-prefix }}-${{ inputs.arch }}-${{ inputs.toolchain_full }}-${{ steps.get-commit-metadata.outputs.branch }}-${{ steps.get-commit-metadata.outputs.timestamp }}-${{ steps.get-commit-metadata.outputs.commit }}
+        restore-keys: |
+          ${{ inputs.cache-key-prefix }}-${{ inputs.arch }}-${{ inputs.toolchain_full }}-${{ steps.get-commit-metadata.outputs.branch }}-${{ steps.get-commit-metadata.outputs.timestamp }}-
+          ${{ inputs.cache-key-prefix }}-${{ inputs.arch }}-${{ inputs.toolchain_full }}-${{ steps.get-commit-metadata.outputs.branch }}-
+          ${{ inputs.cache-key-prefix }}-${{ inputs.arch }}-${{ inputs.toolchain_full }}-
+
+    - name: Prepare incremental build
+      working-directory: ${{ inputs.repo-root }}
+      env:
+        KBUILD_OUTPUT: ${{ inputs.kbuild-output }}
+      shell: bash
+      run: ${GITHUB_ACTION_PATH}/prepare-incremental-builds.sh ${{ steps.get-commit-metadata.outputs.commit }}
+

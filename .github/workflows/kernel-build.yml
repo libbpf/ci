@@ -45,10 +45,16 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: 100
     env:
+        ARCHIVE_MAKE_HELPERS: ${{ github.repository != 'kernel-patches/bpf' && '1' || '0' }}
         KERNEL: ${{ inputs.kernel }}
         REPO_ROOT: ${{ github.workspace }}
         REPO_PATH: ""
-        KBUILD_OUTPUT: kbuild-output/
+        KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
+        BASE_BRANCH: >-
+          ${{ github.event_name == 'push' && github.ref_name
+              || github.base_ref
+              || 'bpf-next'
+          }}
     steps:
       - uses: actions/checkout@v4
         # We fetch an actual bit of history here to facilitate incremental
@@ -67,23 +73,13 @@ jobs:
           rm -rf .kernel/.git
           cp -rf .kernel/. .
           rm -rf .kernel
-      - name: Get commit meta-data
-        id: get-commit-metadata
-        run: |
-          bash .github/scripts/get-commit-metadata.sh
-      - name: Pull recent KBUILD_OUTPUT contents
-        uses: actions/cache@v4
+      - uses: ./prepare-incremental-build
         with:
-          path: ${{ env.KBUILD_OUTPUT }}
-          key: kbuild-output-${{ inputs.arch }}-${{ inputs.toolchain_full }}-${{ steps.get-commit-metadata.outputs.branch }}-${{ steps.get-commit-metadata.outputs.timestamp }}-${{ steps.get-commit-metadata.outputs.commit }}
-          restore-keys: |
-            kbuild-output-${{ inputs.arch }}-${{ inputs.toolchain_full }}-${{ steps.get-commit-metadata.outputs.branch }}-${{ steps.get-commit-metadata.outputs.timestamp }}-
-            kbuild-output-${{ inputs.arch }}-${{ inputs.toolchain_full }}-${{ steps.get-commit-metadata.outputs.branch }}-
-            kbuild-output-${{ inputs.arch }}-${{ inputs.toolchain_full }}-
-      - name: Prepare incremental build
-        shell: bash
-        run: |
-          bash .github/scripts/prepare-incremental-builds.sh ${{ steps.get-commit-metadata.outputs.commit }}
+          repo-root: ${{ env.REPO_ROOT }}
+          base-branch: ${{ env.BASE_BRANCH }}
+          arch: ${{ inputs.arch }}
+          toolchain_full: ${{ inputs.toolchain_full }}
+          kbuild-output: ${{ env.KBUILD_OUTPUT }}
       - uses:  ./patch-kernel
         with:
           repo-root: '${{ github.workspace }}'
@@ -132,8 +128,9 @@ jobs:
           max-make-jobs: 32
           llvm-version: ${{ inputs.llvm-version }}
       - name: Tar artifacts
+        working-directory: ${{ env.REPO_ROOT }}
         run: |
-          bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }} 1
+          bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }} ${{ env.ARCHIVE_MAKE_HELPERS }}
       - if: ${{ github.event_name != 'push' }}
         name: Remove KBUILD_OUTPUT content
         shell: bash

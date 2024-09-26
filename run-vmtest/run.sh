@@ -14,7 +14,7 @@ if [[ "${KERNEL}" = 'LATEST' ]]; then
 	# "&& true" does not change the return code (it is not executed if the
 	# Python script fails), but it prevents the trap on ERR set at the top
 	# of this file to trigger on failure.
-	"${REPO_ROOT}/${KERNEL_ROOT}/tools/testing/selftests/bpf/test_bpftool_synctypes.py" && true
+	"${KERNEL_ROOT}/tools/testing/selftests/bpf/test_bpftool_synctypes.py" && true
 	bpftool_exitstatus=$?
 	if [[ $bpftool_exitstatus -eq 0 ]]; then
 		echo "bpftool checks passed successfully."
