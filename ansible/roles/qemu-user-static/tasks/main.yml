@@ -23,6 +23,13 @@
     group: root
   register: qemu_user_static
 
+- name: Mask systemd-binfmt service
+  become: true
+  systemd:
+    name: systemd-binfmt
+    state: stopped
+    masked: yes
+
 # Building the image relies on this having started. Force starting the service when this file changes.
 - name: start qemu-user-static
   become: yes
