@@ -130,7 +130,7 @@ jobs:
       - name: Tar artifacts
         working-directory: ${{ env.REPO_ROOT }}
         run: |
-          bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }} ${{ env.ARCHIVE_MAKE_HELPERS }}
+          bash ./scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }} ${{ env.ARCHIVE_MAKE_HELPERS }}
       - if: ${{ github.event_name != 'push' }}
         name: Remove KBUILD_OUTPUT content
         shell: bash

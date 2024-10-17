@@ -1,4 +1,4 @@
-name: Workflow to test prepare-incremental-build action
+name: Test prepare-incremental-build action
 
 on:
   push:
