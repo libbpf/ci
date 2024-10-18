@@ -2,14 +2,11 @@
 
 set -euo pipefail
 
-THISDIR="$(cd $(dirname $0) && pwd)"
+source "${GITHUB_ACTION_PATH}/../helpers.sh"
 
-source "${THISDIR}"/../helpers.sh
-
-TARGET_ARCH="$1"
-KERNEL="$2"
-TOOLCHAIN="$3"
-export KBUILD_OUTPUT="$4"
+TARGET_ARCH=$1
+TOOLCHAIN=$2
+LLVM_VERSION=$3
 
 ARCH="$(platform_to_kernel_arch ${TARGET_ARCH})"
 CROSS_COMPILE=""
@@ -24,20 +21,7 @@ if [[ $TOOLCHAIN = "llvm" ]]; then
 	TOOLCHAIN="llvm-$LLVM_VERSION"
 fi
 
-foldable start build_selftests "Building selftests with $TOOLCHAIN"
-
-PREPARE_SELFTESTS_SCRIPT=${THISDIR}/prepare_selftests-${KERNEL}.sh
-if [ -f "${PREPARE_SELFTESTS_SCRIPT}" ]; then
-	(cd "${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf" && ${PREPARE_SELFTESTS_SCRIPT})
-fi
-
-if [[ "${KERNEL}" = 'LATEST' ]]; then
-	VMLINUX_H=
-else
-	VMLINUX_H=${THISDIR}/vmlinux.h
-fi
-
-cd ${REPO_ROOT}/${REPO_PATH}
+foldable start build_selftests "Building selftests/sched_ext with $TOOLCHAIN"
 
 MAKE_OPTS=$(cat <<EOF
 	ARCH=${ARCH}
@@ -46,15 +30,16 @@ MAKE_OPTS=$(cat <<EOF
 	LLC=llc-${LLVM_VERSION}
 	LLVM_STRIP=llvm-strip-${LLVM_VERSION}
 	VMLINUX_BTF=${KBUILD_OUTPUT}/vmlinux
-	VMLINUX_H=${VMLINUX_H}
 EOF
 )
 SELF_OPTS=$(cat <<EOF
-	-C ${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf
+	-C ${REPO_ROOT}/tools/testing/selftests/sched_ext
 EOF
 )
-make ${MAKE_OPTS} headers
+
+cd ${REPO_ROOT}
 make ${MAKE_OPTS} ${SELF_OPTS} clean
 make ${MAKE_OPTS} ${SELF_OPTS} -j $(kernel_build_make_jobs)
 
 foldable end build_selftests
+

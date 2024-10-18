@@ -1,0 +1,34 @@
+name: 'Build selftests/sched_ext'
+inputs:
+  kbuild-output:
+    description: 'Path to the kernel build output'
+    required: true
+  repo-root:
+    description: "Path to the root of the kernel repository"
+    required: true
+  arch:
+    description: 'arch'
+    required: true
+  toolchain:
+    description: 'gcc or llvm'
+    default: 'gcc'
+    required: true
+  llvm-version:
+    description: 'llvm version'
+    required: false
+    default: '16'
+  max-make-jobs:
+    description: 'Maximum number of jobs to use when running make (e.g argument to -j). Default: 4*nproc'
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build selftests/sched_ext
+      env:
+        KBUILD_OUTPUT: ${{ inputs.kbuild-output }}
+        MAX_MAKE_JOBS: ${{ inputs.max-make-jobs }}
+        REPO_ROOT: ${{ inputs.repo-root || github.workspace }}
+      shell: bash
+      run:
+        ${GITHUB_ACTION_PATH}/build.sh "${{ inputs.arch }}" "${{ inputs.toolchain }}" "${{ inputs.llvm-version }}"

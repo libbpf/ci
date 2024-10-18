@@ -45,7 +45,7 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: 100
     env:
-        ARCHIVE_MAKE_HELPERS: ${{ github.repository != 'kernel-patches/bpf' && '1' || '0' }}
+        ARCHIVE_MAKE_HELPERS: ${{ github.repository != 'kernel-patches/bpf' && 'true' || '' }}
         KERNEL: ${{ inputs.kernel }}
         REPO_ROOT: ${{ github.workspace }}
         REPO_PATH: ""
@@ -55,6 +55,7 @@ jobs:
               || github.base_ref
               || 'bpf-next'
           }}
+        BUILD_SCHED_EXT_SELFTESTS: ${{ inputs.arch == 'x86_64' || inputs.arch == 'aarch64' && 'true' || '' }}
     steps:
       - uses: actions/checkout@v4
         # We fetch an actual bit of history here to facilitate incremental
@@ -82,7 +83,8 @@ jobs:
           kbuild-output: ${{ env.KBUILD_OUTPUT }}
       - uses:  ./patch-kernel
         with:
-          repo-root: '${{ github.workspace }}'
+          patches-root: '${{ github.workspace }}/ci/diffs'
+          repo-root: ${{ env.REPO_ROOT }}
       - name: Setup build environment
         uses: ./setup-build-env
         with:
@@ -105,7 +107,7 @@ jobs:
           kbuild-output: ${{ env.KBUILD_OUTPUT }}
           max-make-jobs: 32
           llvm-version: ${{ inputs.llvm-version }}
-      - name: Build selftests
+      - name: Build selftests/bpf
         uses: ./build-selftests
         with:
           arch: ${{ inputs.arch }}
@@ -118,6 +120,16 @@ jobs:
           # RELEASE=0 adds -O0 make flag
           # RELEASE=1 adds -O2 make flag
           RELEASE: ${{ inputs.release && '1' || '' }}
+      - if: ${{ env.BUILD_SCHED_EXT_SELFTESTS }}
+        name: Build selftests/sched_ext
+        uses: ./build-scx-selftests
+        with:
+          kbuild-output: ${{ env.KBUILD_OUTPUT }}
+          repo-root: ${{ env.REPO_ROOT }}
+          arch: ${{ inputs.arch }}
+          toolchain: ${{ inputs.toolchain }}
+          llvm-version: ${{ inputs.llvm-version }}
+          max-make-jobs: 32
       - if: ${{ github.event_name != 'push' }}
         name: Build samples
         uses: ./build-samples
@@ -130,7 +142,7 @@ jobs:
       - name: Tar artifacts
         working-directory: ${{ env.REPO_ROOT }}
         run: |
-          bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }} ${{ env.ARCHIVE_MAKE_HELPERS }}
+          bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }}
       - if: ${{ github.event_name != 'push' }}
         name: Remove KBUILD_OUTPUT content
         shell: bash

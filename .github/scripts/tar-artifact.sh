@@ -13,7 +13,6 @@ fi
 
 arch="${1}"
 toolchain="${2}"
-archive_make_helpers="${3:-0}"
 
 # Convert a platform (as returned by uname -m) to the kernel
 # arch (as expected by ARCH= env).
@@ -40,7 +39,7 @@ platform_to_kernel_arch() {
 # Remove intermediate object files that we have no use for. Ideally
 # we'd just exclude them from tar below, but it does not provide
 # options to express the precise constraints.
-find selftests/ -name "*.o" -a ! -name "*.bpf.o" -print0 | \
+find tools/testing/selftests/ -name "*.o" -a ! -name "*.bpf.o" -print0 | \
   xargs --null --max-args=10000 rm
 
 # Strip debug information, which is excessively large (consuming
@@ -74,7 +73,7 @@ for file in "${kbuild_output_file_list[@]}"; do
 done
 
 additional_file_list=()
-if [ $archive_make_helpers -ne 0 ]; then
+if [[ -n "${ARCHIVE_MAKE_HELPERS}" ]]; then
   # Package up a bunch of additional infrastructure to support running
   # 'make kernelrelease' and bpf tool checks later on.
   mapfile -t additional_file_list < <(find . -iname Makefile)
@@ -86,6 +85,11 @@ if [ $archive_make_helpers -ne 0 ]; then
   )
 fi
 
+mkdir -p selftests
+cp -r tools/testing/selftests/bpf selftests
+if [[ -n "${BUILD_SCHED_EXT_SELFTESTS}" ]]; then
+  cp -r tools/testing/selftests/sched_ext selftests
+fi
 
 tar -cf - \
     kbuild-output \
@@ -94,7 +98,7 @@ tar -cf - \
     --exclude '*.d'                    \
     --exclude '*.h'                    \
     --exclude '*.output'               \
-    selftests/bpf/                     \
+    selftests/                         \
   | zstd -T0 -19 -o "vmlinux-${arch}-${toolchain}.tar.zst"
 
 # Cleanup and restore the original KBUILD_OUTPUT
