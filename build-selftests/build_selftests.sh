@@ -26,8 +26,6 @@ fi
 
 foldable start build_selftests "Building selftests with $TOOLCHAIN"
 
-LIBBPF_PATH="${REPO_ROOT}"
-
 PREPARE_SELFTESTS_SCRIPT=${THISDIR}/prepare_selftests-${KERNEL}.sh
 if [ -f "${PREPARE_SELFTESTS_SCRIPT}" ]; then
 	(cd "${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf" && ${PREPARE_SELFTESTS_SCRIPT})
@@ -58,11 +56,5 @@ EOF
 make ${MAKE_OPTS} headers
 make ${MAKE_OPTS} ${SELF_OPTS} clean
 make ${MAKE_OPTS} ${SELF_OPTS} -j $(kernel_build_make_jobs)
-
-cd -
-mkdir "${LIBBPF_PATH}"/selftests
-cp -R "${REPO_ROOT}/${REPO_PATH}/tools/testing/selftests/bpf" \
-  "${LIBBPF_PATH}"/selftests
-cd "${LIBBPF_PATH}"
 
 foldable end build_selftests
