@@ -30,6 +30,7 @@ cat_kernel_config() {
 	cat ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config \
 	    ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.vm \
 	    ${GITHUB_WORKSPACE}/tools/testing/selftests/bpf/config.${TARGET_ARCH} \
+            ${GITHUB_WORKSPACE}/tools/testing/selftests/sched_ext/config \
 	    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config \
 	    ${GITHUB_WORKSPACE}/ci/vmtest/configs/config.${TARGET_ARCH} 2> /dev/null > "${1}"
 }
