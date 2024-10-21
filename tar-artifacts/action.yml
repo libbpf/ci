@@ -1,0 +1,28 @@
+name: 'Tar build artifacts'
+inputs:
+  kbuild-output:
+    description: 'Path to the kernel build output'
+    required: true
+  repo-root:
+    description: "Path to the root of the kernel repository"
+    required: true
+  arch:
+    required: true
+  toolchain:
+    required: true
+outputs:
+  archive-name:
+    description: 'Artifacts tarball name'
+    value: ${{ steps.run-script.outputs.archive-name }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run tar-artifacts.sh
+      id: run-script
+      env:
+        KBUILD_OUTPUT: ${{ inputs.kbuild-output }}
+        REPO_ROOT: ${{ inputs.repo-root }}
+      shell: bash
+      run:
+        ${GITHUB_ACTION_PATH}/tar-artifacts.sh "${{ inputs.arch }}" "${{ inputs.toolchain }}"

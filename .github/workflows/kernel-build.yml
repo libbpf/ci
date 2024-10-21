@@ -45,7 +45,6 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: 100
     env:
-        ARCHIVE_MAKE_HELPERS: ${{ github.repository != 'kernel-patches/bpf' && 'true' || '' }}
         KERNEL: ${{ inputs.kernel }}
         REPO_ROOT: ${{ github.workspace }}
         REPO_PATH: ""
@@ -140,9 +139,17 @@ jobs:
           max-make-jobs: 32
           llvm-version: ${{ inputs.llvm-version }}
       - name: Tar artifacts
-        working-directory: ${{ env.REPO_ROOT }}
-        run: |
-          bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }}
+        id: tar-artifacts
+        uses: ./tar-artifacts
+        env:
+          ARCHIVE_BPF_SELFTESTS: 'true'
+          ARCHIVE_MAKE_HELPERS: ${{ github.repository != 'kernel-patches/bpf' && 'true' || '' }}
+          ARCHIVE_SCHED_EXT_SELFTESTS: ${{ env.BUILD_SCHED_EXT_SELFTESTS }}
+        with:
+          kbuild-output: ${{ env.KBUILD_OUTPUT }}
+          repo-root: ${{ env.REPO_ROOT }}
+          arch: ${{ inputs.arch }}
+          toolchain: ${{ inputs.toolchain_full }}
       - if: ${{ github.event_name != 'push' }}
         name: Remove KBUILD_OUTPUT content
         shell: bash
@@ -155,4 +162,4 @@ jobs:
         with:
           name: vmlinux-${{ inputs.arch }}-${{ inputs.toolchain_full }}${{ inputs.release && '-release' || '' }}
           if-no-files-found: error
-          path: vmlinux-${{ inputs.arch }}-${{ inputs.toolchain_full }}.tar.zst
+          path: ${{ steps.tar-artifacts.outputs.archive-name }}
