@@ -12,14 +12,14 @@ if [ ! -d "${KBUILD_OUTPUT:-}" ]; then
   exit 1
 fi
 
+zst_tarball="$1"
+arch="${ARCH}"
+
 ARCHIVE_BPF_SELFTESTS="${ARCHIVE_BPF_SELFTESTS:-true}"
 ARCHIVE_MAKE_HELPERS="${ARCHIVE_MAKE_HELPERS:-}"
 ARCHIVE_SCHED_EXT_SELFTESTS="${ARCHIVE_SCHED_EXT_SELFTESTS:-}"
 
-arch="${1}"
-toolchain="${2}"
-
-tarball="vmlinux-${arch}-${toolchain}.tar"
+tarball=$(mktemp ./artifacts.XXXXXXXX.tar)
 
 source "${GITHUB_ACTION_PATH}/../helpers.sh"
 
@@ -58,8 +58,9 @@ fi
 
 if [[ -n "${ARCHIVE_BPF_SELFTESTS}" ]]; then
   # add .bpf.o files
-    find "${REPO_ROOT}/tools/testing/selftests/bpf" -name "*.bpf.o" -printf 'selftests/bpf/%P\n' \
-        | tar -rf "${tarball}" -C "${REPO_ROOT}/tools/testing" -T -
+    find "${REPO_ROOT}/tools/testing/selftests/bpf"   \
+         -name "*.bpf.o" -printf 'selftests/bpf/%P\n' \
+      | tar -rf "${tarball}" -C "${REPO_ROOT}/tools/testing" -T -
   # add other relevant files
   tar -rf "${tarball}" -C "${REPO_ROOT}/tools/testing" \
       --exclude '*.cmd'    \
@@ -74,6 +75,5 @@ if [[ -n "${ARCHIVE_SCHED_EXT_SELFTESTS}" ]]; then
   tar -rf "${tarball}" -C "${REPO_ROOT}/tools/testing" selftests/sched_ext/
 fi
 
-zst_tarball="vmlinux-${arch}-${toolchain}.tar.zst"
 zstd -T0 -19 -i "${tarball}" -o "${zst_tarball}"
-echo "archive-name=$(realpath "${zst_tarball}")" >> $GITHUB_OUTPUT
+

@@ -8,14 +8,10 @@ Linux kernel repository.
 
 ## Required inputs
 
-* `kbuild-output` - Path to the kernel build output.
-* `repo-root` - Path to the root of the Linux kernel repository.
-* `arch` - Kernel build architecture.
-* `toolchain` - Toolchain name: `gcc` (default) or `llvm`.
-
-# Outputs
-
-* `archive-name` - full path to zstd-compressed tarball with the artifacts
+* `arch` - Kernel build architecture, required to find image_name
+* `archive` - path to the produced .zst archive
+* `kbuild-output` - Path to the kernel build output
+* `repo-root` - Path to the root of the Linux kernel repository
 
 # Archive options
 
