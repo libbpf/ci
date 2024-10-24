@@ -45,17 +45,17 @@ jobs:
     runs-on: ${{ fromJSON(inputs.runs_on) }}
     timeout-minutes: 100
     env:
-        ARCHIVE_MAKE_HELPERS: ${{ github.repository != 'kernel-patches/bpf' && 'true' || '' }}
-        KERNEL: ${{ inputs.kernel }}
-        REPO_ROOT: ${{ github.workspace }}
-        REPO_PATH: ""
-        KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
+        ARTIFACTS_ARCHIVE: "vmlinux-${{ inputs.arch }}-${{ inputs.toolchain_full }}.tar.zst"
         BASE_BRANCH: >-
           ${{ github.event_name == 'push' && github.ref_name
               || github.base_ref
               || 'bpf-next'
           }}
         BUILD_SCHED_EXT_SELFTESTS: ${{ inputs.arch == 'x86_64' || inputs.arch == 'aarch64' && 'true' || '' }}
+        KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
+        KERNEL: ${{ inputs.kernel }}
+        REPO_PATH: ""
+        REPO_ROOT: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
         # We fetch an actual bit of history here to facilitate incremental
@@ -140,9 +140,17 @@ jobs:
           max-make-jobs: 32
           llvm-version: ${{ inputs.llvm-version }}
       - name: Tar artifacts
-        working-directory: ${{ env.REPO_ROOT }}
-        run: |
-          bash .github/scripts/tar-artifact.sh ${{ inputs.arch }} ${{ inputs.toolchain_full }}
+        id: tar-artifacts
+        uses: ./tar-artifacts
+        env:
+          ARCHIVE_BPF_SELFTESTS: 'true'
+          ARCHIVE_MAKE_HELPERS: ${{ github.repository != 'kernel-patches/bpf' && 'true' || '' }}
+          ARCHIVE_SCHED_EXT_SELFTESTS: ${{ env.BUILD_SCHED_EXT_SELFTESTS }}
+        with:
+          arch: ${{ inputs.arch }}
+          archive: ${{ env.ARTIFACTS_ARCHIVE }}
+          kbuild-output: ${{ env.KBUILD_OUTPUT }}
+          repo-root: ${{ env.REPO_ROOT }}
       - if: ${{ github.event_name != 'push' }}
         name: Remove KBUILD_OUTPUT content
         shell: bash
@@ -155,4 +163,4 @@ jobs:
         with:
           name: vmlinux-${{ inputs.arch }}-${{ inputs.toolchain_full }}${{ inputs.release && '-release' || '' }}
           if-no-files-found: error
-          path: vmlinux-${{ inputs.arch }}-${{ inputs.toolchain_full }}.tar.zst
+          path: ${{ env.ARTIFACTS_ARCHIVE }}
