@@ -46,12 +46,11 @@ foldable start vmtest "Starting virtual machine..."
 
 # Tests may be comma-separated. vmtest_selftest expect them to come from CLI space-separated.
 T=$(echo ${KERNEL_TEST} | tr -s ',' ' ')
-# HACK: We need to unmount /tmp to access /tmp from the container....
-vmtest -k "${VMLINUZ}" --kargs "panic=-1 sysctl.vm.panic_on_oom=1" "umount /tmp && \
-        	/bin/mount bpffs /sys/fs/bpf -t bpf && \
-            ip link set lo up && \
-            cd '${GITHUB_WORKSPACE}' && \
-            ${VMTEST_SCRIPT} ${T}"
+vmtest -k "${VMLINUZ}" --kargs "panic=-1 sysctl.vm.panic_on_oom=1" \
+       "/bin/mount bpffs /sys/fs/bpf -t bpf && \
+        ip link set lo up                   && \
+        cd '${GITHUB_WORKSPACE}'            && \
+        ${VMTEST_SCRIPT} ${T}"
 
 foldable end vmtest
 
