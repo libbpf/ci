@@ -22,14 +22,6 @@ WORKING_DIR="/${PROJECT_NAME}"
 BPF_SELFTESTS_DIR="${WORKING_DIR}/selftests/bpf"
 VMTEST_CONFIGS_PATH="${WORKING_DIR}/ci/vmtest/configs"
 
-read_lists() {
-	(for path in "$@"; do
-		if [[ -s "$path" ]]; then
-			cat "$path"
-		fi;
-	done) | cut -d'#' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | tr -s '\n' ','
-}
-
 DENYLIST=$(read_lists \
 	"$BPF_SELFTESTS_DIR/DENYLIST" \
 	"$BPF_SELFTESTS_DIR/DENYLIST.${ARCH}" \

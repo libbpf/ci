@@ -36,3 +36,11 @@ print_error() {
 print_notice() {
   __print notice $1 $2
 }
+
+read_lists() {
+	(for path in "$@"; do
+		if [[ -s "$path" ]]; then
+			cat "$path"
+		fi;
+	done) | cut -d'#' -f1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | tr -s '\n' ','
+}

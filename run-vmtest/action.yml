@@ -29,6 +29,10 @@ inputs:
     required: false
     type: string
     default: 'kbuild-output'
+  vmtest-release:
+    description: 'Release version of vmtest tool to use'
+    required: false
+    default: 'v0.14.0'
 
 runs:
   using: "composite"
@@ -42,9 +46,10 @@ runs:
         cp "$vmlinuz" ${{ inputs.vmlinuz }}
     - name: Download vmtest
       shell: bash
-      # FIXME: move to proper release
       run: |
-        sudo curl -L https://github.com/danobi/vmtest/releases/download/v0.12.0/vmtest-$(uname -m) -o /usr/bin/vmtest && sudo chmod 755 /usr/bin/vmtest
+        VMTEST_URL="https://github.com/danobi/vmtest/releases/download/${{ inputs.vmtest-release }}/vmtest-$(uname -m)"
+        sudo curl -L $VMTEST_URL -o /usr/bin/vmtest
+        sudo chmod 755 /usr/bin/vmtest
     - name: install qemu tools and selftest dependencies
       shell: bash
       run: |
