@@ -3,14 +3,28 @@
 set -euo pipefail
 trap 'exit 2' ERR
 
-source $(cd $(dirname $0) && pwd)/../helpers.sh
+source "${GITHUB_ACTION_PATH}/../helpers.sh"
+
+RUN_BPFTOOL_CHECKS=
+
+if [[ "$KERNEL_TEST" != "sched_ext" ]]; then
+	VMTEST_SCRIPT="${GITHUB_ACTION_PATH}/../ci/vmtest/vmtest_selftests.sh"
+	if [[ "${KERNEL}" = 'LATEST' ]]; then
+		RUN_BPFTOOL_CHECKS=true
+	fi
+else
+	VMTEST_SCRIPT="${GITHUB_ACTION_PATH}/../ci/vmtest/sched_ext_selftests.sh"
+fi
+
+# clear exitstatus file
+echo -n "" > exitstatus
 
 foldable start bpftool_checks "Running bpftool checks..."
-bpftool_exitstatus=0
 
 # bpftool checks are aimed at checking type names, documentation, shell
 # completion etc. against the current kernel, so only run on LATEST.
-if [[ "${KERNEL}" = 'LATEST' ]]; then
+if [[ -n "${RUN_BPFTOOL_CHECKS}" ]]; then
+	bpftool_exitstatus=0
 	# "&& true" does not change the return code (it is not executed if the
 	# Python script fails), but it prevents the trap on ERR set at the top
 	# of this file to trigger on failure.
@@ -21,11 +35,11 @@ if [[ "${KERNEL}" = 'LATEST' ]]; then
 	else
 		echo "bpftool checks returned ${bpftool_exitstatus}."
 	fi
+	echo "bpftool:${bpftool_exitstatus}" >> exitstatus
 else
 	echo "bpftool checks skipped."
 fi
 
-bpftool_exitstatus="bpftool:${bpftool_exitstatus}"
 foldable end bpftool_checks
 
 foldable start vmtest "Starting virtual machine..."
@@ -37,14 +51,13 @@ vmtest -k "${VMLINUZ}" --kargs "panic=-1 sysctl.vm.panic_on_oom=1" "umount /tmp 
         	/bin/mount bpffs /sys/fs/bpf -t bpf && \
             ip link set lo up && \
             cd '${GITHUB_WORKSPACE}' && \
-            ./ci/vmtest/vmtest_selftests.sh ${T}"
+            ${VMTEST_SCRIPT} ${T}"
 
 foldable end vmtest
 
 foldable start collect_status "Collecting exit status"
 
-exitfile="${bpftool_exitstatus}\n"
-exitfile+="$(cat exitstatus 2>/dev/null)"
+exitfile="$(cat exitstatus 2>/dev/null)"
 exitstatus="$(echo -e "$exitfile" | awk --field-separator ':' \
   'BEGIN { s=0 } { if ($2) {s=1} } END { print s }')"
 
