@@ -4,12 +4,11 @@ inputs:
   arch:
     description: 'arch'
     required: true
-  img:
-    description: 'img path'
-    required: true
   vmlinuz:
-    description: 'vmlinuz path'
-    required: true
+    description: |
+      If passed, this vmlinuz will be used. Otherwise vmlinuz will be
+      searched via make -s image_name in kbuild-output.
+    required: false
   kernel-root:
     description: 'kernel source dir'
     default: '.'
@@ -27,7 +26,6 @@ inputs:
   kbuild-output:
     description: 'Path to KBUILD_OUTPUT'
     required: false
-    type: string
     default: 'kbuild-output'
   vmtest-release:
     description: 'Release version of vmtest tool to use'
@@ -37,13 +35,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Find kernel
-      id: find-kernel
-      shell: bash
-      run: |
-        BUILDDIR=$(realpath ${{ inputs.kbuild-output }})
-        vmlinuz="$BUILDDIR/$(KBUILD_OUTPUT="${BUILDDIR}" make -C "${{ inputs.kernel-root }}" -s image_name)"
-        cp "$vmlinuz" ${{ inputs.vmlinuz }}
     - name: Download vmtest
       shell: bash
       run: |
@@ -76,8 +67,7 @@ runs:
     - name: Run vmtest
       shell: bash
       env:
-        VMLINUZ: ${{ inputs.vmlinuz }}
-        IMG: ${{ inputs.img }}
+        VMLINUZ: ${{ inputs.vmlinuz || '' }}
         KERNEL_ROOT: ${{ inputs.kernel-root }}
         MAX_CPU: ${{ inputs.max-cpu }}
         KERNEL_TEST: ${{ inputs.kernel-test }}
