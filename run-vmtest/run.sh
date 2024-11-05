@@ -10,15 +10,21 @@ if [[ -z "${VMLINUZ}" || ! -f "${VMLINUZ}" ]]; then
     export VMLINUZ=$(realpath ${KERNEL_ROOT}/${image_name})
 fi
 
-RUN_BPFTOOL_CHECKS=
+RUN_BPFTOOL_CHECKS=${RUN_BPFTOOL_CHECKS:-}
+if [[ -z "${RUN_BPFTOOL_CHECKS}" \
+          && "${KERNEL}" = 'LATEST' \
+          && "$KERNEL_TEST" != "sched_ext" ]];
+then
+    RUN_BPFTOOL_CHECKS=true
+fi
 
-if [[ "$KERNEL_TEST" != "sched_ext" ]]; then
-	VMTEST_SCRIPT="${GITHUB_ACTION_PATH}/../ci/vmtest/vmtest_selftests.sh"
-	if [[ "${KERNEL}" = 'LATEST' ]]; then
-		RUN_BPFTOOL_CHECKS=true
-	fi
+VMTEST_SCRIPT=${VMTEST_SCRIPT:-}
+if [[ -z "$VMTEST_SCRIPT" \
+          && "$KERNEL_TEST" != "sched_ext" ]];
+then
+	VMTEST_SCRIPT="${GITHUB_ACTION_PATH}/run-bpf-selftests.sh"
 else
-	VMTEST_SCRIPT="${GITHUB_ACTION_PATH}/../ci/vmtest/sched_ext_selftests.sh"
+	VMTEST_SCRIPT="${GITHUB_ACTION_PATH}/run-scx-selftests.sh"
 fi
 
 # clear exitstatus file
@@ -52,9 +58,10 @@ foldable start vmtest "Starting virtual machine..."
 # Tests may be comma-separated. vmtest_selftest expect them to come from CLI space-separated.
 T=$(echo ${KERNEL_TEST} | tr -s ',' ' ')
 vmtest -k "${VMLINUZ}" --kargs "panic=-1 sysctl.vm.panic_on_oom=1" \
-       "/bin/mount bpffs /sys/fs/bpf -t bpf && \
-        ip link set lo up                   && \
-        cd '${GITHUB_WORKSPACE}'            && \
+       "ln -sf /mnt/vmtest/vmlinux /boot/vmlinux-$(uname -r) && \
+        /bin/mount bpffs /sys/fs/bpf -t bpf                  && \
+        ip link set lo up                                    && \
+        cd '${GITHUB_WORKSPACE}'                             && \
         ${VMTEST_SCRIPT} ${T}"
 
 foldable end vmtest
