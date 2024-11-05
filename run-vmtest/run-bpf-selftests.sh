@@ -1,40 +1,26 @@
 #!/bin/bash
 
-# run_selftest.sh will run the tests within /${PROJECT_NAME}/selftests/bpf
-# If no specific test names are given, all test will be ran, otherwise, it will
-# run the test passed as parameters.
-# There is 2 ways to pass test names.
+# This script runs the tests within ${GITHUB_WORKSPACE}/selftests/bpf
+# If no specific test names are given, all test runners will be
+# executed. Otherwise, executed runners passed as parameters.
+# There are 2 ways to pass test names.
 # 1) command-line arguments to this script
-# 2) a comma-separated list of test names passed as `run_tests` boot parameters.
-# test names passed as any of those methods will be ran.
+# 2) a comma-separated list of test names passed as `run_tests` boot
+#    parameters.
 
 set -euo pipefail
 
-source "$(cd "$(dirname "$0")" && pwd)/helpers.sh"
+source "${GITHUB_ACTION_PATH}/helpers.sh"
 
 ARCH=$(uname -m)
-DEPLOYMENT=$(if [[ "$GITHUB_REPOSITORY" == "kernel-patches/bpf" ]]; then echo "prod"; else echo "rc"; fi)
 
-STATUS_FILE=/mnt/vmtest/exitstatus
-OUTPUT_DIR=/mnt/vmtest
+STATUS_FILE=${STATUS_FILE:-/mnt/vmtest/exitstatus}
+OUTPUT_DIR=${OUTPUT_DIR:-/mnt/vmtest}
 
-WORKING_DIR="/${PROJECT_NAME}"
-BPF_SELFTESTS_DIR="${WORKING_DIR}/selftests/bpf"
-VMTEST_CONFIGS_PATH="${WORKING_DIR}/ci/vmtest/configs"
-
-DENYLIST=$(read_lists \
-	"$BPF_SELFTESTS_DIR/DENYLIST" \
-	"$BPF_SELFTESTS_DIR/DENYLIST.${ARCH}" \
-	"$VMTEST_CONFIGS_PATH/DENYLIST" \
-	"$VMTEST_CONFIGS_PATH/DENYLIST.${ARCH}" \
-	"$VMTEST_CONFIGS_PATH/DENYLIST.${DEPLOYMENT}" \
-)
-ALLOWLIST=$(read_lists \
-	"$BPF_SELFTESTS_DIR/ALLOWLIST" \
-	"$BPF_SELFTESTS_DIR/ALLOWLIST.${ARCH}" \
-	"$VMTEST_CONFIGS_PATH/ALLOWLIST" \
-	"$VMTEST_CONFIGS_PATH/ALLOWLIST.${ARCH}" \
-)
+ALLOWLIST_FILE=${ALLOWLIST_FILE:-}
+ALLOWLIST=$(read_lists "${ALLOWLIST_FILE}")
+DENYLIST_FILE=${DENYLIST_FILE:-}
+DENYLIST=$(read_lists "${DENYLIST_FILE}")
 
 declare -a TEST_NAMES=()
 
@@ -168,7 +154,7 @@ foldable end kernel_config
 echo "DENYLIST: ${DENYLIST}"
 echo "ALLOWLIST: ${ALLOWLIST}"
 
-cd ${PROJECT_NAME}/selftests/bpf
+cd ${GITHUB_WORKSPACE}/selftests/bpf
 
 # populate TEST_NAMES
 read_test_names "$@"
