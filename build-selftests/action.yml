@@ -1,34 +1,27 @@
 name: 'build selftests'
 description: 'Build BPF selftests'
 inputs:
-  kernel:
-    description: 'kernel version'
-    default: 'LATEST'
-  toolchain:
-    description: 'what toolchain to use'
-    default: 'gcc'
-  kbuild-output:
-    description: 'relative or absolute path to use for storing build artifacts'
-    required: true
-  max-make-jobs:
-    description: 'Maximum number of jobs to use when running make (e.g argument to -j). Default: 4*nproc'
-    default: ''
-  llvm-version:
-    description: 'llvm version'
-    required: false
-    default: '16'
   arch:
     description: 'arch'
     required: true
+  kernel-root:
+    description: 'Path to the root of the kernel source tree'
+    required: true
+  llvm-version:
+    description: 'llvm version'
+    required: false
+    default: '18'
+  toolchain:
+    description: 'gcc or llvm'
+    default: 'gcc'
 
 runs:
   using: "composite"
   steps:
     - name: build selftests
       shell: bash
-      run: |
-        kbuild_output="$(realpath ${{ inputs.kbuild-output }})"
-        export LLVM_VERSION=${{ inputs.llvm-version }}
-        ${GITHUB_ACTION_PATH}/build_selftests.sh "${{ inputs.arch }}" "${{ inputs.kernel }}" "${{ inputs.toolchain }}" "${kbuild_output}"
       env:
-        MAX_MAKE_JOBS: ${{ inputs.max-make-jobs }}
+        LLVM_VERSION: ${{ inputs.llvm-version }}
+      run: |
+        ${GITHUB_ACTION_PATH}/build_selftests.sh "${{ inputs.arch }}" "${{ inputs.toolchain }}" "${{ inputs.kernel-root }}"
+
