@@ -5,9 +5,22 @@ trap 'exit 2' ERR
 
 source "${GITHUB_ACTION_PATH}/../helpers.sh"
 
-if [[ -z "${VMLINUZ}" || ! -f "${VMLINUZ}" ]]; then
+export VMLINUZ=${VMLINUZ:-}
+if [[ ! -f "${VMLINUZ}" ]]; then
     image_name=$(make -C ${KERNEL_ROOT} -s image_name)
-    export VMLINUZ=$(realpath ${KERNEL_ROOT}/${image_name})
+    export VMLINUZ=$(realpath ${KBUILD_OUTPUT})/${image_name}
+fi
+
+# Create a symlink to vmlinux from a "standard" location
+# See btf__load_vmlinux_btf() in libbpf
+VMLINUX=${VMLINUX:-"$KBUILD_OUTPUT/vmlinux"}
+if [[ -f "${VMLINUX}" ]]; then
+    VMLINUX_VERSION="$(strings ${VMLINUX} | grep -m 1 'Linux version' | awk '{print $3}')" || true
+    sudo mkdir -p /usr/lib/debug/boot
+    sudo ln -sf "${VMLINUX}" "/usr/lib/debug/boot/vmlinux-${VMLINUX_VERSION}"
+else
+    echo "$VMLINUX does not exist"
+    exit 2
 fi
 
 RUN_BPFTOOL_CHECKS=${RUN_BPFTOOL_CHECKS:-}
@@ -56,13 +69,11 @@ foldable end bpftool_checks
 foldable start vmtest "Starting virtual machine..."
 
 # Tests may be comma-separated. vmtest_selftest expect them to come from CLI space-separated.
-T=$(echo ${KERNEL_TEST} | tr -s ',' ' ')
+TEST_RUNNERS=$(echo ${KERNEL_TEST} | tr -s ',' ' ')
 vmtest -k "${VMLINUZ}" --kargs "panic=-1 sysctl.vm.panic_on_oom=1" \
-       "ln -sf /mnt/vmtest/vmlinux /boot/vmlinux-$(uname -r) && \
-        /bin/mount bpffs /sys/fs/bpf -t bpf                  && \
-        ip link set lo up                                    && \
-        cd '${GITHUB_WORKSPACE}'                             && \
-        ${VMTEST_SCRIPT} ${T}"
+       "${GITHUB_ACTION_PATH}/vmtest-init.sh && \
+        cd '${GITHUB_WORKSPACE}'             && \
+        ${VMTEST_SCRIPT} ${TEST_RUNNERS}"
 
 foldable end vmtest
 
@@ -81,12 +92,17 @@ fi
 
 foldable end collect_status
 
-# Try to collect json summary from VM
-if [[ -n ${KERNEL_TEST} && ${KERNEL_TEST} =~ test_progs* ]]
-then
-	## Job summary
-	"${GITHUB_ACTION_PATH}/print_test_summary.py" -s "${GITHUB_STEP_SUMMARY}" -j "${KERNEL_TEST}.json"
+if [ -n "${TEST_RUNNERS}" ]; then
+  SUMMARIES=$(for runner in ${TEST_RUNNERS}; do echo "${runner}.json"; done)
+else
+  SUMMARIES=$(find . -maxdepth 1 -name "test_*.json")
 fi
+
+for summary in ${SUMMARIES}; do
+  if [ -f "${summary}" ]; then
+    "${GITHUB_ACTION_PATH}/print_test_summary.py" -s "${GITHUB_STEP_SUMMARY}" -j "${summary}"
+  fi
+done
 
 # Final summary - Don't use a fold, keep it visible
 echo -e "\033[1;33mTest Results:\033[0m"
