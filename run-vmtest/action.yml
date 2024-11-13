@@ -30,7 +30,7 @@ inputs:
   vmtest-release:
     description: 'Release version of vmtest tool to use'
     required: false
-    default: 'v0.14.0'
+    default: 'v0.15.0'
 
 runs:
   using: "composite"
@@ -67,12 +67,12 @@ runs:
     - name: Run vmtest
       shell: bash
       env:
-        VMLINUZ: ${{ inputs.vmlinuz || '' }}
+        KBUILD_OUTPUT: ${{ inputs.kbuild-output }}
         KERNEL_ROOT: ${{ inputs.kernel-root }}
-        MAX_CPU: ${{ inputs.max-cpu }}
         KERNEL_TEST: ${{ inputs.kernel-test }}
+        MAX_CPU: ${{ inputs.max-cpu }}
         OUTPUT_DIR: ${{ inputs.output-dir }}
-        PROJECT_NAME: "/mnt/vmtest"
+        VMLINUZ: ${{ inputs.vmlinuz || '' }}
       run: |
         ${GITHUB_ACTION_PATH}/run.sh
 

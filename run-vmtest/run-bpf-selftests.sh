@@ -1,6 +1,14 @@
 #!/bin/bash
 
-# This script runs the tests within ${GITHUB_WORKSPACE}/selftests/bpf
+# This script is expected to be executed by vmtest program (a qemu
+# wrapper). By default vmtest mounts working directory to /mnt/vmtest,
+# which is why this path is often assumed in the script. The working
+# directory is usually (although not necessarily) the
+# $GITHUB_WORKSPACE of the Github Action workflow, calling
+# libbpf/ci/run-vmtest action.
+# See also action.yml and run.sh
+#
+# The script executes the tests within $SELFTESTS_BPF directory.
 # If no specific test names are given, all test runners will be
 # executed. Otherwise, executed runners passed as parameters.
 # There are 2 ways to pass test names.
@@ -10,10 +18,11 @@
 
 set -euo pipefail
 
-source "${GITHUB_ACTION_PATH}/helpers.sh"
+source "$(cd "$(dirname "$0")" && pwd)/helpers.sh"
 
 ARCH=$(uname -m)
 
+SELFTESTS_BPF=${SELFTESTS_BPF:-/mnt/vmtest/selftests/bpf}
 STATUS_FILE=${STATUS_FILE:-/mnt/vmtest/exitstatus}
 OUTPUT_DIR=${OUTPUT_DIR:-/mnt/vmtest}
 
@@ -100,6 +109,8 @@ test_verifier() {
   foldable end test_verifier
 }
 
+export VERISTAT_CONFIGS=${VERISTAT_CONFIGS:-/mnt/vmtest/ci/vmtest/configs}
+
 run_veristat_helper() {
   local mode="${1}"
 
@@ -114,7 +125,7 @@ run_veristat_helper() {
   (
     # shellcheck source=ci/vmtest/configs/run_veristat.default.cfg
     # shellcheck source=ci/vmtest/configs/run_veristat.meta.cfg
-    source "${VMTEST_CONFIGS_PATH}/run_veristat.${mode}.cfg"
+    source "${VERISTAT_CONFIGS}/run_veristat.${mode}.cfg"
     pushd "${VERISTAT_OBJECTS_DIR}"
 
     "${BPF_SELFTESTS_DIR}/veristat" -o csv -q -e file,prog,verdict,states ${VERISTAT_OBJECTS_GLOB} > \
@@ -154,7 +165,7 @@ foldable end kernel_config
 echo "DENYLIST: ${DENYLIST}"
 echo "ALLOWLIST: ${ALLOWLIST}"
 
-cd ${GITHUB_WORKSPACE}/selftests/bpf
+cd $SELFTESTS_BPF
 
 # populate TEST_NAMES
 read_test_names "$@"
