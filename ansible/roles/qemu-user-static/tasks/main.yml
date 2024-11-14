@@ -13,6 +13,8 @@
       # https://github.com/multiarch/qemu-user-static does not support host arch != x86_64
       # see https://github.com/multiarch/qemu-user-static/issues/174
       # In the meantime use https://dbhi.github.io/qus/
+      # The command below is a stupid trick to ensure that systemd units for binfmt (proc-sys-fs-binfmt_misc.{auto,}mount are kicked and properly mount the FS before we run qemu-user-static
+      ExecStartPre=-/bin/ls /proc/sys/fs/binfmt_misc
       ExecStartPre=/usr/bin/docker run --rm --interactive --privileged {{ qus_container_name }}:{{ qus_container_tag }} -s -- -r
       ExecStart=/usr/bin/docker run --rm --interactive --privileged {{ qus_container_name }}:{{ qus_container_tag }} -s -- -p
 
