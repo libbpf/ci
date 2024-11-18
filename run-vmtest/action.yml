@@ -67,6 +67,7 @@ runs:
     - name: Run vmtest
       shell: bash
       env:
+        ARCH: ${{ inputs.arch }}
         KBUILD_OUTPUT: ${{ inputs.kbuild-output }}
         KERNEL_ROOT: ${{ inputs.kernel-root }}
         KERNEL_TEST: ${{ inputs.kernel-test }}
