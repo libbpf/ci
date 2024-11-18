@@ -9,12 +9,8 @@
 # See also action.yml and run.sh
 #
 # The script executes the tests within $SELFTESTS_BPF directory.
-# If no specific test names are given, all test runners will be
-# executed. Otherwise, executed runners passed as parameters.
-# There are 2 ways to pass test names.
-# 1) command-line arguments to this script
-# 2) a comma-separated list of test names passed as `run_tests` boot
-#    parameters.
+# Runners passed as arguments are executed. In case of no arguments,
+# all test runners are executed.
 
 set -euo pipefail
 
@@ -30,30 +26,6 @@ ALLOWLIST_FILE=${ALLOWLIST_FILE:-}
 ALLOWLIST=$(read_lists "${ALLOWLIST_FILE}")
 DENYLIST_FILE=${DENYLIST_FILE:-}
 DENYLIST=$(read_lists "${DENYLIST_FILE}")
-
-declare -a TEST_NAMES=()
-
-read_test_names() {
-    foldable start read_test_names "Reading test names from boot parameters and command line arguments"
-    # Check if test names were passed as boot parameter.
-    # We expect `run_tests` to be a comma-separated list of test names.
-    IFS=',' read -r -a test_names_from_boot <<< \
-        "$(sed -n 's/.*run_tests=\([^ ]*\).*/\1/p' /proc/cmdline)"
-
-    echo "${#test_names_from_boot[@]} tests extracted from boot parameters: ${test_names_from_boot[*]}"
-    # Sort and only keep unique test names from both boot params and arguments
-    # TEST_NAMES will contain a sorted list of uniq tests to be ran.
-    # Only do this if any of $test_names_from_boot[@] or $@ has elements as
-    # "printf '%s\0'" will otherwise generate an empty element.
-    if [[ ${#test_names_from_boot[@]} -gt 0 || $# -gt 0 ]]
-    then
-        readarray -t TEST_NAMES < \
-            <(printf '%s\0' "${test_names_from_boot[@]}" "$@" | \
-                sort --zero-terminated --unique | \
-                xargs --null --max-args=1)
-    fi
-    foldable end read_test_names
-}
 
 test_progs_helper() {
   local selftest="test_progs${1}"
@@ -167,8 +139,7 @@ echo "ALLOWLIST: ${ALLOWLIST}"
 
 cd $SELFTESTS_BPF
 
-# populate TEST_NAMES
-read_test_names "$@"
+declare -a TEST_NAMES=($@)
 # if we don't have any test name provided to the script, we run all tests.
 if [ ${#TEST_NAMES[@]} -eq 0 ]; then
 	test_progs
