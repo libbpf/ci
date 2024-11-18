@@ -5,10 +5,13 @@ trap 'exit 2' ERR
 
 source "${GITHUB_ACTION_PATH}/../helpers.sh"
 
+export ARCH=${ARCH:-$(uname -m)}
+
 export VMLINUZ=${VMLINUZ:-}
 if [[ ! -f "${VMLINUZ}" ]]; then
     echo "Could not find VMLINUZ=\"$VMLINUZ\", searching with make -s image_name"
-    image_name=$(make -C ${KERNEL_ROOT} -s image_name)
+    karch=$(platform_to_kernel_arch $ARCH)
+    image_name=$(ARCH=${karch} make -C ${KERNEL_ROOT} -s image_name)
     export VMLINUZ=$(realpath ${KBUILD_OUTPUT})/${image_name}
 fi
 
