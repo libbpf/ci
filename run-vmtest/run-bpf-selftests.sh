@@ -83,6 +83,7 @@ test_verifier() {
 }
 
 export VERISTAT_CONFIGS=${VERISTAT_CONFIGS:-/mnt/vmtest/ci/vmtest/configs}
+export WORKING_DIR=$(pwd) # veristat config expects this variable
 
 run_veristat_helper() {
   local mode="${1}"
