@@ -86,7 +86,6 @@ jobs:
         timeout-minutes: ${{ inputs.timeout_minutes }}
         with:
           arch: ${{ inputs.arch }}
-          img: '/tmp/root.img'
           vmlinuz: '${{ github.workspace }}/vmlinuz'
           kernel-root: ${{ env.REPO_ROOT }}
           max-cpu: 8
