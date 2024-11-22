@@ -96,7 +96,7 @@ jobs:
         with:
           arch: ${{ inputs.arch }}
           llvm-version: ${{ inputs.llvm-version }}
-          pahole: c2f89dab3f2b0ebb53bab3ed8be32f41cb743c37
+          pahole: master
       - name: Print toolchain version used
         shell: bash
         run: |
