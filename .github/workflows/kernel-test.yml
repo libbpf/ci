@@ -84,6 +84,8 @@ jobs:
         # booleans are weird in GH.
         continue-on-error: ${{ fromJSON(env.CONTINUE_ON_ERROR) }}
         timeout-minutes: ${{ inputs.timeout_minutes }}
+        env:
+          TEST_PROGS_WATCHDOG_TIMEOUT: 300
         with:
           arch: ${{ inputs.arch }}
           vmlinuz: '${{ github.workspace }}/vmlinuz'

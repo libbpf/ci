@@ -32,6 +32,8 @@ test_progs_helper() {
   local selftest="test_progs${1}"
   local args="$2"
 
+  args+=" ${TEST_PROGS_WATCHDOG_TIMEOUT:+-w$TEST_PROGS_WATCHDOG_TIMEOUT}"
+
   json_file=${selftest/-/_}
   if [ "$2" == "-j" ]
   then
@@ -40,6 +42,7 @@ test_progs_helper() {
   json_file="${OUTPUT_DIR}/${json_file}.json"
 
   foldable start ${selftest} "Testing ${selftest}"
+  echo "./${selftest} ${args} ${DENYLIST:+-d\"$DENYLIST\"} ${ALLOWLIST:+-a\"$ALLOWLIST\"} --json-summary \"${json_file}\""
   # "&& true" does not change the return code (it is not executed
   # if the Python script fails), but it prevents exiting on a
   # failure due to the "set -e".
