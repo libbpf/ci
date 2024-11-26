@@ -46,34 +46,33 @@ jobs:
     timeout-minutes: 100
     env:
         ARTIFACTS_ARCHIVE: "vmlinux-${{ inputs.arch }}-${{ inputs.toolchain_full }}.tar.zst"
+        BPF_NEXT_BASE_BRANCH: 'master'
+        BPF_NEXT_FETCH_DEPTH: 64 # A bit of history is needed to facilitate incremental builds
         BUILD_SCHED_EXT_SELFTESTS: ${{ inputs.arch == 'x86_64' || inputs.arch == 'aarch64' && 'true' || '' }}
-        CACHED_KERNEL_BUILD: ${{ github.event_name == 'push' || github.repository == 'libbpf/ci'  && 'true' || '' }}
         KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
         KERNEL: ${{ inputs.kernel }}
+        KERNEL_ROOT: ${{ github.workspace }}
         REPO_PATH: ""
         REPO_ROOT: ${{ github.workspace }}
-        KERNEL_ROOT: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
-        # We fetch an actual bit of history here to facilitate incremental
-        # builds (which may check out some earlier upstream change).
         with:
-          fetch-depth: 50
+          fetch-depth: ${{ inputs.download_sources && 1 || env.BPF_NEXT_FETCH_DEPTH }}
       - if: ${{ inputs.download_sources }}
         name: Download bpf-next tree
         env:
-          FETCH_DEPTH: ${{ env.CACHED_KERNEL_BUILD && 16 || 0 }}
+          FETCH_DEPTH: ${{ env.BPF_NEXT_FETCH_DEPTH }}
         uses: ./get-linux-source
         with:
           dest: '.kernel'
-      - if: ${{ env.CACHED_KERNEL_BUILD }}
-        uses: ./prepare-incremental-build
+          rev: ${{ env.BPF_NEXT_BASE_BRANCH }}
+      - uses: ./prepare-incremental-build
         with:
           repo-root: ${{ inputs.download_sources && '.kernel' || env.REPO_ROOT }}
           base-branch: >-
-            ${{    github.repository == 'kernel-patches/bpf' && github.event_name == 'push' && github.ref_name
-                || github.repository == 'kernel-patches/bpf' && github.event_name != 'push' && github.base_ref
-                || 'master'
+            ${{    inputs.download_sources && env.BPF_NEXT_BASE_BRANCH
+                || github.event_name == 'pull_request' && github.base_ref
+                || github.ref_name
              }}
           arch: ${{ inputs.arch }}
           toolchain_full: ${{ inputs.toolchain_full }}
@@ -155,7 +154,7 @@ jobs:
           archive: ${{ env.ARTIFACTS_ARCHIVE }}
           kbuild-output: ${{ env.KBUILD_OUTPUT }}
           repo-root: ${{ env.REPO_ROOT }}
-      - if: ${{ ! env.CACHED_KERNEL_BUILD }}
+      - if: ${{ github.event_name != 'push' }}
         name: Remove KBUILD_OUTPUT content
         shell: bash
         run: |
