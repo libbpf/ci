@@ -49,5 +49,5 @@ runs:
       env:
         KBUILD_OUTPUT: ${{ inputs.kbuild-output }}
       shell: bash
-      run: ${GITHUB_ACTION_PATH}/prepare-incremental-builds.sh ${{ steps.get-commit-metadata.outputs.commit }}
+      run: ${GITHUB_ACTION_PATH}/prepare-incremental-builds.sh ${{ steps.get-commit-metadata.outputs.commit }} || echo "Prepare incremental build script failed! Continue anyway..."
 
