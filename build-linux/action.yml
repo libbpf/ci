@@ -18,13 +18,11 @@ inputs:
     required: false
     default: '16'
 runs:
-  using: "composite"
-  steps:
-    - name: build linux
-      shell: bash
-      run: |
-        kbuild_output="$(realpath ${{ inputs.kbuild-output }})"
-        export LLVM_VERSION=${{ inputs.llvm-version }}
-        ${GITHUB_ACTION_PATH}/build.sh "${{ inputs.arch }}" "${{ inputs.toolchain }}" "${kbuild_output}"
-      env:
-        MAX_MAKE_JOBS: ${{ inputs.max-make-jobs }}
+  using: 'docker'
+  image: ghcr.io/theihor/kbuilder-test
+  args:
+    - ${{ inputs.arch }}
+    - ${{ inputs.toolchain }}
+    - ${{ inputs.kbuild-output }}
+  env:
+    MAX_MAKE_JOBS: ${{ inputs.max-make-jobs }}

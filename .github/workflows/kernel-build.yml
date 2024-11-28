@@ -90,20 +90,6 @@ jobs:
         with:
           patches-root: '${{ github.workspace }}/ci/diffs'
           repo-root: ${{ env.REPO_ROOT }}
-      - name: Setup build environment
-        uses: ./setup-build-env
-        with:
-          arch: ${{ inputs.arch }}
-          llvm-version: ${{ inputs.llvm-version }}
-          pahole: master
-      - name: Print toolchain version used
-        shell: bash
-        run: |
-          TOOLCHAIN=${{ inputs.toolchain }}
-          if [ $TOOLCHAIN = "llvm" ]; then
-            TOOLCHAIN="clang-${{ inputs.llvm-version }}"
-          fi
-          ${TOOLCHAIN} --version
       - name: Build kernel image
         uses: ./build-linux
         with:
