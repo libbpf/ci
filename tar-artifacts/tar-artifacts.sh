@@ -32,8 +32,7 @@ image_name=$(make -C ${REPO_ROOT} ARCH="$(platform_to_kernel_arch "${arch}")" -s
 kbuild_output_file_list=(
   ".config"
   "${image_name}"
-  "include/config/auto.conf"
-  "include/generated/autoconf.h"
+  "include/"
   "vmlinux"
 )
 
