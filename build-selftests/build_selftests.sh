@@ -25,10 +25,17 @@ if [[ $TOOLCHAIN = "llvm" ]]; then
 	TOOLCHAIN="llvm-$LLVM_VERSION"
 fi
 
+if [ -n "${BPF_GCC:-}" ]; then
+    BPF_GCC="${BPF_GCC}/bin/bpf-unknown-none-gcc"
+else
+    BPF_GCC=
+fi
+
 foldable start build_selftests "Building selftests with $TOOLCHAIN"
 
 MAKE_OPTS=$(cat <<EOF
 	ARCH=${ARCH}
+	BPF_GCC=${BPF_GCC}
 	CROSS_COMPILE=${CROSS_COMPILE}
 	CLANG=clang-${LLVM_VERSION}
 	LLC=llc-${LLVM_VERSION}

@@ -46,9 +46,13 @@ jobs:
     timeout-minutes: 100
     env:
         ARTIFACTS_ARCHIVE: "vmlinux-${{ inputs.arch }}-${{ inputs.toolchain_full }}.tar.zst"
+
+        BUILD_BPF_GCC: ${{ inputs.arch == 'x86_64' && 'true' || '' }}
+        BPF_GCC_INSTALL_DIR: ${{ github.workspace }}/bpf-gcc
+
         BPF_NEXT_BASE_BRANCH: 'master'
         BPF_NEXT_FETCH_DEPTH: 64 # A bit of history is needed to facilitate incremental builds
-        BUILD_SCHED_EXT_SELFTESTS: ${{ inputs.arch == 'x86_64' || inputs.arch == 'aarch64' && 'true' || '' }}
+        # BUILD_SCHED_EXT_SELFTESTS: ${{ inputs.arch == 'x86_64' || inputs.arch == 'aarch64' && 'true' || '' }}
         KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
         KERNEL: ${{ inputs.kernel }}
         KERNEL_ROOT: ${{ github.workspace }}
@@ -87,23 +91,18 @@ jobs:
           cd ..
           rmdir .kernel
       - uses:  ./patch-kernel
+
         with:
           patches-root: '${{ github.workspace }}/ci/diffs'
           repo-root: ${{ env.REPO_ROOT }}
+
       - name: Setup build environment
         uses: ./setup-build-env
         with:
           arch: ${{ inputs.arch }}
           llvm-version: ${{ inputs.llvm-version }}
           pahole: master
-      - name: Print toolchain version used
-        shell: bash
-        run: |
-          TOOLCHAIN=${{ inputs.toolchain }}
-          if [ $TOOLCHAIN = "llvm" ]; then
-            TOOLCHAIN="clang-${{ inputs.llvm-version }}"
-          fi
-          ${TOOLCHAIN} --version
+
       - name: Build kernel image
         uses: ./build-linux
         with:
@@ -112,11 +111,19 @@ jobs:
           kbuild-output: ${{ env.KBUILD_OUTPUT }}
           max-make-jobs: 32
           llvm-version: ${{ inputs.llvm-version }}
+
+      - if: ${{ env.BUILD_BPF_GCC }}
+        name: Build GCC for BPF selftests
+        uses: theihor/libbpf-ci/build-bpf-gcc@bpf-gcc
+        with:
+          install-dir: ${{ env.BPF_GCC_INSTALL_DIR }}
+
       - name: Build selftests/bpf
         uses: ./build-selftests
         env:
           MAX_MAKE_JOBS: 32
           RELEASE: ${{ inputs.release && '1' || '' }}
+          BPF_GCC: ${{ env.BUILD_BPF_GCC && env.BPF_GCC_INSTALL_DIR || '' }}
         with:
           arch: ${{ inputs.arch }}
           kernel-root: ${{ env.KERNEL_ROOT }}
@@ -133,6 +140,7 @@ jobs:
           toolchain: ${{ inputs.toolchain }}
           llvm-version: ${{ inputs.llvm-version }}
           max-make-jobs: 32
+
       - if: ${{ github.event_name != 'push' }}
         name: Build samples
         uses: ./build-samples
@@ -147,7 +155,7 @@ jobs:
         uses: ./tar-artifacts
         env:
           ARCHIVE_BPF_SELFTESTS: 'true'
-          ARCHIVE_MAKE_HELPERS: ${{ github.repository != 'kernel-patches/bpf' && 'true' || '' }}
+          ARCHIVE_MAKE_HELPERS: 'true'
           ARCHIVE_SCHED_EXT_SELFTESTS: ${{ env.BUILD_SCHED_EXT_SELFTESTS }}
         with:
           arch: ${{ inputs.arch }}
