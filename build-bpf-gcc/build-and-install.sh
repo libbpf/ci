@@ -24,7 +24,7 @@ if [ ! -f  "${INSTALLDIR}/${BINUTILS_BASENAME}.built" ]; then
   cd ${BINUTILS_BASENAME};
    mkdir build-bpf;
    cd build-bpf && ../configure --target=bpf-unknown-none --prefix=$INSTALLDIR && make -j $(nproc) && make install && touch ${INSTALLDIR}/${BINUTILS_BASENAME}.built;
-   ) >> $LOGFILE 2>&1 || { echo -e "\nerror: building $BINUTILS_TARBALL"; exit 1; }
+   ) 2>&1 | tee -a $LOGFILE || { echo -e "\nerror: building $BINUTILS_TARBALL"; exit 1; }
   echo done
 fi
 
@@ -35,7 +35,7 @@ if [ ! -f  "${INSTALLDIR}/${GCC_BASENAME}.built" ]; then
    ./contrib/download_prerequisites
    mkdir build-bpf;
    cd build-bpf && ../configure --target=bpf-unknown-none --prefix=$INSTALLDIR && make -j $(nproc) && make install && touch ${INSTALLDIR}/${GCC_BASENAME}.built;
-   ) >> $LOGFILE 2>&1 || { echo -e "\nerror: building $GCC_TARBALL"; exit 1; }
+   ) 2>&1 | tee -a $LOGFILE || { echo -e "\nerror: building $GCC_TARBALL"; exit 1; }
   echo done
 fi
 

@@ -85,6 +85,11 @@ test_verifier() {
   foldable end test_verifier
 }
 
+test_progs-bpf_gcc() {
+    echo $(pwd)
+    test_progs_helper "-bpf_gcc" ""
+}
+
 export VERISTAT_CONFIGS=${VERISTAT_CONFIGS:-/mnt/vmtest/ci/vmtest/configs}
 export WORKING_DIR=$(pwd) # veristat config expects this variable
 

@@ -60,23 +60,15 @@ jobs:
         # zstd is installed by default in the runner images.
         run: zstd -d -T0  vmlinux-${{ inputs.arch }}-${{ inputs.toolchain_full }}.tar.zst --stdout | tar -xf -
 
-      - name: Prepare ALLOW/DENYLIST
+      - name: Prepare to run selftests
         env:
+          ARCH: ${{ inputs.arch }}
+          DEPLOYMENT: ${{ env.DEPLOYMENT }}
+          KERNEL_TEST: ${{ inputs.test }}
           SELFTESTS_BPF: ${{ github.workspace }}/selftests/bpf
           VMTEST_CONFIGS: ${{ github.workspace }}/ci/vmtest/configs
-        run: |
-          cat "${SELFTESTS_BPF}/ALLOWLIST"          \
-              "${SELFTESTS_BPF}/ALLOWLIST.${ARCH}"  \
-              "${VMTEST_CONFIGS}/ALLOWLIST"         \
-              "${VMTEST_CONFIGS}/ALLOWLIST.${ARCH}" \
-            2> /dev/null > "${ALLOWLIST_FILE}" || true
-
-          cat "${SELFTESTS_BPF}/DENYLIST" \
-              "${SELFTESTS_BPF}/DENYLIST.${ARCH}" \
-              "${VMTEST_CONFIGS}/DENYLIST" \
-              "${VMTEST_CONFIGS}/DENYLIST.${ARCH}" \
-              "${VMTEST_CONFIGS}/DENYLIST.${DEPLOYMENT}" \
-            2> /dev/null > "${DENYLIST_FILE}" || true
+        shell: bash
+        run: ${{ github.workspace }}/ci/vmtest/prepare-selftests-run.sh
 
       - name: Run selftests
         uses: ./run-vmtest
