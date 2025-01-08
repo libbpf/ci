@@ -22,11 +22,7 @@ runs:
 
     - if: steps.cache.outputs.cache-hit != 'true'
       name: Build BPF GCC
-      env:
-        LOGFILE: /tmp/build-bpf-gcc.log
       shell: bash
       run: |
-        ${GITHUB_ACTION_PATH}/build-and-install.sh ${{ inputs.install-dir }} \
-          || { cat $LOGFILE; exit 1; }
-
+        ${GITHUB_ACTION_PATH}/build-and-install.sh ${{ inputs.install-dir }}
 

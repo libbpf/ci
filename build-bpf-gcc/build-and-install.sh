@@ -1,42 +1,49 @@
 #!/bin/bash
 set -euo pipefail
 
+source ${GITHUB_ACTION_PATH}/../helpers.sh
+
 INSTALLDIR=$(realpath $1)
-LOGFILE=${LOGFILE:-build-bpf-gcc.log}
 
-source ${GITHUB_ACTION_PATH}/.env
+if [ -f ${GITHUB_ACTION_PATH}/.env ]; then
+    source ${GITHUB_ACTION_PATH}/.env
+else
+    echo "${GITHUB_ACTION_PATH}/.env is not found, supposed to be produced by latest-snapshots.sh"
+    exit 1
+fi
 
-test -f $BINUTILS_TARBALL || {
-  echo -n "Fetching $BINUTILS_URL... ";
-  wget -o /dev/null $BINUTILS_URL || { echo -e "\nerror: could not fetch $BINUTILS_URL"; exit 1; };
-  echo done;
-}
+test -f $BINUTILS_TARBALL || wget $BINUTILS_URL
+test -f $GCC_TARBALL || wget $GCC_URL
 
-test -f $GCC_TARBALL || {
-  echo -n "Fetching $GCC_URL... ";
-  wget -o /dev/null $GCC_URL || { echo -e "\nerror: could not fetch $GCC_URL"; exit 1; };
-  echo done;
-}
+foldable start build_binutils "Building $BINUTILS_BASENAME"
 
 if [ ! -f  "${INSTALLDIR}/${BINUTILS_BASENAME}.built" ]; then
-  echo -n "Building and installing $BINUTILS_BASENAME... ";
-  (tar xJf $BINUTILS_TARBALL;
-  cd ${BINUTILS_BASENAME};
-   mkdir build-bpf;
-   cd build-bpf && ../configure --target=bpf-unknown-none --prefix=$INSTALLDIR && make -j $(nproc) && make install && touch ${INSTALLDIR}/${BINUTILS_BASENAME}.built;
-   ) 2>&1 | tee -a $LOGFILE || { echo -e "\nerror: building $BINUTILS_TARBALL"; exit 1; }
-  echo done
+  tar xJf $BINUTILS_TARBALL
+  mkdir -p ${BINUTILS_BASENAME}/build-bpf
+  cd ${BINUTILS_BASENAME}/build-bpf
+  ../configure --target=bpf-unknown-none --prefix=$INSTALLDIR
+  make -j$(nproc) && make install
+  touch ${INSTALLDIR}/${BINUTILS_BASENAME}.built
+  cd -
 fi
 
+foldable end build_binutils "Building $BINUTILS_BASENAME"
+
+foldable start build_gcc "Building $GCC_BASENAME"
+
 if [ ! -f  "${INSTALLDIR}/${GCC_BASENAME}.built" ]; then
-  echo -n "Building and installing $GCC_BASENAME... ";
-  (tar xJf $GCC_TARBALL;
-   cd ${GCC_BASENAME};
-   ./contrib/download_prerequisites
-   mkdir build-bpf;
-   cd build-bpf && ../configure --target=bpf-unknown-none --prefix=$INSTALLDIR && make -j $(nproc) && make install && touch ${INSTALLDIR}/${GCC_BASENAME}.built;
-   ) 2>&1 | tee -a $LOGFILE || { echo -e "\nerror: building $GCC_TARBALL"; exit 1; }
-  echo done
+  tar xJf $GCC_TARBALL
+  cd ${GCC_BASENAME}
+  ./contrib/download_prerequisites
+  cd -
+  mkdir -p ${GCC_BASENAME}/build-bpf
+  cd ${GCC_BASENAME}/build-bpf
+  ../configure --target=bpf-unknown-none --prefix=$INSTALLDIR
+  make -j $(nproc) && make install
+  touch ${INSTALLDIR}/${GCC_BASENAME}.built
+  cd -
 fi
+
+foldable end build_gcc "Building $GCC_BASENAME"
 
 exit 0
