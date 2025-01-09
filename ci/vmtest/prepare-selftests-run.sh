@@ -2,17 +2,22 @@
 
 set -euo pipefail
 
-function append_into() {
+function merge_test_lists_into() {
     local out="$1"
     shift
     local files=("$@")
     echo -n > "$out"
+
+    # first, append all the input lists into one
     for file in "${files[@]}"; do
         if [[ -f "$file" ]]; then
             echo "cat $file >> $out"
             cat "$file" >> "$out"
         fi
     done
+
+    # then merge the list
+    cat "$out" | python3 "$(dirname "$0")/merge_test_lists.py" > "$out"
 }
 
 allowlists=(
@@ -24,7 +29,7 @@ allowlists=(
     "${VMTEST_CONFIGS}/ALLOWLIST.${KERNEL_TEST}"
 )
 
-append_into "${ALLOWLIST_FILE}" "${allowlists[@]}"
+merge_test_lists_into "${ALLOWLIST_FILE}" "${allowlists[@]}"
 
 denylists=(
     "${SELFTESTS_BPF}/DENYLIST"
@@ -35,6 +40,6 @@ denylists=(
     "${VMTEST_CONFIGS}/DENYLIST.${KERNEL_TEST}"
 )
 
-append_into "${DENYLIST_FILE}" "${denylists[@]}"
+merge_test_lists_into "${DENYLIST_FILE}" "${denylists[@]}"
 
 exit 0

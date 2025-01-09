@@ -12,8 +12,12 @@ else
     exit 1
 fi
 
-test -f $BINUTILS_TARBALL || wget $BINUTILS_URL
-test -f $GCC_TARBALL || wget $GCC_URL
+foldable start download_tarballs "Downloading $BINUTILS_URL and $GCC_URL"
+
+test -f $BINUTILS_TARBALL || wget -q $BINUTILS_URL
+test -f $GCC_TARBALL || wget -q $GCC_URL
+
+foldable end download_tarballs
 
 foldable start build_binutils "Building $BINUTILS_BASENAME"
 
@@ -27,7 +31,7 @@ if [ ! -f  "${INSTALLDIR}/${BINUTILS_BASENAME}.built" ]; then
   cd -
 fi
 
-foldable end build_binutils "Building $BINUTILS_BASENAME"
+foldable end build_binutils
 
 foldable start build_gcc "Building $GCC_BASENAME"
 
@@ -39,11 +43,11 @@ if [ ! -f  "${INSTALLDIR}/${GCC_BASENAME}.built" ]; then
   mkdir -p ${GCC_BASENAME}/build-bpf
   cd ${GCC_BASENAME}/build-bpf
   ../configure --target=bpf-unknown-none --prefix=$INSTALLDIR
-  make -j $(nproc) && make install
+  make -j$(nproc) && make install
   touch ${INSTALLDIR}/${GCC_BASENAME}.built
   cd -
 fi
 
-foldable end build_gcc "Building $GCC_BASENAME"
+foldable end build_gcc
 
 exit 0

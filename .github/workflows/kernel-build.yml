@@ -114,7 +114,7 @@ jobs:
 
       - if: ${{ env.BUILD_BPF_GCC }}
         name: Build GCC for BPF selftests
-        uses: theihor/libbpf-ci/build-bpf-gcc@bpf-gcc
+        uses: ./build-bpf-gcc
         with:
           install-dir: ${{ env.BPF_GCC_INSTALL_DIR }}
 
