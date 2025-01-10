@@ -26,6 +26,7 @@ jobs:
             - {"test": "test_progs_no_alu32", "continue_on_error": false, "timeout_minutes": 360}
             - {"test": "test_verifier", "continue_on_error": false, "timeout_minutes": 360}
             - {"test": "test_maps", "continue_on_error": false, "timeout_minutes": 360}
+            - {"test": "test_progs-bpf_gcc", "continue_on_error": false, "timeout_minutes": 360}
             # Uncomment this to enable sched_ext selftests jobs
             # - {"test": "sched_ext", "continue_on_error": false, "timeout_minutes": 360}
       fail-fast: false
