@@ -23,16 +23,13 @@ export SELFTESTS_BPF=${SELFTESTS_BPF:-/mnt/vmtest/selftests/bpf}
 STATUS_FILE=${STATUS_FILE:-/mnt/vmtest/exitstatus}
 OUTPUT_DIR=${OUTPUT_DIR:-/mnt/vmtest}
 
-ALLOWLIST_FILE=${ALLOWLIST_FILE:-}
-ALLOWLIST=$(read_lists "${ALLOWLIST_FILE}")
-DENYLIST_FILE=${DENYLIST_FILE:-}
-DENYLIST=$(read_lists "${DENYLIST_FILE}")
-
 test_progs_helper() {
   local selftest="test_progs${1}"
   local args="$2"
 
   args+=" ${TEST_PROGS_WATCHDOG_TIMEOUT:+-w$TEST_PROGS_WATCHDOG_TIMEOUT}"
+  args+=" ${ALLOWLIST_FILE:+-a@$ALLOWLIST_FILE}"
+  args+=" ${DENYLIST_FILE:+-d@$DENYLIST_FILE}"
 
   json_file=${selftest/-/_}
   if [ "$2" == "-j" ]
@@ -42,11 +39,11 @@ test_progs_helper() {
   json_file="${OUTPUT_DIR}/${json_file}.json"
 
   foldable start ${selftest} "Testing ${selftest}"
-  echo "./${selftest} ${args} ${DENYLIST:+-d\"$DENYLIST\"} ${ALLOWLIST:+-a\"$ALLOWLIST\"} --json-summary \"${json_file}\""
+  echo "./${selftest} ${args} --json-summary \"${json_file}\""
   # "&& true" does not change the return code (it is not executed
   # if the Python script fails), but it prevents exiting on a
   # failure due to the "set -e".
-  ./${selftest} ${args} ${DENYLIST:+-d"$DENYLIST"} ${ALLOWLIST:+-a"$ALLOWLIST"} --json-summary "${json_file}" && true
+  ./${selftest} ${args} --json-summary "${json_file}" && true
   echo "${selftest}:$?" >>"${STATUS_FILE}"
   foldable end ${selftest}
 }
@@ -83,6 +80,10 @@ test_verifier() {
   ./test_verifier && true
   echo "test_verifier:$?" >>"${STATUS_FILE}"
   foldable end test_verifier
+}
+
+test_progs-bpf_gcc() {
+    test_progs_helper "-bpf_gcc" ""
 }
 
 export VERISTAT_CONFIGS=${VERISTAT_CONFIGS:-/mnt/vmtest/ci/vmtest/configs}
@@ -134,13 +135,16 @@ run_veristat_meta() {
 foldable end vm_init
 
 foldable start kernel_config "Kconfig"
-
 zcat /proc/config.gz
-
 foldable end kernel_config
 
-echo "DENYLIST: ${DENYLIST}"
-echo "ALLOWLIST: ${ALLOWLIST}"
+foldable start allowlist "ALLOWLIST"
+test -f "${ALLOWLIST_FILE:-}" && cat "${ALLOWLIST_FILE}"
+foldable end allowlist
+
+foldable start denylist "DENYLIST"
+test -f "${DENYLIST_FILE:-}" && cat "${DENYLIST_FILE}"
+foldable end denylist
 
 cd $SELFTESTS_BPF
 
@@ -152,6 +156,7 @@ if [ ${#TEST_NAMES[@]} -eq 0 ]; then
 	test_progs_cpuv4
 	test_maps
 	test_verifier
+        test -f test_progs-bpf_gcc && test_progs-bpf_gcc
 else
 	# else we run the tests passed as command-line arguments and through boot
 	# parameter.
