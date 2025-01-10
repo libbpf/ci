@@ -1,0 +1,28 @@
+name: 'Build BPF GCC'
+description: 'Fetch latest GCC and binutils snapshots, bulid GCC and install into the target directory'
+inputs:
+  install-dir:
+    description: "Path to the GCC installation directory"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Determine latest snapshots
+      id: latest-snapshots
+      shell: bash
+      run: ${GITHUB_ACTION_PATH}/latest-snapshots.sh
+
+    - uses: actions/cache@v4
+      id: cache
+      with:
+        path: ${{ inputs.install-dir }}
+        key: BPF-GCC-${{ steps.latest-snapshots.outputs.GCC_BASENAME }}-${{ steps.latest-snapshots.outputs.BINUTILS_BASENAME }}
+
+    - if: steps.cache.outputs.cache-hit != 'true'
+      name: Build BPF GCC
+      shell: bash
+      run: |
+        ${GITHUB_ACTION_PATH}/build-and-install.sh ${{ inputs.install-dir }}
+
