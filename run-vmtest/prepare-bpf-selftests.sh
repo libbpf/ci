@@ -6,18 +6,20 @@ function merge_test_lists_into() {
     local out="$1"
     shift
     local files=("$@")
-    echo -n > "$out"
 
-    # first, append all the input lists into one
+    local list=$(mktemp)
+    echo -n > "$list"
+    # append all the source lists into one
     for file in "${files[@]}"; do
         if [[ -f "$file" ]]; then
-            echo "cat $file >> $out"
-            cat "$file" >> "$out"
+            echo "Include $file"
+            cat "$file" >> "$list"
         fi
     done
 
-    # then merge the list of test names
-    cat "$out" | python3 "$(dirname $0)/merge_test_lists.py" > "$out"
+    # then normalize the list of test names
+    $GITHUB_ACTION_PATH/normalize_bpf_test_names.py "$list" > "$out"
+    rm "$list"
 }
 
 # Read arrays from pipe-separated strings
