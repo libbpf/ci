@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [[ -z "${SELFTESTS_BPF_ALLOWLIST_FILES:-}" && -z "${SELFTESTS_BPF_DENYLIST_FILES:-}" ]]; then
+   exit 0
+fi
+
 function merge_test_lists_into() {
     local out="$1"
     shift
