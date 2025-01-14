@@ -1,0 +1,20 @@
+test1
+test2/subtest1
+test2/subtest2 with a space
+test2/subtest3 with a space, and a comma
+test2/subtest4                                          # with comment
+test3/subtest1 with a space, and a comma                # and a comment
+test4
+blah_test4
+test4_blah
+test4/subtest                                           # should be deleted, because test4 exists
+test5/subtest1
+test5/subtest2
+test6
+test7/subtest123
+test5                                                   # should consume test5/subtest1 and test5/subtest2
+
+
+   ## some blank lines, should be removed
+      
+
