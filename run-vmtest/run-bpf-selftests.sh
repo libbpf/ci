@@ -138,13 +138,22 @@ foldable start kernel_config "Kconfig"
 zcat /proc/config.gz
 foldable end kernel_config
 
-foldable start allowlist "ALLOWLIST"
-test -f "${ALLOWLIST_FILE:-}" && cat "${ALLOWLIST_FILE}"
-foldable end allowlist
 
-foldable start denylist "DENYLIST"
-test -f "${DENYLIST_FILE:-}" && cat "${DENYLIST_FILE}"
-foldable end denylist
+if [ -f "${ALLOWLIST_FILE:-}" ]; then
+  foldable start allowlist "Print ALLOWLIST"
+  cat "${ALLOWLIST_FILE}"
+  foldable end allowlist
+else
+  echo "ALLOWLIST_FILE=${ALLOWLIST_FILE:-} is not set or does not exist"
+fi
+
+if [ -f "${DENYLIST_FILE:-}" ]; then
+  foldable start denylist "Print DENYLIST"
+  cat "${DENYLIST_FILE}"
+  foldable end denylist
+else
+  echo "DENYLIST_FILE=${DENYLIST_FILE:-} is not set or does not exist"
+fi
 
 cd $SELFTESTS_BPF
 
@@ -156,7 +165,9 @@ if [ ${#TEST_NAMES[@]} -eq 0 ]; then
 	test_progs_cpuv4
 	test_maps
 	test_verifier
-        test -f test_progs-bpf_gcc && test_progs-bpf_gcc
+	if [ -f test_progs-bpf_gcc ]; then
+		test_progs-bpf_gcc
+	fi
 else
 	# else we run the tests passed as command-line arguments and through boot
 	# parameter.
