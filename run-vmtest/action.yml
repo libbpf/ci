@@ -48,7 +48,7 @@ runs:
         foldable start install_qemu "Installing QEMU tools"
         # need gawk to support `--field-separator`
         sudo apt-get update && sudo apt-get install -y cpu-checker qemu-kvm qemu-utils qemu-system-x86 qemu-system-s390x qemu-system-arm qemu-guest-agent \
-          ethtool keyutils iptables \
+          ethtool keyutils iptables libpcap-dev \
           gawk
         foldable end install_qemu
     - name: Configure KVM group perms
