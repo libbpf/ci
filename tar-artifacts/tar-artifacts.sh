@@ -29,12 +29,25 @@ source "${GITHUB_ACTION_PATH}/../helpers.sh"
 "${arch}"-linux-gnu-strip --strip-debug "${KBUILD_OUTPUT}"/vmlinux
 
 image_name=$(make -C ${REPO_ROOT} ARCH="$(platform_to_kernel_arch "${arch}")" -s image_name)
-kbuild_output_file_list=(
-  ".config"
-  "${image_name}"
-  "include/"
-  "vmlinux"
-)
+kbuild_output_file_list=(".config" "${image_name}" "vmlinux")
+
+function push_to_kout_list() {
+  local item="$1"
+  if [[ -e "${KBUILD_OUTPUT}/${item}" ]]; then
+      kbuild_output_file_list+=("${item}")
+  else
+      echo "tar-artifacts.sh warning: couldn't find ${KBUILD_OUTPUT}/${item}"
+  fi
+}
+
+cd "${KBUILD_OUTPUT}"
+push_to_kout_list "Module.symvers"
+push_to_kout_list "scripts/"
+push_to_kout_list "tools/objtool/"
+for dir in $(find . -type d -name "include"); do
+    push_to_kout_list "${dir}/"
+done
+cd -
 
 tar -rf "${tarball}" -C "${KBUILD_OUTPUT}" \
     --transform "s,^,kbuild-output/,"      \
