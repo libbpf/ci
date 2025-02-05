@@ -82,3 +82,9 @@ jobs:
           # Here we must use kbuild-output local to the repo, because
           # it was extracted from the artifacts.
           kbuild-output: ${{ env.REPO_ROOT }}/kbuild-output
+      - if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: tmon-logs-${{ inputs.arch }}-${{ inputs.toolchain_full }}-${{ inputs.test }}
+          if-no-files-found: ignore
+          path: /tmp/tmon_pcap/*
