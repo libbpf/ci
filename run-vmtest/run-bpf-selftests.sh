@@ -25,11 +25,11 @@ OUTPUT_DIR=${OUTPUT_DIR:-/mnt/vmtest}
 
 test_progs_helper() {
   local selftest="test_progs${1}"
-  local args="$2"
+  local args=("$2")
 
-  args+=" ${TEST_PROGS_WATCHDOG_TIMEOUT:+-w$TEST_PROGS_WATCHDOG_TIMEOUT}"
-  args+=" ${ALLOWLIST_FILE:+-a@$ALLOWLIST_FILE}"
-  args+=" ${DENYLIST_FILE:+-d@$DENYLIST_FILE}"
+  if [ "${args[0]}" == "" ]; then
+	args=("${args[@]:1}")
+  fi
 
   json_file=${selftest/-/_}
   if [ "$2" == "-j" ]
@@ -38,12 +38,17 @@ test_progs_helper() {
   fi
   json_file="${OUTPUT_DIR}/${json_file}.json"
 
+  args+=(${TEST_PROGS_WATCHDOG_TIMEOUT:+-w$TEST_PROGS_WATCHDOG_TIMEOUT})
+  args+=(${ALLOWLIST_FILE:+-a@$ALLOWLIST_FILE})
+  args+=(${DENYLIST_FILE:+-d@$DENYLIST_FILE})
+  args+=(-J "${json_file}")
+
   foldable start ${selftest} "Testing ${selftest}"
-  echo "./${selftest} ${args} --json-summary \"${json_file}\""
+  echo "./${selftest}" "${args[@]}"
   # "&& true" does not change the return code (it is not executed
   # if the Python script fails), but it prevents exiting on a
   # failure due to the "set -e".
-  ./${selftest} ${args} --json-summary "${json_file}" && true
+  ./${selftest} "${args[@]}" && true
   echo "${selftest}:$?" >>"${STATUS_FILE}"
   foldable end ${selftest}
 }
