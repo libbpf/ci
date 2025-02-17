@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-BINUTILS_TARBALL=`wget https://snapshots.sourceware.org/binutils/trunk/latest/src/sha512.sum -O - -o /dev/null | grep -E 'binutils-[0-9a-f.-]+.tar.xz' | sed -e 's/.*\(binutils-[^<]*\).*/\1/'`
-GCC_TARBALL=`wget https://gcc.gnu.org/pub/gcc/snapshots/LATEST-15 -O - -o /dev/null | grep -E 'gcc-15-[0-9]+.tar.xz' | sed -e 's/.*\(gcc-15-[^<]*\).*/\1/'`
+BINUTILS_TARBALL=$(wget https://snapshots.sourceware.org/binutils/trunk/latest/src/sha512.sum -O - -o /dev/null | awk '{print $2}')
+GCC_TARBALL=$(wget https://gcc.gnu.org/pub/gcc/snapshots/LATEST-15 -O - -o /dev/null | grep -E 'gcc-15-[0-9]+.tar.xz' | sed -e 's/.*\(gcc-15-[^<]*\).*/\1/')
 
 BINUTILS_URL="https://snapshots.sourceware.org/binutils/trunk/latest/src/$BINUTILS_TARBALL"
 GCC_URL="https://gcc.gnu.org/pub/gcc/snapshots/LATEST-15/$GCC_TARBALL"
