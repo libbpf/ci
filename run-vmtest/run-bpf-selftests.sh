@@ -42,7 +42,7 @@ test_progs_helper() {
   args+=(${ALLOWLIST_FILE:+-a@$ALLOWLIST_FILE})
   args+=(${DENYLIST_FILE:+-d@$DENYLIST_FILE})
   args+=(-J "${json_file}")
-  args+=(-m '*')
+  args+=(${TEST_PROGS_TRAFFIC_MONITOR:+-m '*'})
 
   foldable start ${selftest} "Testing ${selftest}"
   echo "./${selftest}" "${args[@]}"

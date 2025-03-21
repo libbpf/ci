@@ -72,6 +72,7 @@ jobs:
           KERNEL_TEST: ${{ inputs.test }}
           SELFTESTS_BPF: ${{ github.workspace }}/selftests/bpf
           VMTEST_CONFIGS: ${{ github.workspace }}/ci/vmtest/configs
+          TEST_PROGS_TRAFFIC_MONITOR: ${{ inputs.arch == 'x86_64' && 'true' || '' }}
           TEST_PROGS_WATCHDOG_TIMEOUT: 300
         with:
           arch: ${{ inputs.arch }}
