@@ -91,6 +91,10 @@ vmtest -k "${VMLINUZ}" --kargs "panic=-1 sysctl.vm.panic_on_oom=1" \
         cd '${GITHUB_WORKSPACE}'             && \
         ${VMTEST_SCRIPT} ${TEST_RUNNERS}"
 
+# fixup traffic montioring log paths if present
+PCAP_DIR=/tmp/tmon_pcap
+${GITHUB_ACTION_PATH}/normalize-paths-for-github.sh "$PCAP_DIR"
+
 foldable end vmtest
 
 foldable start collect_status "Collecting exit status"
