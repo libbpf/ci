@@ -112,12 +112,7 @@ fi
 
 foldable end collect_status
 
-if [ -n "${TEST_RUNNERS}" ]; then
-  SUMMARIES=$(for runner in ${TEST_RUNNERS}; do echo "${runner}.json"; done)
-else
-  SUMMARIES=$(find . -maxdepth 1 -name "test_*.json")
-fi
-
+SUMMARIES=$(find . -maxdepth 1 -name "test_*.json")
 for summary in ${SUMMARIES}; do
   if [ -f "${summary}" ]; then
     "${GITHUB_ACTION_PATH}/print_test_summary.py" -s "${GITHUB_STEP_SUMMARY}" -j "${summary}"
