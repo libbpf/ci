@@ -25,14 +25,19 @@ on:
 jobs:
   test:
     name: GCC BPF
-    runs-on: ${{ fromJSON(inputs.runs_on) }}
-    timeout-minutes: 100
+    runs-on: >-
+      ${{
+          contains(fromJSON(inputs.runs_on), 'codebuild')
+          && format('codebuild-bpf-ci-{0}-{1}', github.run_id, github.run_attempt)
+          || fromJSON(inputs.runs_on)
+      }}
     env:
       ARCH: ${{ inputs.arch }}
-      BPF_GCC_INSTALL_DIR: ${{ github.workspace }}/gcc-bpf
       BPF_NEXT_BASE_BRANCH: 'master'
-      REPO_ROOT: ${{ github.workspace }}/src
+      GCC_BPF_INSTALL_DIR: ${{ github.workspace }}/gcc-bpf
+      GCC_BPF_RELEASE_REPO: 'theihor/gcc-bpf'
       KBUILD_OUTPUT: ${{ github.workspace }}/src/kbuild-output
+      REPO_ROOT: ${{ github.workspace }}/src
 
     steps:
 
@@ -44,6 +49,12 @@ jobs:
         with:
           dest: ${{ env.REPO_ROOT }}
           rev: ${{ env.BPF_NEXT_BASE_BRANCH }}
+
+      - if: ${{ ! inputs.download_sources }}
+        name: Checkout ${{ github.repository }} to ./src
+        uses: actions/checkout@v4
+        with:
+          path: 'src'
 
       - uses: ./patch-kernel
         with:
@@ -65,16 +76,17 @@ jobs:
           arch: ${{ inputs.arch }}
           llvm-version: ${{ inputs.llvm-version }}
 
-      - name: Build GCC BPF compiler
-        uses: ./build-bpf-gcc
-        with:
-          install-dir: ${{ env.BPF_GCC_INSTALL_DIR }}
+      - name: Download GCC BPF compiler
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/download-gcc-bpf.sh ${{ env.GCC_BPF_RELEASE_REPO }} ${{ env.GCC_BPF_INSTALL_DIR }}
 
       - name: Build selftests/bpf/test_progs-bpf_gcc
         uses: ./build-selftests
         env:
+          BPF_GCC: ${{ env.GCC_BPF_INSTALL_DIR }}
           MAX_MAKE_JOBS: 32
-          BPF_GCC: ${{ env.BPF_GCC_INSTALL_DIR }}
           SELFTESTS_BPF_TARGETS: 'test_progs-bpf_gcc'
         with:
           arch: ${{ inputs.arch }}
