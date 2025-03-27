@@ -51,6 +51,7 @@ on:
         default: false
 
 jobs:
+
   # Build kernel and selftest
   build:
     uses: ./.github/workflows/kernel-build.yml
@@ -70,7 +71,7 @@ jobs:
       arch: ${{ inputs.arch }}
       toolchain_full: ${{ inputs.toolchain_full }}
       toolchain: ${{ inputs.toolchain }}
-      runs_on: ${{ inputs.runs_on }}
+      runs_on: ${{ inputs.build_runs_on }}
       llvm-version: ${{ inputs.llvm-version }}
       kernel: ${{ inputs.kernel }}
       download_sources: ${{ inputs.download_sources }}
@@ -101,7 +102,8 @@ jobs:
     uses: ./.github/workflows/gcc-bpf.yml
     needs: [build]
     with:
-      runs_on: ${{ inputs.runs_on }}
+      # GCC BPF does not need /dev/kvm, so use the "build" runners
+      runs_on: ${{ inputs.build_runs_on }}
       arch: ${{ inputs.arch }}
       llvm-version: ${{ inputs.llvm-version }}
       toolchain: ${{ inputs.toolchain }}

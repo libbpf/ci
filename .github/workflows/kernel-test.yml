@@ -73,7 +73,7 @@ jobs:
           SELFTESTS_BPF: ${{ github.workspace }}/selftests/bpf
           VMTEST_CONFIGS: ${{ github.workspace }}/ci/vmtest/configs
           TEST_PROGS_TRAFFIC_MONITOR: ${{ inputs.arch == 'x86_64' && 'true' || '' }}
-          TEST_PROGS_WATCHDOG_TIMEOUT: 300
+          TEST_PROGS_WATCHDOG_TIMEOUT: 600
         with:
           arch: ${{ inputs.arch }}
           vmlinuz: '${{ github.workspace }}/vmlinuz'
@@ -83,6 +83,7 @@ jobs:
           # Here we must use kbuild-output local to the repo, because
           # it was extracted from the artifacts.
           kbuild-output: ${{ env.REPO_ROOT }}/kbuild-output
+
       - if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
