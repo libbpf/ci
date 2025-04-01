@@ -36,27 +36,9 @@ cat_kernel_config() {
 }
 
 mkdir -p "${KBUILD_OUTPUT}"
-if [ -f "${KBUILD_OUTPUT}"/.config ]; then
-	kbuild_tmp="$(mktemp -d)"
-	cat_kernel_config ${kbuild_tmp}/.config && :
-
-	# Generate a fully blown config to determine whether anything changed.
-	KBUILD_OUTPUT="${kbuild_tmp}" make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" olddefconfig
-
-	if diff -q "${kbuild_tmp}"/.config "${KBUILD_OUTPUT}"/.config > /dev/null; then
-		echo "Existing kernel configuration is up-to-date"
-	else
-		echo "Using updated kernel configuration; diff:"
-		diff -u "${KBUILD_OUTPUT}"/.config "${kbuild_tmp}"/.config && :
-
-		mv "${kbuild_tmp}"/.config "${KBUILD_OUTPUT}"/.config
-	fi
-	rm -rf "${kbuild_tmp}"
-else
-	cat_kernel_config "${KBUILD_OUTPUT}"/.config && :
-fi
-
+cat_kernel_config "${KBUILD_OUTPUT}"/.config && :
 make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" olddefconfig
+
 make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" -j $(kernel_build_make_jobs) all || (
   echo "Build failed; falling back to full rebuild"
   make clean; make ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" -j $(kernel_build_make_jobs) all
