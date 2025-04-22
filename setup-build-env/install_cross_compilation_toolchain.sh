@@ -49,9 +49,6 @@ EOF
 
 sudo apt-get update -y
 
-# downgrade due to conflict with linux-libc-dev:s390x
-sudo apt-get install --allow-downgrades -y linux-libc-dev=6.8.0-57.59
-
 sudo apt-get install -y                  \
      "crossbuild-essential-${DEB_ARCH}"  \
      "binutils-${TARGET_ARCH}-linux-gnu" \
