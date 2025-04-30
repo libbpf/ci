@@ -20,10 +20,14 @@ on:
         required: true
         type: string
         description: The runners to run the test on. This is a json string representing an array of labels.
-      llvm-version:
+      gcc_version:
         required: true
         type: string
-        description: The version of LLVM used to build selftest.... for llvm toolchain, this should match the one from toolchain_full, for gcc it is an arbritrary version we decide to build selftests against.
+        description: GCC version to install
+      llvm_version:
+        required: true
+        type: string
+        description: LLVM version to install
       kernel:
         required: true
         type: string
@@ -41,7 +45,7 @@ on:
 
 jobs:
   build:
-    name: build for ${{ inputs.arch }} with ${{ inputs.toolchain_full }}${{ inputs.release && '-O2' || '' }}
+    name: build kernel and selftests ${{ inputs.release && '-O2' || '' }}
     # To run on CodeBuild, runs-on value must correspond to the AWS
     # CodeBuild project associated with the kernel-patches webhook
     # However matrix.py passes just a 'codebuild' string
@@ -111,7 +115,8 @@ jobs:
         uses: ./setup-build-env
         with:
           arch: ${{ inputs.arch }}
-          llvm-version: ${{ inputs.llvm-version }}
+          gcc-version: ${{ inputs.gcc_version }}
+          llvm-version: ${{ inputs.llvm_version }}
           pahole: master
 
         # We have to setup qemu+binfmt in order to enable cross-compation of selftests.
@@ -133,7 +138,7 @@ jobs:
           toolchain: ${{ inputs.toolchain }}
           kbuild-output: ${{ env.KBUILD_OUTPUT }}
           max-make-jobs: 32
-          llvm-version: ${{ inputs.llvm-version }}
+          llvm-version: ${{ inputs.llvm_version }}
 
       - name: Build selftests/bpf
         uses: ./build-selftests
@@ -143,7 +148,7 @@ jobs:
         with:
           arch: ${{ inputs.arch }}
           kernel-root: ${{ env.KERNEL_ROOT }}
-          llvm-version: ${{ inputs.llvm-version }}
+          llvm-version: ${{ inputs.llvm_version }}
           toolchain: ${{ inputs.toolchain }}
 
       - if: ${{ env.BUILD_SCHED_EXT_SELFTESTS }}
@@ -154,7 +159,7 @@ jobs:
           repo-root: ${{ env.REPO_ROOT }}
           arch: ${{ inputs.arch }}
           toolchain: ${{ inputs.toolchain }}
-          llvm-version: ${{ inputs.llvm-version }}
+          llvm-version: ${{ inputs.llvm_version }}
           max-make-jobs: 32
 
       - if: ${{ github.event_name != 'push' }}
@@ -165,7 +170,7 @@ jobs:
           toolchain: ${{ inputs.toolchain }}
           kbuild-output: ${{ env.KBUILD_OUTPUT }}
           max-make-jobs: 32
-          llvm-version: ${{ inputs.llvm-version }}
+          llvm-version: ${{ inputs.llvm_version }}
       - name: Tar artifacts
         id: tar-artifacts
         uses: ./tar-artifacts
