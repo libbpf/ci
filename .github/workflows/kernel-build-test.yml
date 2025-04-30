@@ -23,10 +23,14 @@ on:
         required: true
         type: string
         description: The runners to run the builds on. This is a json string representing an array of labels.
-      llvm-version:
+      gcc_version:
         required: true
         type: string
-        description: The version of LLVM used to build selftest.... for llvm toolchain, this should match the one from toolchain_full, for gcc it is an arbritrary version we decide to build selftests against.
+        description: GCC version to install
+      llvm_version:
+        required: true
+        type: string
+        description: LLVM version to install
       kernel:
         required: true
         type: string
@@ -60,7 +64,8 @@ jobs:
       toolchain_full: ${{ inputs.toolchain_full }}
       toolchain: ${{ inputs.toolchain }}
       runs_on: ${{ inputs.build_runs_on }}
-      llvm-version: ${{ inputs.llvm-version }}
+      gcc_version: ${{ inputs.gcc_version }}
+      llvm_version: ${{ inputs.llvm_version }}
       kernel: ${{ inputs.kernel }}
       download_sources: ${{ inputs.download_sources }}
 
@@ -72,7 +77,8 @@ jobs:
       toolchain_full: ${{ inputs.toolchain_full }}
       toolchain: ${{ inputs.toolchain }}
       runs_on: ${{ inputs.build_runs_on }}
-      llvm-version: ${{ inputs.llvm-version }}
+      gcc_version: ${{ inputs.gcc_version }}
+      llvm_version: ${{ inputs.llvm_version }}
       kernel: ${{ inputs.kernel }}
       download_sources: ${{ inputs.download_sources }}
       release: true
@@ -105,7 +111,8 @@ jobs:
       # GCC BPF does not need /dev/kvm, so use the "build" runners
       runs_on: ${{ inputs.build_runs_on }}
       arch: ${{ inputs.arch }}
-      llvm-version: ${{ inputs.llvm-version }}
+      gcc_version: ${{ inputs.gcc_version }}
+      llvm_version: ${{ inputs.llvm_version }}
       toolchain: ${{ inputs.toolchain }}
       toolchain_full: ${{ inputs.toolchain_full }}
       download_sources: ${{ inputs.download_sources }}
