@@ -20,6 +20,7 @@ source /etc/os-release
 DEB_ARCH="$(platform_to_deb_arch "${TARGET_ARCH}")"
 DEB_HOST_ARCH="$(dpkg --print-architecture)"
 UBUNTU_CODENAME=${VERSION_CODENAME:-noble}
+GCC_VERSION=${GCC_VERSION:-14}
 
 cat <<EOF | sudo tee /etc/apt/sources.list.d/ubuntu.sources
 Types:        deb
@@ -48,15 +49,22 @@ Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 EOF
 
 sudo apt-get update -y
-
-sudo apt-get install -y                  \
-     "crossbuild-essential-${DEB_ARCH}"  \
-     "binutils-${TARGET_ARCH}-linux-gnu" \
-     "gcc-${TARGET_ARCH}-linux-gnu"      \
-     "g++-${TARGET_ARCH}-linux-gnu"      \
-     "linux-libc-dev:${DEB_ARCH}"        \
-     "libelf-dev:${DEB_ARCH}"            \
-     "libssl-dev:${DEB_ARCH}"            \
+sudo apt-get install -y --no-install-recommends    \
+     "gcc-${GCC_VERSION}-${TARGET_ARCH}-linux-gnu" \
+     "g++-${GCC_VERSION}-${TARGET_ARCH}-linux-gnu" \
+     "linux-libc-dev:${DEB_ARCH}"                  \
+     "libelf-dev:${DEB_ARCH}"                      \
+     "libssl-dev:${DEB_ARCH}"                      \
      "zlib1g-dev:${DEB_ARCH}"
+
+sudo update-alternatives --install \
+     /usr/bin/${TARGET_ARCH}-linux-gnu-gcc  \
+     ${TARGET_ARCH}-linux-gnu-gcc           \
+     /usr/bin/${TARGET_ARCH}-linux-gnu-gcc-${GCC_VERSION} 10
+
+sudo update-alternatives --install \
+     /usr/bin/${TARGET_ARCH}-linux-gnu-g++  \
+     ${TARGET_ARCH}-linux-gnu-g++           \
+     /usr/bin/${TARGET_ARCH}-linux-gnu-g++-${GCC_VERSION} 10
 
 foldable end install_crosscompile

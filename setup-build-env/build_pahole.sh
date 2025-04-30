@@ -14,7 +14,8 @@ source $(cd $(dirname $0) && pwd)/../helpers.sh
 
 foldable start build_pahole "Building pahole"
 
-sudo apt-get update && sudo apt-get install elfutils libelf-dev libdw-dev
+sudo apt-get update -y
+sudo apt-get install -y --no-install-recommends elfutils libelf-dev libdw-dev
 
 CWD=$(pwd)
 
