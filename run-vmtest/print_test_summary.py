@@ -9,7 +9,8 @@
 
 import argparse
 import json
-
+import os
+import sys
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -75,14 +76,28 @@ def test_error_console_log(test_error: str, test_message: str) -> str:
     else:
         return error_msg
 
+def error_die(msg: str):
+    print("print_test_summary.py: {}".format(msg), file=sys.stderr)
+    exit(0)
 
 if __name__ == "__main__":
     args = parse_args()
     step_open_mode = "a" if args.append else "w"
+    str_summary = None
     json_summary = None
 
+    if not os.path.exists(args.json_summary):
+        error_die("Could not find {}".format(args.json_summary))
+    elif os.stat(args.json_summary).st_size == 0:
+        error_die("{} is empty".format(args.json_summary))
+
     with open(args.json_summary, "r") as f:
-        json_summary = json.load(f)
+        str_summary = f.read()
+
+    try:
+        json_summary = json.loads(str_summary)
+    except json.JSONDecodeError:
+        error_die("{} is not a valid JSON\n{}".format(args.json_summary, str_summary))
 
     with open(args.step_summary, step_open_mode) as f:
         log_gh_summary(f, "# Tests summary")
