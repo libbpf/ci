@@ -92,12 +92,12 @@ test_progs-bpf_gcc() {
     test_progs_helper "-bpf_gcc" ""
 }
 
+export VERISTAT_TARGET=${VERISTAT_TARGET:-kernel}
 export VERISTAT_CONFIGS=${VERISTAT_CONFIGS:-/mnt/vmtest/ci/vmtest/configs}
 export WORKING_DIR=$(pwd) # veristat config expects this variable
 
-run_veristat_helper() {
-  local mode="${1}"
-
+run_veristat() {
+  foldable start run_veristat_${VERISTAT_TARGET} "Running veristat ${VERISTAT_TARGET}"
   # Make veristat commands visible in the log
   if [ -o xtrace ]; then
       xtrace_was_on="1"
@@ -109,13 +109,13 @@ run_veristat_helper() {
   (
     # shellcheck source=ci/vmtest/configs/run_veristat.default.cfg
     # shellcheck source=ci/vmtest/configs/run_veristat.meta.cfg
-    source "${VERISTAT_CONFIGS}/run_veristat.${mode}.cfg"
+    source "${VERISTAT_CONFIGS}/run_veristat.${VERISTAT_TARGET}.cfg"
     pushd "${VERISTAT_OBJECTS_DIR}"
 
     "${SELFTESTS_BPF}/veristat" -o csv -q -e file,prog,verdict,states ${VERISTAT_OBJECTS_GLOB} > \
       "${OUTPUT_DIR}/${VERISTAT_OUTPUT}"
 
-    echo "run_veristat_${mode}:$?" >> ${STATUS_FILE}
+    echo "run_veristat_${VERISTAT_TARGET}:$?" >> ${STATUS_FILE}
     popd
   )
 
@@ -123,19 +123,7 @@ run_veristat_helper() {
   if [ -z "$xtrace_was_on" ]; then
       set +x
   fi
-
-}
-
-run_veristat_kernel() {
-  foldable start run_veristat_kernel "Running veristat.kernel"
-  run_veristat_helper "kernel"
-  foldable end run_veristat_kernel
-}
-
-run_veristat_meta() {
-  foldable start run_veristat_meta "Running veristat.meta"
-  run_veristat_helper "meta"
-  foldable end run_veristat_meta
+  foldable end run_veristat_${VERISTAT_TARGET}
 }
 
 foldable end vm_init
