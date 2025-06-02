@@ -1,0 +1,19 @@
+name: 'Build sched-ext/scx'
+inputs:
+  output-dir:
+    description: 'Path to the output of scx build'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Install sched-ext/scx dependencies
+      shell: bash
+      run: ${GITHUB_ACTION_PATH}/install-dependencies.sh
+
+    - name: Build sched-ext/scx
+      env:
+        OUTPUT_DIR: ${{ inputs.output-dir }}
+      shell: bash
+      run: ${GITHUB_ACTION_PATH}/build-scheds.sh
