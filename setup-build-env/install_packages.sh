@@ -12,11 +12,20 @@ foldable start install_packages
 
 sudo apt-get update -y
 
-sudo -E apt-get install --no-install-recommends -y                    \
-     bc binutils-dev bison build-essential cmake curl elfutils flex   \
-     libcap-dev libdw-dev libelf-dev libguestfs-tools libpcap-dev     \
-     libssl-dev libzstd-dev ncurses-dev pkg-config python3-docutils   \
-     qemu-kvm qemu-utils rsync texinfo tzdata xz-utils zstd
+sudo -E apt-get install --no-install-recommends -y                     \
+     bc bison build-essential cmake cpu-checker curl dumb-init         \
+     elfutils ethtool ethtool flex gawk git iproute2 iptables          \
+     iputils-ping jq keyutils libguestfs-tools pkg-config              \
+     python3-docutils python3-minimal rsync software-properties-common \
+     sudo texinfo tree tzdata wget xz-utils zstd
+
+sudo -E apt-get install --no-install-recommends -y            \
+     binutils-dev libcap-dev libdw-dev libelf-dev libpcap-dev \
+     libssl-dev libzstd-dev ncurses-dev
+
+sudo -E apt-get install --no-install-recommends -y               \
+     qemu-guest-agent qemu-kvm qemu-system-arm qemu-system-s390x \
+     qemu-system-x86 qemu-utils
 
 sudo apt-get install -y gcc-${GCC_VERSION} g++-${GCC_VERSION}
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 10
