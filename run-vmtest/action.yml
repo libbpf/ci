@@ -35,22 +35,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Download vmtest
+
+    - name: Install dependencies
       shell: bash
-      run: |
-        VMTEST_URL="https://github.com/danobi/vmtest/releases/download/${{ inputs.vmtest-release }}/vmtest-$(uname -m)"
-        sudo curl -L $VMTEST_URL -o /usr/bin/vmtest
-        sudo chmod 755 /usr/bin/vmtest
-    - name: install qemu tools and selftest dependencies
-      shell: bash
-      run: |
-        source "${GITHUB_ACTION_PATH}/../helpers.sh"
-        foldable start install_qemu "Installing QEMU tools"
-        # need gawk to support `--field-separator`
-        sudo apt-get update && sudo apt-get install -y cpu-checker qemu-kvm qemu-utils qemu-system-x86 qemu-system-s390x qemu-system-arm qemu-guest-agent \
-          ethtool keyutils iptables libpcap-dev \
-          gawk
-        foldable end install_qemu
+      env:
+        VMTEST_RELEASE: ${{ inputs.vmtest-release }}
+      run: ${GITHUB_ACTION_PATH}/install-dependencies.sh
+
     - name: Configure KVM group perms
       shell: bash
       run: |
@@ -64,6 +55,7 @@ runs:
           sudo udevadm trigger --name-match=kvm
         fi
         foldable end config_kvm
+
     - name: Run vmtest
       shell: bash
       env:
