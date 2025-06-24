@@ -4,12 +4,28 @@ set -euo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 export LLVM_VERSION=${LLVM_VERSION:-20}
+export PIPX_VERSION=${PIPX_VERSION:-1.7.1}
 
 # Assume Ubuntu/Debian
 sudo -E apt-get -y update
 
+# Download and install pipx
+sudo -E apt-get --no-install-recommends -y install wget python3 python3-pip python3-venv
+wget "https://github.com/pypa/pipx/releases/download/${PIPX_VERSION}/pipx.pyz"
+mv pipx.pyz /usr/bin/pipx && chmod +x /usr/bin/pipx
+
+# pipx ensurepath is not doing what we need
+# install pipx apps to /usr/local/bin manually
+pipx install meson
+pipx install ninja
+sudo cp -a ~/.local/bin/meson /usr/local/bin
+sudo cp -a ~/.local/bin/ninja /usr/local/bin
+
+meson --version
+ninja --version
+
 # Install LLVM
-sudo -E apt-get -y install lsb-release wget software-properties-common gnupg
+sudo -E apt-get --no-install-recommends -y install lsb-release wget software-properties-common gnupg
 wget https://apt.llvm.org/llvm.sh
 chmod +x llvm.sh
 sudo -E ./llvm.sh ${LLVM_VERSION}
@@ -25,6 +41,6 @@ sudo update-alternatives --install \
 # Install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
-sudo -E apt-get -y install \
-    build-essential libssl-dev libelf-dev meson cmake pkg-config jq \
+sudo -E apt-get --no-install-recommends -y install \
+    build-essential libssl-dev libelf-dev cmake pkg-config jq \
     protobuf-compiler libseccomp-dev
