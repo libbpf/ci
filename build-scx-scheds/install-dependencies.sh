@@ -12,7 +12,7 @@ sudo -E apt-get -y update
 # Download and install pipx
 sudo -E apt-get --no-install-recommends -y install wget python3 python3-pip python3-venv
 wget "https://github.com/pypa/pipx/releases/download/${PIPX_VERSION}/pipx.pyz"
-mv pipx.pyz /usr/bin/pipx && chmod +x /usr/bin/pipx
+chmod +x pipx.pyz && sudo mv pipx.pyz /usr/bin/pipx
 
 # pipx ensurepath is not doing what we need
 # install pipx apps to /usr/local/bin manually
