@@ -16,13 +16,14 @@ chmod +x pipx.pyz && sudo mv pipx.pyz /usr/bin/pipx
 
 # pipx ensurepath is not doing what we need
 # install pipx apps to /usr/local/bin manually
+export PIPX_BIN_DIR=${PIPX_BIN_DIR:-~/.local/bin}
 pipx install meson
 pipx install ninja
-sudo cp -a ~/.local/bin/meson /usr/local/bin
-sudo cp -a ~/.local/bin/ninja /usr/local/bin
+sudo cp -a "${PIPX_BIN_DIR}/meson" /usr/local/bin
+sudo cp -a "${PIPX_BIN_DIR}/ninja" /usr/local/bin
 
-meson --version
-ninja --version
+echo "meson --version" && meson --version
+echo "ninja --version" && ninja --version
 
 # Install LLVM
 sudo -E apt-get --no-install-recommends -y install lsb-release wget software-properties-common gnupg
