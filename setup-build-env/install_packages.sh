@@ -17,7 +17,7 @@ sudo -E apt-get install --no-install-recommends -y                     \
      elfutils ethtool ethtool flex gawk git iproute2 iptables          \
      iputils-ping jq keyutils libguestfs-tools pkg-config              \
      python3-docutils python3-minimal rsync software-properties-common \
-     sudo texinfo tree tzdata wget xz-utils zstd
+     sudo texinfo tree tzdata wget xxd xz-utils zstd
 
 sudo -E apt-get install --no-install-recommends -y            \
      binutils-dev libcap-dev libdw-dev libelf-dev libpcap-dev \
