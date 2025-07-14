@@ -154,6 +154,7 @@ packages=(
 	openssl
 	strace
 	zlib1g
+ 	xxd
 )
 packages=$(IFS=, && echo "${packages[*]}")
 
