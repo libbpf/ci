@@ -112,7 +112,13 @@ run_veristat() {
     source "${VERISTAT_CONFIGS}/run_veristat.${VERISTAT_TARGET}.cfg"
     pushd "${VERISTAT_OBJECTS_DIR}"
 
-    "${SELFTESTS_BPF}/veristat" -o csv -q -e file,prog,verdict,states ${VERISTAT_OBJECTS_GLOB} > \
+    args=()
+    args+=(-o csv)
+    args+=(-q)
+    args+=(-e file,prog,verdict,states)
+    args+=(${VERISTAT_CFG_FILE:+-f@$VERISTAT_CFG_FILE})
+
+    "${SELFTESTS_BPF}/veristat" "${args[@]}" ${VERISTAT_OBJECTS_GLOB} > \
       "${OUTPUT_DIR}/${VERISTAT_OUTPUT}"
 
     echo "run_veristat_${VERISTAT_TARGET}:$?" >> ${STATUS_FILE}
