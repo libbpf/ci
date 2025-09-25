@@ -151,6 +151,7 @@ packages=(
 	keyutils
 	libcap2
 	libelf1t64
+	libpcap
 	openssl
 	strace
 	zlib1g
