@@ -3,6 +3,7 @@
 set -xeuo pipefail
 
 FETCH_DEPTH=${FETCH_DEPTH:-1}
+REFERENCE_REPO_PATH=${REFERENCE_REPO_PATH:-/libbpfci/mirrors/linux}
 
 echo KERNEL_ORIGIN = ${KERNEL_ORIGIN}
 echo KERNEL_BRANCH = ${KERNEL_BRANCH}
@@ -13,10 +14,12 @@ if [ -d "${REPO_PATH}" ]; then
     exit 1
 fi
 
-mkdir -p "${REPO_PATH}"
-cd "${REPO_PATH}"
+clone_args=()
+clone_args+=(--branch ${KERNEL_BRANCH})
+clone_args+=(--reference-if-able ${REFERENCE_REPO_PATH})
+if [ ${FETCH_DEPTH} -ge 1 ]; then
+    clone_args+=(--depth ${FETCH_DEPTH})
+fi
 
-git init
-git remote add origin ${KERNEL_ORIGIN}
-git fetch --depth=${FETCH_DEPTH} origin ${KERNEL_BRANCH}
-git checkout FETCH_HEAD
+git clone "${clone_args[@]}" ${KERNEL_ORIGIN} ${REPO_PATH}
+
