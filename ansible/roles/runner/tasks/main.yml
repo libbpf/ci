@@ -105,8 +105,7 @@
       RUNNER_SCOPE=org
       ORG_NAME={{ item.0.name }}
       {% endif %}
-      RUNNER_NAME_PREFIX={{ runner_name_prefix }}-{{ 'worker-%02d' | format(item.1) }}
-      RANDOM_RUNNER_SUFFIX=true
+      RUNNER_NAME={{ runner_name_prefix }}-{{ 'worker-%02d' | format(item.1) }}
       DISABLE_AUTO_UPDATE=true
   loop: "{{ runners | subelements('workers') }}"
 
