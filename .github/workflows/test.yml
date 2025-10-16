@@ -19,7 +19,7 @@ jobs:
         arch: ["x86_64"]
         kernel_compiler: ["gcc", "llvm"]
         gcc_version: [14]
-        llvm_version: [18]
+        llvm_version: [20]
         kernel: ["LATEST"]
         build_release: [false]
         tests:
@@ -28,7 +28,7 @@ jobs:
             - {"test": "test_progs_no_alu32", "continue_on_error": false, "timeout_minutes": 360}
             - {"test": "test_verifier", "continue_on_error": false, "timeout_minutes": 360}
             - {"test": "test_maps", "continue_on_error": false, "timeout_minutes": 360}
-            # - {"test": "sched_ext", "continue_on_error": false, "timeout_minutes": 360}
+            - {"test": "sched_ext", "continue_on_error": false, "timeout_minutes": 360}
             # - {"test": "test_progs-bpf_gcc", "continue_on_error": false, "timeout_minutes": 360}
       fail-fast: false
 

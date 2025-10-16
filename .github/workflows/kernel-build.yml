@@ -60,7 +60,7 @@ jobs:
         BPF_NEXT_BASE_BRANCH: 'master'
         BPF_NEXT_FETCH_DEPTH: 64 # A bit of history is needed to facilitate incremental builds
         CROSS_COMPILE: ${{ inputs.arch != 'x86_64' && 'true' || '' }}
-        # BUILD_SCHED_EXT_SELFTESTS: ${{ inputs.arch == 'x86_64' || inputs.arch == 'aarch64' && 'true' || '' }}
+        BUILD_SCHED_EXT_SELFTESTS: ${{ inputs.arch == 'x86_64' || inputs.arch == 'aarch64' && 'true' || '' }}
         KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
         KERNEL: ${{ inputs.kernel }}
         KERNEL_ROOT: ${{ github.workspace }}
