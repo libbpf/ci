@@ -26,25 +26,10 @@ runs:
       shell: bash
       env:
         GCC_VERSION: ${{ inputs.gcc-version }}
-      run: |
-        ${GITHUB_ACTION_PATH}/install_packages.sh
-    - name: Install clang
-      shell: bash
-      env:
         LLVM_VERSION: ${{ inputs.llvm-version }}
-      run: |
-        ${GITHUB_ACTION_PATH}/install_clang.sh
-    - name: Install pahole
-      shell: bash
-      env:
         PAHOLE_BRANCH: ${{ inputs.pahole }}
         PAHOLE_ORIGIN: ${{ inputs.pahole-origin }}
+        TARGET_ARCH: ${{ inputs.arch }}
       run: |
-        ${GITHUB_ACTION_PATH}/build_pahole.sh
+        ${GITHUB_ACTION_PATH}/action.sh
         echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib" >> $GITHUB_ENV
-    - name: Install cross compilation toolchain
-      shell: bash
-      env:
-        GCC_VERSION: ${{ inputs.gcc-version }}
-      run: |
-         ${GITHUB_ACTION_PATH}/install_cross_compilation_toolchain.sh ${{ inputs.arch }}

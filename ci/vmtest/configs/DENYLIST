@@ -15,3 +15,4 @@ connect_force_port # unreliably fails
 sockmap_ktls/sockmap_ktls disconnect_after_delete* # https://lore.kernel.org/bpf/20250415163332.1836826-1-ihor.solodrai@linux.dev/
 verif_scale_pyperf600 # llvm 20 generates code that fails verification
 arena_spin_lock # llvm 20 generates code that fails verification
+perf_branches/perf_branches_no_hw  # this fails on github-hosted runners
