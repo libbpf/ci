@@ -14,12 +14,39 @@ jobs:
   build-and-test:
     strategy:
       matrix:
-        runs_on: ["ubuntu-24.04"]
-        build_runs_on: ["ubuntu-24.04"]
-        arch: ["x86_64"]
-        kernel_compiler: ["gcc", "llvm"]
-        gcc_version: [14]
-        llvm_version: [20]
+        include:
+          # x86_64 configs
+          - arch: x86_64
+            kernel_compiler: gcc
+            gcc_version: 14
+            llvm_version: 20
+            runs_on: ubuntu-latest
+            build_runs_on: ubuntu-latest
+          - arch: x86_64
+            kernel_compiler: gcc
+            gcc_version: 15
+            llvm_version: 20
+            runs_on: ubuntu-latest
+            build_runs_on: ubuntu-latest
+          - arch: x86_64
+            kernel_compiler: llvm
+            gcc_version: 14
+            llvm_version: 20
+            runs_on: ubuntu-latest
+            build_runs_on: ubuntu-latest
+          # aarch64 configs
+          - arch: aarch64
+            kernel_compiler: gcc
+            gcc_version: 14
+            llvm_version: 20
+            runs_on: ubuntu-arm
+            build_runs_on: ubuntu-latest
+          - arch: aarch64
+            kernel_compiler: gcc
+            gcc_version: 15
+            llvm_version: 20
+            runs_on: ubuntu-arm
+            build_runs_on: ubuntu-latest
         kernel: ["LATEST"]
         build_release: [false]
         tests:
@@ -51,4 +78,3 @@ jobs:
       run_tests: true
       download_sources: true
       build_release: ${{ matrix.build_release }}
-
