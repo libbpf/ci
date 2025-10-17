@@ -14,9 +14,6 @@ jobs:
   build-and-test:
     strategy:
       matrix:
-        runs_on: ["ubuntu-24.04"]
-        build_runs_on: ["ubuntu-24.04"]
-        arch: ["x86_64"]
         kernel_compiler: ["gcc", "llvm"]
         gcc_version: [14]
         llvm_version: [20]
@@ -30,7 +27,15 @@ jobs:
             - {"test": "test_maps", "continue_on_error": false, "timeout_minutes": 360}
             - {"test": "sched_ext", "continue_on_error": false, "timeout_minutes": 360}
             # - {"test": "test_progs-bpf_gcc", "continue_on_error": false, "timeout_minutes": 360}
+        include:
+          - arch: "x86_64"
+            runs_on: ["ubuntu-24.04"]
+            build_runs_on: ["ubuntu-24.04"]
+          - arch: "aarch64"
+            runs_on: ["ubuntu-24.04-arm"]
+            build_runs_on: ["ubuntu-24.04"]
       fail-fast: false
+
 
     name: ${{ matrix.arch }} ${{ matrix.kernel_compiler }}-${{ matrix.kernel_compiler == 'gcc' && matrix.gcc_version || matrix.llvm_version }}
     uses: ./.github/workflows/kernel-build-test.yml
@@ -51,4 +56,3 @@ jobs:
       run_tests: true
       download_sources: true
       build_release: ${{ matrix.build_release }}
-
