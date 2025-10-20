@@ -19,24 +19,19 @@ source /etc/os-release
 
 DEB_ARCH="$(platform_to_deb_arch "${TARGET_ARCH}")"
 DEB_HOST_ARCH="$(dpkg --print-architecture)"
-UBUNTU_CODENAME=${VERSION_CODENAME:-noble}
 GCC_VERSION=${GCC_VERSION:-14}
+UBUNTU_CODENAME=${UBUNTU_CODENAME:-noble}
 
-cat <<EOF | sudo tee /etc/apt/sources.list.d/ubuntu.sources
-Types:        deb
-URIs:         http://archive.ubuntu.com/ubuntu/
-Suites:       ${UBUNTU_CODENAME} ${UBUNTU_CODENAME}-updates ${UBUNTU_CODENAME}-backports
-Components:   main restricted universe multiverse
-Architectures:   ${DEB_HOST_ARCH}
-Signed-By:    /usr/share/keyrings/ubuntu-archive-keyring.gpg
+if [ "${GCC_VERSION}" -ge 15 ]; then
+    UBUNTU_CODENAME=${UBUNTU_CODENAME_OVERRIDE}
+fi
 
-Types:        deb
-URIs:         http://security.ubuntu.com/ubuntu/
-Suites:       ${UBUNTU_CODENAME}-security
-Components:   main restricted universe multiverse
-Architectures:   ${DEB_HOST_ARCH}
-Signed-By:    /usr/share/keyrings/ubuntu-archive-keyring.gpg
-EOF
+# Disable other apt sources for foreign architectures to avoid 404 errors
+# Only allow fetching packages for the added architecture from ports.ubuntu.com
+sudo tee /etc/apt/apt.conf.d/99-no-foreign-arch <<APT_CONF
+APT::Architectures "${DEB_HOST_ARCH}";
+APT::Architectures:: "${DEB_ARCH}";
+APT_CONF
 
 sudo dpkg --add-architecture "$DEB_ARCH"
 cat <<EOF | sudo tee /etc/apt/sources.list.d/xcompile.sources
@@ -61,10 +56,17 @@ sudo update-alternatives --install \
      /usr/bin/${TARGET_ARCH}-linux-gnu-gcc  \
      ${TARGET_ARCH}-linux-gnu-gcc           \
      /usr/bin/${TARGET_ARCH}-linux-gnu-gcc-${GCC_VERSION} 10
+sudo update-alternatives --set \
+     ${TARGET_ARCH}-linux-gnu-gcc \
+     /usr/bin/${TARGET_ARCH}-linux-gnu-gcc-${GCC_VERSION}
+
 
 sudo update-alternatives --install \
      /usr/bin/${TARGET_ARCH}-linux-gnu-g++  \
      ${TARGET_ARCH}-linux-gnu-g++           \
      /usr/bin/${TARGET_ARCH}-linux-gnu-g++-${GCC_VERSION} 10
+sudo update-alternatives --set \
+     ${TARGET_ARCH}-linux-gnu-g++ \
+     /usr/bin/${TARGET_ARCH}-linux-gnu-g++-${GCC_VERSION}
 
 foldable end install_crosscompile

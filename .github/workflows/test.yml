@@ -18,7 +18,7 @@ jobs:
         build_runs_on: ["ubuntu-24.04"]
         arch: ["x86_64"]
         kernel_compiler: ["gcc", "llvm"]
-        gcc_version: [14]
+        gcc_version: [15]
         llvm_version: [20]
         kernel: ["LATEST"]
         build_release: [false]
