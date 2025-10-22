@@ -30,7 +30,7 @@ inputs:
   vmtest-release:
     description: 'Release version of vmtest tool to use'
     required: false
-    default: 'v0.15.0'
+    default: 'v0.18.0'
 
 runs:
   using: "composite"
