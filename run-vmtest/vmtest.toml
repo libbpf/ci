@@ -1,0 +1,13 @@
+[[target]]
+name = "run-vmtest"
+kernel = "${VMLINUZ}"
+kernel_args = "panic=-1 sysctl.vm.panic_on_oom=1"
+command = """\
+${GITHUB_ACTION_PATH}/vmtest-init.sh && \
+cd ${GITHUB_WORKSPACE} && \
+${VMTEST_SCRIPT} ${TEST_RUNNERS} \
+"""
+
+[target.vm]
+num_cpus = 4
+

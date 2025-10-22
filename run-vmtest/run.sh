@@ -86,10 +86,13 @@ foldable start vmtest "Starting virtual machine..."
 
 # Tests may be comma-separated. vmtest_selftest expect them to come from CLI space-separated.
 TEST_RUNNERS=$(echo ${KERNEL_TEST} | tr -s ',' ' ')
-vmtest -k "${VMLINUZ}" --kargs "panic=-1 sysctl.vm.panic_on_oom=1" \
-       "${GITHUB_ACTION_PATH}/vmtest-init.sh && \
-        cd '${GITHUB_WORKSPACE}'             && \
-        ${VMTEST_SCRIPT} ${TEST_RUNNERS}"
+
+export VMLINUZ TEST_RUNNERS VMTEST_SCRIPT
+VMTEST_TOML=$(mktemp /tmp/vmtest.XXXXXX.toml)
+envsubst < "${GITHUB_ACTION_PATH}/vmtest.toml" > $VMTEST_TOML
+echo "cat $VMTEST_TOML"
+cat $VMTEST_TOML
+vmtest -c $VMTEST_TOML
 
 # fixup traffic montioring log paths if present
 PCAP_DIR=/tmp/tmon_pcap
