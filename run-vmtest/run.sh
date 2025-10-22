@@ -86,10 +86,32 @@ foldable start vmtest "Starting virtual machine..."
 
 # Tests may be comma-separated. vmtest_selftest expect them to come from CLI space-separated.
 TEST_RUNNERS=$(echo ${KERNEL_TEST} | tr -s ',' ' ')
-vmtest -k "${VMLINUZ}" --kargs "panic=-1 sysctl.vm.panic_on_oom=1" \
-       "${GITHUB_ACTION_PATH}/vmtest-init.sh && \
-        cd '${GITHUB_WORKSPACE}'             && \
-        ${VMTEST_SCRIPT} ${TEST_RUNNERS}"
+
+VMTEST_NUM_CPUS=${VMTEST_NUM_CPUS:-2}
+VMTEST_MEMORY=${VMTEST_MEMORY:-4G}
+
+VMTEST_TOML=$(mktemp ./vmtest.XXXXXX.toml)
+cat > $VMTEST_TOML <<EOF
+[[target]]
+name = "run-vmtest"
+kernel = "${VMLINUZ}"
+kernel_args = "panic=-1 sysctl.vm.panic_on_oom=1"
+command = """\
+${GITHUB_ACTION_PATH}/vmtest-init.sh && \
+cd ${GITHUB_WORKSPACE} && \
+${VMTEST_SCRIPT} ${TEST_RUNNERS} \
+"""
+
+[target.vm]
+num_cpus = ${VMTEST_NUM_CPUS}
+memory = "${VMTEST_MEMORY}"
+EOF
+
+foldable start vmtest_toml "$VMTEST_TOML"
+cat $VMTEST_TOML
+foldable end vmtest_toml
+
+vmtest -c $VMTEST_TOML
 
 # fixup traffic montioring log paths if present
 PCAP_DIR=/tmp/tmon_pcap
