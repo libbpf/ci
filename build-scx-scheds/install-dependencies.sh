@@ -1,47 +1,59 @@
 #!/bin/bash
 
-set -euo pipefail
+set -xeuo pipefail
 
-export DEBIAN_FRONTEND=noninteractive
-export LLVM_VERSION=${LLVM_VERSION:-20}
-export PIPX_VERSION=${PIPX_VERSION:-1.7.1}
+export LLVM_VERSION=${LLVM_VERSION:-21}
+export LIBBPF_REVISION=${LIBBPF_REVISION:-master}
+export BPFTOOL_REVISION=${BPFTOOL_REVISION:-main}
 
 # Assume Ubuntu/Debian
+export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get -y update
 
-# Download and install pipx
-sudo -E apt-get --no-install-recommends -y install wget python3 python3-pip python3-venv
-wget "https://github.com/pypa/pipx/releases/download/${PIPX_VERSION}/pipx.pyz"
-chmod +x pipx.pyz && sudo mv pipx.pyz /usr/bin/pipx
-
-# pipx ensurepath is not doing what we need
-# install pipx apps to /usr/local/bin manually
-export PIPX_BIN_DIR=${PIPX_BIN_DIR:-~/.local/bin}
-pipx install meson
-pipx install ninja
-sudo cp -a "${PIPX_BIN_DIR}/meson" /usr/local/bin
-sudo cp -a "${PIPX_BIN_DIR}/ninja" /usr/local/bin
-
-echo "meson --version" && meson --version
-echo "ninja --version" && ninja --version
-
 # Install LLVM
-sudo -E apt-get --no-install-recommends -y install lsb-release wget software-properties-common gnupg
+sudo -E apt-get --no-install-recommends -y install \
+        curl git gnupg lsb-release software-properties-common wget
 wget https://apt.llvm.org/llvm.sh
 chmod +x llvm.sh
 sudo -E ./llvm.sh ${LLVM_VERSION}
 rm llvm.sh
 
-# We have to set up the alternatives because meson expects
-# clang and llvm-strip commands to be available
 sudo update-alternatives --install \
     /usr/bin/clang clang /usr/bin/clang-${LLVM_VERSION} 10
+sudo update-alternatives --set clang /usr/bin/clang-${LLVM_VERSION}
 sudo update-alternatives --install \
     /usr/bin/llvm-strip llvm-strip /usr/bin/llvm-strip-${LLVM_VERSION} 10
+sudo update-alternatives --set llvm-strip /usr/bin/llvm-strip-${LLVM_VERSION}
+sudo update-alternatives --install \
+    /usr/bin/llvm-ar llvm-ar /usr/bin/llvm-ar-${LLVM_VERSION} 10
+sudo update-alternatives --set llvm-ar /usr/bin/llvm-ar-${LLVM_VERSION}
 
 # Install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
+# Install libs and other deps
 sudo -E apt-get --no-install-recommends -y install \
-    build-essential libssl-dev libelf-dev cmake pkg-config jq \
-    protobuf-compiler libseccomp-dev
+    build-essential libssl-dev libelf-dev libzstd-dev libseccomp-dev \
+    libbfd-dev libcap-dev jq pkg-config protobuf-compiler
+
+# Build and install libbpf
+export LIBBPF_ROOT=$(mktemp -d libbpf.XXXX)
+git clone https://github.com/libbpf/libbpf.git $LIBBPF_ROOT
+pushd $LIBBPF_ROOT
+git reset --hard $LIBBPF_REVISION
+make -C src -j$(nproc)
+make -C src install
+sudo ln -s /usr/lib64/pkgconfig/libbpf.pc /usr/lib/pkgconfig/libbpf.pc
+popd
+rm -rf $LIBBPF_ROOT
+
+# Build and install bpftool
+export BPFTOOL_ROOT=$(mktemp -d bpftool.XXXX)
+git clone --recurse-submodules https://github.com/libbpf/bpftool.git $BPFTOOL_ROOT
+pushd $BPFTOOL_ROOT
+git reset --hard $BPFTOOL_REVISION
+git submodule update --init
+make LLVM=1 LLVM_VERSION=-${LLVM_VERSION} -C src -j$(nproc)
+make LLVM=1 LLVM_VERSION=-${LLVM_VERSION} -C src install
+popd
+rm -rf $BPFTOOL_ROOT

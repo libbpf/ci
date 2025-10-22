@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-export LLVM_VERSION=${LLVM_VERSION:-20}
 export SCX_ROOT=${SCX_ROOT:-}
 export SCX_REVISION=${SCX_REVISION:-main}
 
@@ -15,10 +14,16 @@ if [[ -z "$SCX_ROOT" ]]; then
 fi
 
 pushd $SCX_ROOT
-. $HOME/.cargo/env
-meson setup build
-meson compile -C build
-rm -rf $OUTPUT_DIR
-mv build $OUTPUT_DIR
-popd
 
+rm -rf $OUTPUT_DIR && mkdir -p $OUTPUT_DIR
+
+# build C scheds
+make all -j$(nproc)
+mv build $OUTPUT_DIR/c-scheds
+
+# build Rust scheds
+. $HOME/.cargo/env
+cargo build --release
+mv target/release/build $OUTPUT_DIR/rust-scheds
+
+popd
