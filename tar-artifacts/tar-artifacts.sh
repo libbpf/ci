@@ -29,7 +29,7 @@ source "${GITHUB_ACTION_PATH}/../helpers.sh"
 "${arch}"-linux-gnu-strip --strip-debug "${KBUILD_OUTPUT}"/vmlinux
 
 image_name=$(make -C ${REPO_ROOT} ARCH="$(platform_to_kernel_arch "${arch}")" -s image_name)
-kbuild_output_file_list=(".config" "${image_name}" "vmlinux")
+kbuild_output_file_list=(".config" "${image_name}" "vmlinux" "samples/livepatch/livepatch-sample.ko")
 
 function push_to_kout_list() {
   local item="$1"
@@ -88,4 +88,3 @@ if [[ -n "${ARCHIVE_SCHED_EXT_SELFTESTS}" ]]; then
 fi
 
 zstd -T0 -19 -i "${tarball}" -o "${zst_tarball}"
-
