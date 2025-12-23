@@ -13,7 +13,10 @@ inputs:
     description: 'kernel source dir'
     default: '.'
   max-cpu:
-    description: 'Maximum number of CPU allocated to a VM (regardless of number of CPUs available on the host). Default is unset, e.g it will default to the number of CPU on the host.'
+    description: 'Number of CPUs allocated to the VM. Default is 2.'
+    default: ''
+  max-memory:
+    description: 'Amount of memory allocated to the VM (e.g., "4G", "16G"). Default is "4G".'
     default: ''
   kernel-test:
     description: 'Test to run'
@@ -64,6 +67,7 @@ runs:
         KERNEL_ROOT: ${{ inputs.kernel-root }}
         KERNEL_TEST: ${{ inputs.kernel-test }}
         MAX_CPU: ${{ inputs.max-cpu }}
+        MAX_MEMORY: ${{ inputs.max-memory }}
         OUTPUT_DIR: ${{ inputs.output-dir }}
         VMLINUZ: ${{ inputs.vmlinuz || '' }}
       run: |

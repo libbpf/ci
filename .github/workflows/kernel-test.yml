@@ -79,6 +79,7 @@ jobs:
           vmlinuz: '${{ github.workspace }}/vmlinuz'
           kernel-root: ${{ env.REPO_ROOT }}
           max-cpu: 8
+          max-memory: 16G
           kernel-test: ${{ inputs.test }}
           # Here we must use kbuild-output local to the repo, because
           # it was extracted from the artifacts.
