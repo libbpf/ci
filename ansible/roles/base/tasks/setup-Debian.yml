@@ -20,3 +20,45 @@
     enabled: no
     masked: yes
   when: "'auditd' in ansible_facts.packages"
+
+- name: Set up swap space on s390x
+  when: ansible_architecture == "s390x"
+  block:
+    - name: Check if swap file exists
+      ansible.builtin.stat:
+        path: "{{ swap_file_path }}"
+      register: swap_file
+
+    - name: Create swap file
+      become: true
+      ansible.builtin.command:
+        cmd: "fallocate -l {{ swap_file_size }} {{ swap_file_path }}"
+        creates: "{{ swap_file_path }}"
+      when: not swap_file.stat.exists
+
+    - name: Set swap file permissions
+      become: true
+      ansible.builtin.file:
+        path: "{{ swap_file_path }}"
+        mode: "0600"
+
+    - name: Make swap file
+      become: true
+      ansible.builtin.command:
+        cmd: "mkswap {{ swap_file_path }}"
+      when: not swap_file.stat.exists
+
+    - name: Enable swap file
+      become: true
+      ansible.builtin.command:
+        cmd: "swapon {{ swap_file_path }}"
+      register: swapon_result
+      changed_when: swapon_result.rc == 0
+      failed_when: false
+
+    - name: Add swap to fstab
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        line: "{{ swap_file_path }} none swap sw 0 0"
+        state: present
