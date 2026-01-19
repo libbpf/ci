@@ -5,15 +5,12 @@ inputs:
     required: true
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
-
-    - name: Install sched-ext/scx dependencies
+    - name: Build sched-ext/scx in container
       shell: bash
-      run: ${GITHUB_ACTION_PATH}/install-dependencies.sh
-
-    - name: Build sched-ext/scx
       env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+        GITHUB_WORKSPACE: ${{ github.workspace }}
         OUTPUT_DIR: ${{ inputs.output-dir }}
-      shell: bash
-      run: ${GITHUB_ACTION_PATH}/build-scheds.sh
+      run: ${{ github.action_path }}/action.sh
