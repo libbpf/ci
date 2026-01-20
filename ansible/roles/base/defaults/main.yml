@@ -5,3 +5,7 @@ __base_packages:
   - jq
   - python3-pip
   - vim
+
+# swap config for s390x
+swap_file_path: /swapfile
+swap_file_size: 8G
