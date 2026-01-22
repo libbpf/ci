@@ -47,6 +47,7 @@ fi
 sudo dpkg --add-architecture "$DEB_ARCH"
 sudo apt-get update -y
 sudo apt-get install -y --no-install-recommends    \
+     binfmt-support qemu-user-static               \
      "gcc-${GCC_VERSION}-${TARGET_ARCH}-linux-gnu" \
      "g++-${GCC_VERSION}-${TARGET_ARCH}-linux-gnu" \
      "linux-libc-dev:${DEB_ARCH}"                  \
