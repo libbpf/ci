@@ -26,11 +26,9 @@ git remote add origin ${PAHOLE_ORIGIN}
 git fetch --depth=1 origin "${PAHOLE_BRANCH}"
 git checkout "${PAHOLE_BRANCH}"
 
-mkdir -p build
-cd build
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -D__LIB=lib ..
-make -j$((4*$(nproc)))
-sudo make install
+cmake -Bbuild -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr
+make -C build -j$(nproc)
+sudo make -C build install
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-}:/usr/local/lib
 ldd $(which pahole)
