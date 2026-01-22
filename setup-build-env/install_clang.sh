@@ -12,6 +12,6 @@ sudo -E apt-get install --no-install-recommends -y \
 
 curl -O https://apt.llvm.org/llvm.sh
 chmod +x llvm.sh
-sudo ./llvm.sh ${LLVM_VERSION}
+sudo ./llvm.sh ${LLVM_VERSION} all
 
 foldable end install_clang
