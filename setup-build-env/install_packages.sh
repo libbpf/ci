@@ -12,7 +12,7 @@ foldable start install_packages
 
 source /etc/os-release
 
-if [[ "$GCC_VERSION" -ge 15 && "${UBUNTU_CODENAME}" != "${UBUNTU_CODENAME_OVERRIDE}" ]]; then
+if [[ "$ID" == "ubuntu" && $GCC_VERSION -ge 15 && "${UBUNTU_CODENAME}" != "${UBUNTU_CODENAME_OVERRIDE}" ]]; then
     UBUNTU_CODENAME=${UBUNTU_CODENAME_OVERRIDE}
     cat <<EOF | sudo tee /etc/apt/sources.list.d/${UBUNTU_CODENAME}.list
 deb http://archive.ubuntu.com/ubuntu ${UBUNTU_CODENAME} main universe
@@ -28,10 +28,12 @@ fi
 
 sudo apt-get update -y
 
-# add git-core/ppa to install latest git version
-sudo -E apt-get install -y software-properties-common
-sudo add-apt-repository -y ppa:git-core/ppa
-sudo apt-get update -y
+if [[ "$ID" == "ubuntu" ]]; then
+     # add git-core/ppa to install latest git version
+     sudo -E apt-get install -y software-properties-common
+     sudo add-apt-repository -y ppa:git-core/ppa
+     sudo apt-get update -y
+fi
 
 sudo -E apt-get install --no-install-recommends -y                     \
      bc bison build-essential cmake cpu-checker curl dumb-init         \
