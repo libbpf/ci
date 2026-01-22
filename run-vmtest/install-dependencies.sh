@@ -9,6 +9,8 @@ sudo chmod 755 /usr/bin/vmtest
 
 sudo apt-get update -y
 sudo -E apt-get install --no-install-recommends -y \
-     binutils cpu-checker ethtool gawk iproute2 iptables iputils-ping keyutils libpcap-dev make
+     binutils cpu-checker ethtool gawk iproute2 iptables iputils-ping \
+     keyutils libpcap-dev llvm-dev libz3-4 make zlib1g
+
 sudo -E apt-get install --no-install-recommends -y \
      qemu-guest-agent qemu-kvm qemu-system-arm qemu-system-s390x qemu-system-x86 qemu-utils
