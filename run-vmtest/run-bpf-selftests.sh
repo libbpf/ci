@@ -112,6 +112,12 @@ run_veristat() {
     source "${VERISTAT_CONFIGS}/run_veristat.${VERISTAT_TARGET}.cfg"
     pushd "${VERISTAT_OBJECTS_DIR}"
 
+    # first run veristat with --verbose to get logs, ignoring errors
+    args=()
+    args+=(-v)
+    args+=(${VERISTAT_CFG_FILE:+-f@$VERISTAT_CFG_FILE})
+    "${SELFTESTS_BPF}/veristat" "${args[@]}" ${VERISTAT_OBJECTS_GLOB} || true
+
     args=()
     args+=(-o csv)
     args+=(-q)
