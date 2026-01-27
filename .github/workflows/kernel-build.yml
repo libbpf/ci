@@ -64,10 +64,25 @@ jobs:
         KBUILD_OUTPUT: ${{ github.workspace }}/kbuild-output
         KERNEL: ${{ inputs.kernel }}
         KERNEL_ROOT: ${{ github.workspace }}
+        REFERENCE_REPO_PATH: /libbpfci/mirrors/linux
         REPO_PATH: ""
         REPO_ROOT: ${{ github.workspace }}
         RUNNER_TYPE: ${{ contains(fromJSON(inputs.runs_on), 'codebuild') && 'codebuild' || 'default' }}
     steps:
+
+      # git version 2.43.0 (current Ubuntu 24 installation)
+      # does not support git clone --revision option
+      # so make sure latest git is installed
+      - name: Install latest git
+        shell: bash
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y software-properties-common
+            sudo add-apt-repository -y ppa:git-core/ppa
+            sudo apt-get update
+            sudo apt-get install -y git
+            git --version
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.download_sources && 1 || env.BPF_NEXT_FETCH_DEPTH }}
@@ -87,7 +102,7 @@ jobs:
 
       - uses: ./prepare-incremental-build
         with:
-          repo-root: ${{ inputs.download_sources && '.kernel' || env.REPO_ROOT }}
+          repo-root: '.kernel'
           base-branch: >-
             ${{    inputs.download_sources && env.BPF_NEXT_BASE_BRANCH
                 || github.event_name == 'pull_request' && github.base_ref
@@ -96,12 +111,12 @@ jobs:
           arch: ${{ inputs.arch }}
           toolchain_full: ${{ inputs.toolchain_full }}
           kbuild-output: ${{ env.KBUILD_OUTPUT }}
-      - if: ${{ inputs.download_sources }}
-        name: Move linux source in place
+
+      - name: Move linux source in place
         shell: bash
         run: |
           cd .kernel
-          rm -rf .git
+          rm -rf .git .github ci
           mv -t .. $(ls -A)
           cd ..
           rmdir .kernel
