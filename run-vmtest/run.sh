@@ -6,6 +6,7 @@ trap 'exit 2' ERR
 source "${GITHUB_ACTION_PATH}/../helpers.sh"
 
 export ARCH=${ARCH:-$(uname -m)}
+export KERNEL=${KERNEL:-"LATEST"}
 
 export VMLINUZ=${VMLINUZ:-}
 if [[ ! -f "${VMLINUZ}" ]]; then
