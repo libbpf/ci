@@ -16,6 +16,7 @@ zst_tarball="$1"
 arch="${ARCH}"
 
 ARCHIVE_BPF_SELFTESTS="${ARCHIVE_BPF_SELFTESTS:-true}"
+ARCHIVE_KBUILD_OUTPUT="${ARCHIVE_KBUILD_OUTPUT:-true}"
 ARCHIVE_MAKE_HELPERS="${ARCHIVE_MAKE_HELPERS:-}"
 ARCHIVE_SCHED_EXT_SELFTESTS="${ARCHIVE_SCHED_EXT_SELFTESTS:-}"
 
@@ -40,18 +41,20 @@ function push_to_kout_list() {
   fi
 }
 
-cd "${KBUILD_OUTPUT}"
-push_to_kout_list "Module.symvers"
-push_to_kout_list "scripts/"
-push_to_kout_list "tools/objtool/"
-for dir in $(find . -type d -name "include"); do
-    push_to_kout_list "${dir}/"
-done
-cd -
+if [[ -n "${ARCHIVE_KBUILD_OUTPUT}" ]]; then
+  cd "${KBUILD_OUTPUT}"
+  push_to_kout_list "Module.symvers"
+  push_to_kout_list "scripts/"
+  push_to_kout_list "tools/objtool/"
+  for dir in $(find . -type d -name "include"); do
+      push_to_kout_list "${dir}/"
+  done
+  cd -
 
-tar -rf "${tarball}" -C "${KBUILD_OUTPUT}" \
-    --transform "s,^,kbuild-output/,"      \
-    "${kbuild_output_file_list[@]}"
+  tar -rf "${tarball}" -C "${KBUILD_OUTPUT}" \
+      --transform "s,^,kbuild-output/,"      \
+      "${kbuild_output_file_list[@]}"
+fi
 
 # In case artifacts are restored not to the kernel repo root,
 # package up a bunch of additional infrastructure to support running
