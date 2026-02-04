@@ -1,0 +1,19 @@
+name: 'Build cilium/cilium bpf programs'
+inputs:
+  output-dir:
+    description: 'Path to the output of cilium build'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Install cilium dependencies
+      shell: bash
+      run: ${GITHUB_ACTION_PATH}/install-dependencies.sh
+
+    - name: Build cilium/cilium bpf programs
+      env:
+        OUTPUT_DIR: ${{ inputs.output-dir }}
+      shell: bash
+      run: ${GITHUB_ACTION_PATH}/build-cilium.sh
