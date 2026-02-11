@@ -1,11 +1,12 @@
 #!/bin/bash
 
-set -euo pipefail
+set -xeuo pipefail
 trap 'exit 2' ERR
 
 source "${GITHUB_ACTION_PATH}/../helpers.sh"
 
 export ARCH=${ARCH:-$(uname -m)}
+export KERNEL=${KERNEL:-"LATEST"}
 
 export VMLINUZ=${VMLINUZ:-}
 if [[ ! -f "${VMLINUZ}" ]]; then
@@ -112,6 +113,7 @@ cat $VMTEST_TOML
 foldable end vmtest_toml
 
 vmtest -c $VMTEST_TOML
+rm -f $VMTEST_TOML
 
 # fixup traffic montioring log paths if present
 PCAP_DIR=/tmp/tmon_pcap
