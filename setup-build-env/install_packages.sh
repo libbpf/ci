@@ -42,9 +42,9 @@ sudo -E apt-get install --no-install-recommends -y                     \
      python3-docutils python3-minimal rsync sudo texinfo tree          \
      tzdata wget xxd xz-utils zstd
 
-sudo -E apt-get install --no-install-recommends -y            \
-     binutils-dev libcap-dev libdw-dev libelf-dev libpcap-dev \
-     libssl-dev libzstd-dev ncurses-dev
+sudo -E apt-get install --no-install-recommends -y          \
+     binutils-dev libasan8 libcap-dev libdw-dev libelf-dev  \
+     libpcap-dev libssl-dev libzstd-dev ncurses-dev
 
 sudo -E apt-get install --no-install-recommends -y               \
      qemu-guest-agent qemu-kvm qemu-system-arm qemu-system-s390x \
