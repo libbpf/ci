@@ -28,20 +28,8 @@ extract_bpf_progs() {
     done
 }
 
-# build C scheds
-# .SECONDARY prevents make from deleting the intermediate .bpf.o files
-echo '.SECONDARY:' >> scheds/c/Makefile
-make all -j$(nproc)
-mv build $OUTPUT_DIR/c-build
-extract_bpf_progs $OUTPUT_DIR/c-build/scheds "*.bpf.o" $OUTPUT_DIR/bpf
-
-# this is a lib object, remove
-find $OUTPUT_DIR/bpf -name "c_scx_sdt.bpf.o" -delete
-
-# build Rust scheds
 . $HOME/.cargo/env
 cargo build --release
-mv target/release/build $OUTPUT_DIR/rust-build
-extract_bpf_progs $OUTPUT_DIR/rust-build "bpf.bpf.o" $OUTPUT_DIR/bpf
+extract_bpf_progs target/release/build "bpf.bpf.o" $OUTPUT_DIR/bpf
 
 popd
