@@ -47,11 +47,8 @@ llvm_latest_version() {
   echo "19"
 }
 
-# No arguments
 kernel_build_make_jobs() {
-  # returns the number of processes to use when building kernel/selftests/samples
-  # default to 4*nproc if MAX_MAKE_JOBS is not defined
-  smp=$((4*$(nproc)))
+  smp=$(( $(nproc) - 1 ))
   MAX_MAKE_JOBS=${MAX_MAKE_JOBS:-$smp}
   echo $(( smp > MAX_MAKE_JOBS ? MAX_MAKE_JOBS : smp ))
 }
