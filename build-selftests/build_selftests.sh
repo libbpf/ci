@@ -33,7 +33,7 @@ fi
 
 foldable start build_selftests "Building selftests with $TOOLCHAIN"
 
-MAKE_OPTS=$(cat <<EOF
+MAKE_OPTS=(
 	ARCH=${ARCH}
 	BPF_GCC=${BPF_GCC}
 	CROSS_COMPILE=${CROSS_COMPILE}
@@ -43,15 +43,18 @@ MAKE_OPTS=$(cat <<EOF
 	LLVM_STRIP=llvm-strip-${LLVM_VERSION}
 	VMLINUX_BTF=${VMLINUX_BTF}
 	VMLINUX_H=${VMLINUX_H}
-	EXTRA_LDFLAGS=-static
-EOF
 )
-SELF_OPTS=$(cat <<EOF
-	-C ${KERNEL_ROOT}/tools/testing/selftests/bpf
-EOF
-)
-make ${MAKE_OPTS} -C ${KERNEL_ROOT} headers
-make ${MAKE_OPTS} ${SELF_OPTS} clean
-make ${MAKE_OPTS} ${SELF_OPTS} -j $(kernel_build_make_jobs) ${SELFTESTS_BPF_TARGETS:-}
+
+SELF_OPTS=(-C "${KERNEL_ROOT}/tools/testing/selftests/bpf")
+
+if [[ -n "${SELFTESTS_BPF_ASAN:-}" ]]; then
+	SELF_OPTS+=(SAN_CFLAGS="-fsanitize=address -fno-omit-frame-pointer")
+else # static build by default
+	SELF_OPTS+=(EXTRA_LDFLAGS=-static)
+fi
+
+make "${MAKE_OPTS[@]}" -C ${KERNEL_ROOT} headers
+make "${MAKE_OPTS[@]}" "${SELF_OPTS[@]}" clean
+make "${MAKE_OPTS[@]}" "${SELF_OPTS[@]}" -j $(kernel_build_make_jobs) ${SELFTESTS_BPF_TARGETS:-}
 
 foldable end build_selftests
