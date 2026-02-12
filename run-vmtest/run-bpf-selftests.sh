@@ -12,13 +12,14 @@
 # Runners passed as arguments are executed. In case of no arguments,
 # all test runners are executed.
 
-set -euo pipefail
+set -xeuo pipefail
 
 source "$(cd "$(dirname "$0")" && pwd)/helpers.sh"
 
 ARCH=$(uname -m)
 
 export SELFTESTS_BPF=${SELFTESTS_BPF:-/mnt/vmtest/selftests/bpf}
+export BPFTOOL=$(find $(realpath $(find "$SELFTESTS_BPF" -name sbin)) -type f -name bpftool)
 
 STATUS_FILE=${STATUS_FILE:-/mnt/vmtest/exitstatus}
 OUTPUT_DIR=${OUTPUT_DIR:-/mnt/vmtest}
