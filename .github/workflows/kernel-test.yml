@@ -31,6 +31,9 @@ on:
         required: true
         type: number
         description: In case a test runs for too long, after how many seconds shall we timeout and error.
+      llvm_version:
+        required: true
+        type: string
 
 jobs:
   test:
@@ -70,6 +73,7 @@ jobs:
           ARCH: ${{ inputs.arch }}
           DEPLOYMENT: ${{ env.DEPLOYMENT }}
           KERNEL_TEST: ${{ inputs.test }}
+          LLVM_VERSION: ${{ inputs.llvm_version }}
           SELFTESTS_BPF: ${{ github.workspace }}/selftests/bpf
           VMTEST_CONFIGS: ${{ github.workspace }}/ci/vmtest/configs
           VMTEST_MEMORY: 5G

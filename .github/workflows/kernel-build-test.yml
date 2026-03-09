@@ -101,6 +101,7 @@ jobs:
       test: ${{ matrix.test }}
       continue_on_error: ${{ toJSON(matrix.continue_on_error) }}
       timeout_minutes: ${{ matrix.timeout_minutes }}
+      llvm_version: ${{ inputs.llvm_version }}
 
   gcc-bpf:
     name: 'GCC BPF'
@@ -116,4 +117,3 @@ jobs:
       toolchain: ${{ inputs.toolchain }}
       toolchain_full: ${{ inputs.toolchain_full }}
       download_sources: ${{ inputs.download_sources }}
-
