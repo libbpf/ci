@@ -14,4 +14,7 @@ runs:
   steps:
     - name: apply temporary patches
       shell: bash
-      run: cd ${{ inputs.repo-root }} && ${GITHUB_ACTION_PATH}/patch_kernel.sh "${{ inputs.patches-root }}"
+      env:
+        REPO_ROOT: ${{ inputs.repo-root }}
+        PATCHES_ROOT: ${{ inputs.patches-root }}
+      run: cd ${REPO_ROOT} && ${GITHUB_ACTION_PATH}/patch_kernel.sh "${PATCHES_ROOT}"

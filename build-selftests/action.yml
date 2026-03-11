@@ -21,7 +21,10 @@ runs:
     - name: build selftests
       shell: bash
       env:
+        ARCH: ${{ inputs.arch }}
+        KERNEL_ROOT: ${{ inputs.kernel-root }}
         LLVM_VERSION: ${{ inputs.llvm-version }}
+        TOOLCHAIN: ${{ inputs.toolchain }}
       run: |
-        ${GITHUB_ACTION_PATH}/build_selftests.sh "${{ inputs.arch }}" "${{ inputs.toolchain }}" "${{ inputs.kernel-root }}"
+        ${GITHUB_ACTION_PATH}/build_selftests.sh "${ARCH}" "${TOOLCHAIN}" "${KERNEL_ROOT}"
 
