@@ -17,8 +17,10 @@ runs:
   steps:
     - name: Get bpf-next source
       shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        KERNEL_ORIGIN: ${{ inputs.repo }}
+        KERNEL_BRANCH: ${{ inputs.rev }}
+        REPO_PATH: ${{ inputs.dest }}
       run: |
-        export KERNEL_ORIGIN='${{ inputs.repo }}'
-        export KERNEL_BRANCH='${{ inputs.rev }}'
-        export REPO_PATH='${{ inputs.dest }}'
-        ${{ github.action_path }}/checkout_latest_kernel.sh
+        ${ACTION_PATH}/checkout_latest_kernel.sh
