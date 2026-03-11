@@ -13,6 +13,8 @@ runs:
     - name: Download prebuilt vmlinux
       shell: bash
       env:
+        ACTION_PATH: ${{ github.action_path }}
         ARCH: ${{ inputs.arch }}
+        KERNEL: ${{ inputs.kernel }}
       run: |
-        ${{ github.action_path }}/run.sh -k '${{ inputs.kernel }}'
+        ${ACTION_PATH}/run.sh -k "${KERNEL}"
