@@ -96,7 +96,7 @@ cat > $VMTEST_TOML <<EOF
 [[target]]
 name = "run-vmtest"
 kernel = "${VMLINUZ}"
-kernel_args = "panic=-1 sysctl.vm.panic_on_oom=1 hardlockup_all_cpu_backtrace=1 softlockup_all_cpu_backtrace=1"
+kernel_args = "panic=-1 sysctl.vm.panic_on_oom=1 hardlockup_all_cpu_backtrace=1 softlockup_all_cpu_backtrace=1 kasan_multi_shot"
 command = """\
 ${GITHUB_ACTION_PATH}/vmtest-init.sh && \
 cd ${GITHUB_WORKSPACE} && \
