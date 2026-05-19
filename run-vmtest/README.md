@@ -39,6 +39,30 @@ environment variables.
 * `kbuild-output` (default: `./kbuild-output`) - path to Linux Kernel binaries, aka `$KBUILD_OUTPUT`
 * `vmtest-release` - release version name of the vmtest tool
 
+## Kernel splats
+
+`check-kernel-splats.sh` runs after the selftests and greps the kernel log for
+splats that leave the VM alive: WARN, KASAN and friends, lockdep, RCU stalls,
+hung tasks and lockups. A hit adds a `kernel_splats` row to `exitstatus`, which
+turns the run red like any other failing test group. Anything fatal panics the
+VM instead, and fails the job on its own.
+
+The action carries no patterns. What a splat is, and what is benign, is policy
+that changes per arch and per kernel, so it lives with the configs. Two files
+of extended regexes, one per line, `#` comments and blank lines ignored, named
+by `run-vmtest.env` next to the allow and denylists:
+
+* `SPLAT_DENYLIST_FILE` - a matching dmesg line is a splat. **Required.**
+* `SPLAT_ALLOWLIST_FILE` - a matching splat line is ignored. Optional.
+
+The denylist is required on purpose: with no patterns there is no check, so a
+missing or empty file fails the run rather than reporting a clean log.
+
+See `ci/vmtest/configs/SPLAT_DENYLIST` for the set BPF CI uses.
+
+`dmesg.txt` is written to the output dir and uploaded as the `kernel-log-*`
+artifact, so the full log is always one click away.
+
 ## run-vmtest.env
 
 There are a couple of scripts, as well as code in the

@@ -1,0 +1,1 @@
+export SPLAT_ALLOWLIST_FILE="${CASE_DIR}/allowlist.txt"

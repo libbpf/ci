@@ -1,0 +1,14 @@
+[    0.100000] Linux version 6.5.0
+[   10.000000] WARNING: CPU: 0 PID: 100 at kernel/sched/core.c:1 first+0x1/0x2
+[   10.000001] Call Trace:
+[   10.000002]  ? __warn+0x80/0xc0
+[   10.000003] ---[ end trace ]---
+[   10.500000] test_progs: PASS one
+[   11.000000] test_progs: running two
+[   11.000001] BUG: KASAN: slab-out-of-bounds in second+0x3/0x4
+[   11.000002] Read of size 8 at addr ffff888000000000 by task test_progs/9
+[   11.000003] ---[ end trace ]---
+[  199.000000] test_progs: running three
+[  200.000000] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [test_progs:9]
+[  200.000001] watchdog: BUG: soft lockup - CPU#1 stuck for 22s! [test_progs:9]
+[  201.000000] test_progs: PASS
