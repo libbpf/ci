@@ -61,7 +61,7 @@ all:
   vars:
     ansible_ssh_common_args: -o 'ProxyCommand ......'
     runner_libbpf_ci_repo_url: https://github.com/libbpf/ci
-    runner_libbpf_ci_repo_branch: master
+    runner_libbpf_ci_repo_branch: main
     runner_gh_apps:
     - name: kernel-patches-runner
       id: a-github-app-id

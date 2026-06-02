@@ -18,6 +18,11 @@
     state: present
     name: python3-docker
     update_cache: yes
+    lock_timeout: 300
+  register: python3_docker_install
+  until: python3_docker_install is succeeded
+  retries: 30
+  delay: 10
   when: ansible_os_family == 'Debian'
 
 - name: Create runner directory
@@ -75,10 +80,12 @@
   set_fact:
     runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_hostname }}"
 
-# When running on Amazon Linux hosts, we override the runner_name_prefix with the ec2's instance ID.
-# When testing in Amazon Linux VMs, the `Load ec2 metadata facts` task will fail and we will fallback
-# on using hostname.
-- name: Set runner_name_prefix to instance ID for Amazon hosts
+# On EC2 hosts (Amazon Linux metal and Ubuntu metal alike) we override the runner_name_prefix
+# with the ec2's instance ID for stable, collision-free runner names. Non-EC2 hosts (e.g. s390x
+# LinuxONE, vendor "IBM") are skipped so we never block on the 169.254.169.254 metadata endpoint.
+# If amazon.aws is missing or the metadata endpoint is unreachable, `ignore_errors` lets us fall
+# back to the hostname-based prefix set above.
+- name: Set runner_name_prefix to instance ID for EC2 hosts
   block:
     - name: Load ec2 metadata facts
       amazon.aws.ec2_metadata_facts:
@@ -86,7 +93,7 @@
     - name: Set runner name prefix with instance ID
       set_fact:
         runner_name_prefix: "{{ '%s-' | format(runner_prefix) if runner_prefix }}{{ ansible_ec2_instance_id }}"
-  when: ansible_distribution == 'Amazon'
+  when: ansible_system_vendor == 'Amazon EC2' or ansible_distribution == 'Amazon'
   ignore_errors: yes
 
 - name: Generate runner env
