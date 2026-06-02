@@ -5,7 +5,19 @@
     state: present
     name: "{{ base_packages }}"
     update_cache: yes
+    lock_timeout: 300
+  register: base_packages_install
+  until: base_packages_install is succeeded
+  retries: 30
+  delay: 10
   tags: [install]
+
+- name: Start docker
+  become: true
+  service:
+    name: docker
+    state: started
+    enabled: true
 
 - name: Gather the package facts
   ansible.builtin.package_facts:

@@ -5,6 +5,17 @@ sudo dnf install -y ansible
 ```
 
 
+## Required collections
+
+The playbook uses modules from `community.docker` (`docker_login`) and `amazon.aws`
+(`ec2_metadata_facts`). The `ansible` metapackage bundles these; if you installed
+`ansible-core` only, install them explicitly:
+
+```
+ansible-galaxy collection install -r ansible/requirements.yml
+```
+
+
 ## Inventory
 
 The [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) is where we define our hosts, hostgroup, possibly variable...
