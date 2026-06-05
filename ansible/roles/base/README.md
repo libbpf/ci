@@ -2,13 +2,13 @@
 
 ## Description
 
-This role is used to install basic packages that may be required by any deployment.
+This role installs the basic packages required by any deployment on our
+Debian-family (Ubuntu / s390x LinuxONE) hosts, starts docker, and performs
+common host setup (disabling auditd, and configuring swap on s390x).
 
-Some default packages that apply to both RedHat based and Debian based is set in [defaults/main.yml](defaults/main.yml) file.
+The package list lives in [defaults/main.yml](defaults/main.yml).
 
-Each specific distro that has different package name has a file under [vars/](vars/) with a list of packages (example: `docker.io` for Debian, `podman-docker` for RedHat).
-
-It also provides handler that can be useful to any other roles, such as
+It also provides handlers that can be useful to any other roles, such as
 - `"reset systemd failed"`: runs `systemctl reset-failed`
 - `"reload systemd daemon"`: essentially runs `systemctl daemon-reload`
 

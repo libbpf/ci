@@ -1,7 +1,7 @@
 ## Install `ansible`
 
 ```
-sudo dnf install -y ansible
+sudo apt install -y ansible
 ```
 
 
