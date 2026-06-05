@@ -1,4 +1,0 @@
----
-
-__base_distro_packages:
-  - docker.io

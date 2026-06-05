@@ -1,10 +1,11 @@
 ---
-__base_packages:
+base_packages:
   - curl
   - git
   - jq
   - python3-pip
   - vim
+  - docker.io
 
 # swap config for s390x
 swap_file_path: /swapfile
