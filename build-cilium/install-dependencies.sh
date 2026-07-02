@@ -2,7 +2,7 @@
 
 set -xeuo pipefail
 
-export LLVM_VERSION=${LLVM_VERSION:-21}
+export LLVM_VERSION=${LLVM_VERSION:-19}
 export LIBBPF_REVISION=${LIBBPF_REVISION:-master}
 export BPFTOOL_REVISION=${BPFTOOL_REVISION:-main}
 
