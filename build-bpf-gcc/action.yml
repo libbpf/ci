@@ -4,6 +4,10 @@ inputs:
   install-dir:
     description: "Path to the GCC installation directory"
     required: true
+  gcc-version:
+    description: "Major GCC version to build (e.g. 15, 16)"
+    required: false
+    default: "15"
 
 runs:
   using: "composite"
@@ -12,6 +16,8 @@ runs:
     - name: Determine latest snapshots
       id: latest-snapshots
       shell: bash
+      env:
+        GCC_VERSION: ${{ inputs.gcc-version }}
       run: ${GITHUB_ACTION_PATH}/latest-snapshots.sh
 
     - uses: actions/cache@v4
