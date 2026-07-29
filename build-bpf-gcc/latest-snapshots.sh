@@ -1,11 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
+# Major GCC version to build; defaults to 15 for backward compatibility.
+GCC_VERSION="${GCC_VERSION:-15}"
+
 BINUTILS_TARBALL=$(wget https://snapshots.sourceware.org/binutils/trunk/latest/src/sha512.sum -O - -o /dev/null | awk '{print $2}')
-GCC_TARBALL=$(wget https://gcc.gnu.org/pub/gcc/snapshots/LATEST-15 -O - -o /dev/null | grep -E 'gcc-15-[0-9]+.tar.xz' | sed -e 's/.*\(gcc-15-[^<]*\).*/\1/')
+GCC_TARBALL=$(wget https://gcc.gnu.org/pub/gcc/snapshots/LATEST-${GCC_VERSION} -O - -o /dev/null | grep -E "gcc-${GCC_VERSION}-[0-9]+.tar.xz" | sed -e "s/.*\(gcc-${GCC_VERSION}-[^<]*\).*/\1/")
 
 BINUTILS_URL="https://snapshots.sourceware.org/binutils/trunk/latest/src/$BINUTILS_TARBALL"
-GCC_URL="https://gcc.gnu.org/pub/gcc/snapshots/LATEST-15/$GCC_TARBALL"
+GCC_URL="https://gcc.gnu.org/pub/gcc/snapshots/LATEST-${GCC_VERSION}/$GCC_TARBALL"
 
 BINUTILS_BASENAME=$(basename $BINUTILS_TARBALL .tar.xz)
 GCC_BASENAME=$(basename $GCC_TARBALL .tar.xz)
