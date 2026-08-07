@@ -45,7 +45,10 @@ def next_test(lines: list[str]):
     prev = lines[0]
 
     def is_subtest(line: str) -> bool:
-        return ('/' in line) and ('/' not in prev) and line.startswith(prev)
+        # Compare against "prev/" rather than "prev": without the separator
+        # "a_test" also swallows "a_test_two/subtest", which is a subtest of a
+        # different test that happens to share a prefix.
+        return ('/' not in prev) and line.startswith(prev + '/')
 
     yield lines[0]
     for line in lines[1:]:

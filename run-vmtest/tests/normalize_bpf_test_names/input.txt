@@ -18,3 +18,5 @@ test5                                                   # should consume test5/s
    ## some blank lines, should be removed
       
 
+test8
+test8_peek/subtest1                                     # must be kept: test8_peek is a different test, not a subtest of test8
