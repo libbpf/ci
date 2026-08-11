@@ -10,3 +10,5 @@ test4_blah
 test5
 test6
 test7/subtest123
+test8
+test8_peek/subtest1
