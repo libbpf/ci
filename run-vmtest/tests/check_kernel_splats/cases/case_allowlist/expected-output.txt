@@ -1,0 +1,5 @@
+::group::kernel_splats - Checking kernel log for splats
+Splat denylist: $VMTEST_CONFIGS/SPLAT_DENYLIST
+Splat allowlist: $CASE_DIR/allowlist.txt
+::endgroup::
+No kernel splats detected

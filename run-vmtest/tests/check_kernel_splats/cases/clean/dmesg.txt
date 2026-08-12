@@ -1,0 +1,4 @@
+[    0.000000] Linux version 6.5.0
+[    0.001234] CPU: 0
+[    0.002345] Memory: 4G
+[    1.000000] vmtest selftests complete

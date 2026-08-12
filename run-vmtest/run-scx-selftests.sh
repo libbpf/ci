@@ -37,5 +37,7 @@ fi
 
 echo "selftests/sched_ext:$failed" >> "${STATUS_FILE}"
 
+"$(cd "$(dirname "$0")" && pwd)/check-kernel-splats.sh"
+
 exit 0
 

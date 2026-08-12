@@ -1,0 +1,1 @@
+kernel_splats:1

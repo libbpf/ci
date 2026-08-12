@@ -1,0 +1,3 @@
+::group::kernel_splats - Checking kernel log for splats
+No splat denylist: SPLAT_DENYLIST_FILE=/nonexistent/SPLAT_DENYLIST
+::endgroup::

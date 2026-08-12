@@ -1,0 +1,2 @@
+# Silence the WARN this case produces.
+WARNING: CPU: 0 PID: 100 at kernel/sched/core\.c:1234

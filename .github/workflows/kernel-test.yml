@@ -96,3 +96,12 @@ jobs:
           name: tmon-logs-${{ inputs.arch }}-${{ inputs.toolchain_full }}-${{ inputs.test }}
           if-no-files-found: ignore
           path: /tmp/tmon_pcap/*
+
+      # Written by check-kernel-splats.sh inside the VM, into the bind-mounted
+      # workspace. Needed to triage a splat, and to audit the scan itself.
+      - if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-log-${{ inputs.arch }}-${{ inputs.toolchain_full }}-${{ inputs.test }}
+          if-no-files-found: ignore
+          path: dmesg.txt

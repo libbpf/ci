@@ -14,7 +14,8 @@
 
 set -xeuo pipefail
 
-source "$(cd "$(dirname "$0")" && pwd)/helpers.sh"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "${SCRIPT_DIR}/helpers.sh"
 
 ARCH=$(uname -m)
 
@@ -176,3 +177,5 @@ else
 		"${test_name}"
 	done
 fi
+
+"${SCRIPT_DIR}/check-kernel-splats.sh"

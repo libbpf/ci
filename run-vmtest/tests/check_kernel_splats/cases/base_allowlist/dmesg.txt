@@ -1,0 +1,3 @@
+[ 0.1] Linux version 6.5.0
+[ 0.2] WARNING: Unprivileged eBPF is enabled with eIBRS on, data leaks possible via Spectre v2 BHB attacks!
+[ 1.0] test_progs: PASS
