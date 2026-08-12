@@ -69,3 +69,12 @@ runs:
       run: |
         ${GITHUB_ACTION_PATH}/run.sh
 
+    # Callers upload this directory with if: always(), and the upload rejects
+    # the characters this renames, so it has to happen even when the step
+    # above fails.
+    - name: Normalize traffic monitor log paths
+      if: always()
+      shell: bash
+      run: |
+        ${GITHUB_ACTION_PATH}/normalize-paths-for-github.sh /tmp/tmon_pcap
+

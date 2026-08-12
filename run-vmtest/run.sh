@@ -115,10 +115,6 @@ foldable end vmtest_toml
 vmtest -c $VMTEST_TOML
 rm -f $VMTEST_TOML
 
-# fixup traffic montioring log paths if present
-PCAP_DIR=/tmp/tmon_pcap
-${GITHUB_ACTION_PATH}/normalize-paths-for-github.sh "$PCAP_DIR"
-
 foldable end vmtest
 
 foldable start collect_status "Collecting exit status"
