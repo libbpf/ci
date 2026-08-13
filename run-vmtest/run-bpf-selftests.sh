@@ -178,4 +178,8 @@ else
 	done
 fi
 
-"${SCRIPT_DIR}/check-kernel-splats.sh"
+if [ ${#TEST_NAMES[@]} -eq 0 ] || [[ "${TEST_NAMES[*]}" == *test_progs* ]]; then
+	"${SCRIPT_DIR}/check-kernel-splats.sh"
+else
+	echo "Skipping kernel splat check: test_progs not requested"
+fi
