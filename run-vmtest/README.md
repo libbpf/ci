@@ -47,6 +47,9 @@ hung tasks and lockups. A hit adds a `kernel_splats` row to `exitstatus`, which
 turns the run red like any other failing test group. Anything fatal panics the
 VM instead, and fails the job on its own.
 
+The check runs for the default suite or when the requested runners include
+`test_progs`. Veristat-only runs skip it.
+
 The action carries no patterns. What a splat is, and what is benign, is policy
 that changes per arch and per kernel, so it lives with the configs. Two files
 of extended regexes, one per line, `#` comments and blank lines ignored, named
