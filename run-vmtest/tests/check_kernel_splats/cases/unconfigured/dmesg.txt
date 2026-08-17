@@ -1,0 +1,2 @@
+[    0.000000] Linux version 6.5.0
+[   12.345679] WARNING: CPU: 0 PID: 100 at kernel/sched/core.c:1234 do_thing+0x10/0x20

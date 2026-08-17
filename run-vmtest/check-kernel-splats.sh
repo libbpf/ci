@@ -7,8 +7,7 @@
 # config repo rather than here:
 #
 #   SPLAT_DENYLIST_FILE   extended regexes; a matching dmesg line is a splat.
-#                         Required: with no patterns there is no check, so a
-#                         missing file fails the run instead of passing it.
+#                         Required if either splat list file exists.
 #   SPLAT_ALLOWLIST_FILE  extended regexes; a matching splat line is ignored.
 #                         Optional: no file means no exceptions.
 #
@@ -27,6 +26,11 @@ STATUS_FILE=${STATUS_FILE:-/mnt/vmtest/exitstatus}
 OUTPUT_DIR=${OUTPUT_DIR:-/mnt/vmtest}
 SPLAT_DENYLIST_FILE=${SPLAT_DENYLIST_FILE:-}
 SPLAT_ALLOWLIST_FILE=${SPLAT_ALLOWLIST_FILE:-}
+
+if [ ! -e "${SPLAT_DENYLIST_FILE}" ] && [ ! -e "${SPLAT_ALLOWLIST_FILE}" ]; then
+    echo "Skipping kernel splat check: no allowlist or denylist files found"
+    exit 0
+fi
 
 # Fail the row and stop. Also used when the scan cannot run: a check that is
 # not working must not look like a clean log.

@@ -11,6 +11,7 @@ run_case() (
 
     CASE_DIR=$(realpath "${case_dir}")
     export CASE_DIR OUTPUT_DIR="$tmpdir" STATUS_FILE="$tmpdir/exitstatus"
+    : > "${STATUS_FILE}"
 
     # Default to the configs this repo carries, which is what a job gets from
     # $VMTEST_CONFIGS. A case overrides either one through its `env` file.

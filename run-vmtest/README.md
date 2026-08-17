@@ -47,24 +47,23 @@ hung tasks and lockups. A hit adds a `kernel_splats` row to `exitstatus`, which
 turns the run red like any other failing test group. Anything fatal panics the
 VM instead, and fails the job on its own.
 
-The check runs for the default suite or when the requested runners include
-`test_progs`. Veristat-only runs skip it.
+Leave both splat list files absent to disable detection.
 
 The action carries no patterns. What a splat is, and what is benign, is policy
 that changes per arch and per kernel, so it lives with the configs. Two files
 of extended regexes, one per line, `#` comments and blank lines ignored, named
 by `run-vmtest.env` next to the allow and denylists:
 
-* `SPLAT_DENYLIST_FILE` - a matching dmesg line is a splat. **Required.**
+* `SPLAT_DENYLIST_FILE` - a matching dmesg line is a splat.
 * `SPLAT_ALLOWLIST_FILE` - a matching splat line is ignored. Optional.
 
-The denylist is required on purpose: with no patterns there is no check, so a
-missing or empty file fails the run rather than reporting a clean log.
+If either file exists, the denylist must exist and contain at least one
+pattern.
 
 See `ci/vmtest/configs/SPLAT_DENYLIST` for the set BPF CI uses.
 
-`dmesg.txt` is written to the output dir and uploaded as the `kernel-log-*`
-artifact, so the full log is always one click away.
+When the detector runs, `dmesg.txt` is written to the output dir and uploaded
+as the `kernel-log-*` artifact, so the full log is one click away.
 
 ## run-vmtest.env
 
