@@ -12,7 +12,7 @@
 # Runners passed as arguments are executed. In case of no arguments,
 # all test runners are executed.
 
-set -xeuo pipefail
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "${SCRIPT_DIR}/helpers.sh"
