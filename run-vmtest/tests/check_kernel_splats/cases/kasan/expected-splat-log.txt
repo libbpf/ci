@@ -1,0 +1,14 @@
+kernel splat detected: [   20.000001] BUG: KASAN: slab-use-after-free in foo+0x42/0x100
+1-[    0.000000] Linux version 6.5.0
+2-[   20.000000] ==================================================================
+3:[   20.000001] BUG: KASAN: slab-use-after-free in foo+0x42/0x100
+4-[   20.000002] Read of size 8 at addr ffff888100001234 by task test_progs/123
+5-[   20.000003]
+6-[   20.000004] CPU: 0 PID: 123 Comm: test_progs
+7-[   20.000005] Call Trace:
+8-[   20.000006]  <TASK>
+9-[   20.000007]  dump_stack_lvl+0x60/0x80
+10-[   20.000008]  print_report+0xc4/0x630
+11-[   20.000009]  kasan_report+0xb6/0xf0
+12-[   20.000010]  </TASK>
+13-[   20.000011] ==================================================================

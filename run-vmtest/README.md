@@ -62,8 +62,9 @@ pattern.
 
 See `ci/vmtest/configs/SPLAT_DENYLIST` for the set BPF CI uses.
 
-When the detector runs, `dmesg.txt` is written to the output dir and uploaded
-as the `kernel-log-*` artifact, so the full log is one click away.
+On failure, matching kernel log context is printed in the job log. `dmesg.txt`
+is also written to the output dir and uploaded as the `kernel-log-*` artifact
+for the full log.
 
 ## run-vmtest.env
 

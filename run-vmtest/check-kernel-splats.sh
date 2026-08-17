@@ -14,7 +14,9 @@
 # `#` comments and blank lines are ignored in both. See run-vmtest.env in the
 # repo that owns $VMTEST_CONFIGS.
 #
-# The whole log is written to dmesg.txt, which the workflow uploads.
+# The whole log is written to dmesg.txt, which the workflow uploads. A short
+# excerpt around unallowlisted hits is written next to the status file so the
+# host can print it after closing the folded VM log.
 #
 # $1 - log file to scan instead of running dmesg (used by the unit tests)
 
@@ -26,6 +28,9 @@ STATUS_FILE=${STATUS_FILE:-/mnt/vmtest/exitstatus}
 OUTPUT_DIR=${OUTPUT_DIR:-/mnt/vmtest}
 SPLAT_DENYLIST_FILE=${SPLAT_DENYLIST_FILE:-}
 SPLAT_ALLOWLIST_FILE=${SPLAT_ALLOWLIST_FILE:-}
+SPLAT_LOG_FILE=${SPLAT_LOG_FILE:-"$(dirname "${STATUS_FILE}")/kernel_splats.log"}
+
+rm -f "${SPLAT_LOG_FILE}"
 
 if [ ! -e "${SPLAT_DENYLIST_FILE}" ] && [ ! -e "${SPLAT_ALLOWLIST_FILE}" ]; then
     echo "Skipping kernel splat check: no allowlist or denylist files found"
@@ -36,6 +41,7 @@ fi
 # not working must not look like a clean log.
 fail_check() {
     echo "$1"
+    printf '%s\n' "$1" > "${SPLAT_LOG_FILE}"
     echo "kernel_splats:1" >> "${STATUS_FILE}"
     foldable end kernel_splats
     exit 0
@@ -82,5 +88,8 @@ if [ -z "${hits}" ]; then
 fi
 
 echo "kernel_splats:1" >> "${STATUS_FILE}"
-grep -nC 30 -E -f <(printf '%s\n' "${deny}") "${log}" || true
-echo "::error title=kernel_splats::kernel splat detected, see the dmesg.txt artifact"
+first_hit=${hits%%$'\n'*}
+{
+    printf 'kernel splat detected: %s\n' "${first_hit}"
+    grep -nC 30 -F -f <(printf '%s\n' "${hits}") "${log}" || true
+} > "${SPLAT_LOG_FILE}"
