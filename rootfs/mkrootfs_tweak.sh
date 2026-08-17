@@ -30,6 +30,7 @@ if [[ -z "$(/bin/mount -t devtmpfs)" ]]; then
 fi
 
 /bin/mount sysfs /sys -t sysfs
+/bin/mount tmpfs /tmp -t tmpfs
 /bin/mount bpffs /sys/fs/bpf -t bpf
 /bin/mount debugfs /sys/kernel/debug -t debugfs
 
