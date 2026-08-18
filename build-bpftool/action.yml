@@ -1,0 +1,16 @@
+name: 'Test bpftool build'
+description: 'Run test_bpftool_build.sh to exercise the various ways of building bpftool'
+inputs:
+  kernel-root:
+    description: 'Path to the root of the kernel source tree'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Test bpftool build
+      shell: bash
+      run:
+        ${GITHUB_ACTION_PATH}/build_bpftool.sh "${{ inputs.kernel-root }}"
+      env:
+        MAX_MAKE_JOBS: ${{ inputs.max-make-jobs }}
