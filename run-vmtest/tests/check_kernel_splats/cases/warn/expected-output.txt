@@ -2,18 +2,3 @@
 Splat denylist: $VMTEST_CONFIGS/SPLAT_DENYLIST
 Splat allowlist: $VMTEST_CONFIGS/SPLAT_ALLOWLIST
 ::endgroup::
-1-[    0.000000] Linux version 6.5.0
-2-[    0.001234] CPU: 0
-3-[   12.345678] ------------[ cut here ]------------
-4:[   12.345679] WARNING: CPU: 0 PID: 100 at kernel/sched/core.c:1234 do_thing+0x10/0x20
-5-[   12.345680] Modules linked in:
-6-[   12.345681] CPU: 0 PID: 100 Comm: test_progs
-7-[   12.345682] RIP: 0010:do_thing+0x10/0x20
-8-[   12.345683] Call Trace:
-9-[   12.345684]  <TASK>
-10-[   12.345685]  ? __warn+0x80/0xc0
-11-[   12.345686]  ? report_bug+0xa0/0xc0
-12-[   12.345687]  </TASK>
-13-[   12.345688] ---[ end trace ]---
-14-[   13.000000] test_progs: PASS
-::error title=kernel_splats::kernel splat detected, see the dmesg.txt artifact

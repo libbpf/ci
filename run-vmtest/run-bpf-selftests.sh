@@ -12,7 +12,7 @@
 # Runners passed as arguments are executed. In case of no arguments,
 # all test runners are executed.
 
-set -xeuo pipefail
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "${SCRIPT_DIR}/helpers.sh"
@@ -178,8 +178,4 @@ else
 	done
 fi
 
-if [ ${#TEST_NAMES[@]} -eq 0 ] || [[ "${TEST_NAMES[*]}" == *test_progs* ]]; then
-	"${SCRIPT_DIR}/check-kernel-splats.sh"
-else
-	echo "Skipping kernel splat check: test_progs not requested"
-fi
+"${SCRIPT_DIR}/check-kernel-splats.sh"

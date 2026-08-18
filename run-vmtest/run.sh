@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xeuo pipefail
+set -euo pipefail
 trap 'exit 2' ERR
 
 source "${GITHUB_ACTION_PATH}/../helpers.sh"
@@ -116,6 +116,17 @@ vmtest -c $VMTEST_TOML
 rm -f $VMTEST_TOML
 
 foldable end vmtest
+
+if grep -q '^kernel_splats:1$' exitstatus; then
+  splat_error="kernel splat check failed"
+  if [[ -s kernel_splats.log ]]; then
+    cat kernel_splats.log
+    splat_error=$(head -n 1 kernel_splats.log)
+  fi
+  splat_error=${splat_error//'%'/'%25'}
+  splat_error=${splat_error//$'\r'/'%0D'}
+  printf '::error title=kernel_splats::%s\n' "${splat_error}"
+fi
 
 foldable start collect_status "Collecting exit status"
 

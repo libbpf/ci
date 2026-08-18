@@ -1,0 +1,2 @@
+export SPLAT_DENYLIST_FILE="${CASE_DIR}/missing-denylist.txt"
+export SPLAT_ALLOWLIST_FILE="${CASE_DIR}/missing-allowlist.txt"

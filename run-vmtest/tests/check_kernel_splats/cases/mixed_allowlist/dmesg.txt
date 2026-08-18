@@ -1,0 +1,5 @@
+[    0.000000] Linux version 6.5.0
+[   10.000000] WARNING: CPU: 0 PID: 100 at kernel/sched/core.c:1234 allowed+0x1/0x2
+[   10.000001] Call Trace:
+[   11.000000] BUG: KASAN: slab-out-of-bounds in real_splat+0x3/0x4
+[   11.000001] Read of size 8 at addr ffff888000000000 by task test_progs/9

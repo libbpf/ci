@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xeuo pipefail
+set -euo pipefail
 
 if [[ -z "${SELFTESTS_BPF_ALLOWLIST_FILES:-}" && -z "${SELFTESTS_BPF_DENYLIST_FILES:-}" ]]; then
    exit 0

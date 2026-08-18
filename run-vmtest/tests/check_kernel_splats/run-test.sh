@@ -11,6 +11,7 @@ run_case() (
 
     CASE_DIR=$(realpath "${case_dir}")
     export CASE_DIR OUTPUT_DIR="$tmpdir" STATUS_FILE="$tmpdir/exitstatus"
+    : > "${STATUS_FILE}"
 
     # Default to the configs this repo carries, which is what a job gets from
     # $VMTEST_CONFIGS. A case overrides either one through its `env` file.
@@ -30,6 +31,13 @@ run_case() (
 
     diff -u "${case_dir}/expected-output.txt" "$tmpdir/output.txt"
     diff -u "${case_dir}/expected-status.txt" "$tmpdir/exitstatus"
+
+    if [ -f "${case_dir}/expected-splat-log.txt" ]; then
+        diff -u "${case_dir}/expected-splat-log.txt" "$tmpdir/kernel_splats.log"
+    elif [ -e "$tmpdir/kernel_splats.log" ]; then
+        echo "Unexpected kernel_splats.log for ${case_dir}"
+        return 1
+    fi
 )
 
 for case_dir in cases/*/; do
