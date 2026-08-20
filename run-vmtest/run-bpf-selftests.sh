@@ -24,6 +24,7 @@ export BPFTOOL=$(find $(realpath "$SELFTESTS_BPF/tools/sbin") -type f -name bpft
 
 STATUS_FILE=${STATUS_FILE:-/mnt/vmtest/exitstatus}
 OUTPUT_DIR=${OUTPUT_DIR:-/mnt/vmtest}
+VMTEST_CONFIGS_DIR=${VMTEST_CONFIGS_DIR:-/mnt/vmtest/ci/vmtest/configs}
 
 test_progs_helper() {
   local selftest="test_progs${1}"
@@ -90,8 +91,41 @@ test_verifier() {
   foldable end test_verifier
 }
 
+# Re-run the tests that the denylist kept out of the main pass, by feeding
+# the denylist back in as an allowlist. Denylisted tests are expected to
+# fail, so this reports the ones that have started passing and can be
+# dropped from the list.
+#
+# Only the runner specific list is re-run, not the merged denylist the main
+# pass uses: entries in the generic lists are excluded because they are
+# broken or unstable in the VM, so re-running them risks taking the whole
+# machine down, and they say nothing about the compiler either way.
+#
+# This is informational: the exit code is deliberately not written to
+# ${STATUS_FILE}, so tests that are still failing cannot fail the job.
+test_progs_denylisted_helper() {
+  local selftest="test_progs${1}"
+  local denylist="${VMTEST_CONFIGS_DIR}/DENYLIST.${selftest}"
+  local args=()
+
+  if [ ! -s "${denylist}" ]; then
+    echo "${denylist} is missing or empty, nothing to re-test"
+    return 0
+  fi
+
+  args+=(${TEST_PROGS_WATCHDOG_TIMEOUT:+-w$TEST_PROGS_WATCHDOG_TIMEOUT})
+  args+=(-a@"${denylist}")
+
+  foldable start ${selftest}_denylisted "Re-testing denylisted ${selftest}"
+  echo "./${selftest}" "${args[@]}"
+  ./${selftest} "${args[@]}" && true
+  echo "${selftest} denylisted re-run exited with $?"
+  foldable end ${selftest}_denylisted
+}
+
 test_progs-bpf_gcc() {
     test_progs_helper "-bpf_gcc" ""
+    test_progs_denylisted_helper "-bpf_gcc"
 }
 
 export VERISTAT_TARGET=${VERISTAT_TARGET:-kernel}
