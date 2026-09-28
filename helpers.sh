@@ -39,12 +39,12 @@ print_notice() {
 
 # No arguments
 llvm_default_version() {
-  echo "17"
+  echo "22"
 }
 
 # No arguments
 llvm_latest_version() {
-  echo "19"
+  echo "22"
 }
 
 kernel_build_make_jobs() {
