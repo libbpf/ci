@@ -34,6 +34,9 @@ fi
 /bin/mount bpffs /sys/fs/bpf -t bpf
 /bin/mount debugfs /sys/kernel/debug -t debugfs
 
+mkdir -p /dev/shm
+/bin/mount tmpfs /dev/shm -t tmpfs -o mode=1777
+
 # Symlink /dev/fd to /proc/self/fd so process substitution works.
 [[ -e /dev/fd ]] || ln -s /proc/self/fd /dev/fd
 
