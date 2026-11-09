@@ -19,6 +19,12 @@ In summary the action performs the following:
 Note that behavior of the running scripts is tunable mostly by the
 environment variables.
 
+`VMTEST_SCRIPT` selects a custom guest entrypoint. Configuration from
+`run-vmtest.env` is loaded before selecting the script. BPF selftest preparation,
+bpftool checks, and JSON summaries run only for `run-bpf-selftests.sh`. Custom
+scripts share VM setup and exitstatus collection, and provide their own workload
+setup and results.
+
 ## Required inputs
 
 * `arch` - Target architecture
