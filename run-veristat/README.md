@@ -46,3 +46,16 @@ details. Messages are flushed so an interrupted run retains its last operation.
 Tool output stays in files. The caller controls visibility of the result files
 and VM console. Meta objects and raw verifier logs must remain private; OSS
 callers can publish their results.
+
+## Prepare a corpus
+
+`create_manifest.py` selects local files by glob and records their checksums:
+
+```sh
+python3 create_manifest.py --name kernel --directory /inputs/kernel \
+    --pattern '*.bpf.o' --filter /inputs/kernel/veristat.cfg \
+    --output /inputs/corpora.json
+```
+
+Omit `--filter` when none is needed. A batch caller can use `make_corpus()`
+to build the manifest's `corpora` list. Downloads and builds belong to the caller.
