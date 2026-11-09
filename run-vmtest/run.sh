@@ -33,6 +33,7 @@ else
     exit 2
 fi
 
+# Set this default before the config hook so its overrides take precedence.
 RUN_BPFTOOL_CHECKS=${RUN_BPFTOOL_CHECKS:-}
 if [[ -z "${RUN_BPFTOOL_CHECKS}" \
           && "${KERNEL}" = 'LATEST' \
@@ -53,8 +54,13 @@ then
     VMTEST_SCRIPT="${GITHUB_ACTION_PATH}/run-scx-selftests.sh"
 elif [[ -z "$VMTEST_SCRIPT" ]];
 then
-    ${GITHUB_ACTION_PATH}/prepare-bpf-selftests.sh
     VMTEST_SCRIPT="${GITHUB_ACTION_PATH}/run-bpf-selftests.sh"
+fi
+
+bpf_selftests=false
+if [[ "$VMTEST_SCRIPT" == "${GITHUB_ACTION_PATH}/run-bpf-selftests.sh" ]]; then
+    bpf_selftests=true
+    ${GITHUB_ACTION_PATH}/prepare-bpf-selftests.sh
 fi
 
 # clear exitstatus file
@@ -63,8 +69,8 @@ echo -n > exitstatus
 foldable start bpftool_checks "Running bpftool checks..."
 
 # bpftool checks are aimed at checking type names, documentation, shell
-# completion etc. against the current kernel, so only run on LATEST.
-if [[ -n "${RUN_BPFTOOL_CHECKS}" ]]; then
+# completion etc. against the current kernel, so default to LATEST.
+if "$bpf_selftests" && [[ -n "${RUN_BPFTOOL_CHECKS:-}" ]]; then
 	bpftool_exitstatus=0
 	# "&& true" does not change the return code (it is not executed if the
 	# Python script fails), but it prevents the trap on ERR set at the top
@@ -143,12 +149,14 @@ fi
 
 foldable end collect_status
 
-SUMMARIES=$(find . -maxdepth 1 -name "test_*.json")
-for summary in ${SUMMARIES}; do
-  if [ -f "${summary}" ]; then
-    "${GITHUB_ACTION_PATH}/print_test_summary.py" -s "${GITHUB_STEP_SUMMARY}" -j "${summary}"
-  fi
-done
+if "$bpf_selftests"; then
+  SUMMARIES=$(find . -maxdepth 1 -name "test_*.json")
+  for summary in ${SUMMARIES}; do
+    if [ -f "${summary}" ]; then
+      "${GITHUB_ACTION_PATH}/print_test_summary.py" -s "${GITHUB_STEP_SUMMARY}" -j "${summary}"
+    fi
+  done
+fi
 
 # Final summary - Don't use a fold, keep it visible
 echo -e "\033[1;33mTest Results:\033[0m"
