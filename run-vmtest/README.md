@@ -1,6 +1,7 @@
 # Run vmtest
 
-This action is designed to run Linux Kernel BPF selftests.
+This action boots a supplied Linux kernel and runs a guest workload. The default
+guest script runs Linux kernel BPF selftests.
 
 It expects kernel binaries as well as test runner binaries as input,
 and executes the test runners with a given kernel using the [vmtest
@@ -24,6 +25,9 @@ environment variables.
 bpftool checks, and JSON summaries run only for `run-bpf-selftests.sh`. Custom
 scripts share VM setup and exitstatus collection, and provide their own workload
 setup and results.
+
+For veristat, select `run-veristat.sh` and provide prepared corpora as described
+in [run-veristat](../run-veristat/README.md#run-with-run-vmtest).
 
 ## Required inputs
 

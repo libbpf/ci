@@ -6,7 +6,7 @@ boots the kernel, and handles baselines and publication.
 
 ```sh
 python3 run_veristat.py --veristat /tools/veristat \
-    --manifest /inputs/corpora.json --output /results/current
+    --manifest /inputs/manifest.json --output /results/current
 ```
 
 The manifest selects exact objects and optional veristat filter files. Paths
@@ -54,8 +54,26 @@ callers can publish their results.
 ```sh
 python3 create_manifest.py --name kernel --directory /inputs/kernel \
     --pattern '*.bpf.o' --filter /inputs/kernel/veristat.cfg \
-    --output /inputs/corpora.json
+    --output /inputs/manifest.json
 ```
 
 Omit `--filter` when none is needed. A batch caller can use `make_corpus()`
 to build the manifest's `corpora` list. Downloads and builds belong to the caller.
+
+## Run with run-vmtest
+
+Select `run-vmtest/run-veristat.sh` through `VMTEST_SCRIPT` and supply guest paths:
+
+```sh
+VERISTAT_BINARY=/mnt/vmtest/selftests/bpf/veristat
+VERISTAT_MANIFEST=/mnt/vmtest/manifest.json
+VERISTAT_RESULTS=/mnt/vmtest/veristat-results
+```
+
+The entrypoint records `veristat:<exitcode>` in `STATUS_FILE` (default
+`/mnt/vmtest/exitstatus`) and runs the kernel-splat check. The host `run.sh`
+collects those statuses after the guest exits and fails the action on errors.
+Per-corpus outcomes remain in the result JSON files.
+
+When upgrading from v4, migrate `kernel-test: run_veristat` callers to this
+entrypoint and prepare their manifests before booting the VM.
