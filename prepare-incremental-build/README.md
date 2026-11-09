@@ -1,5 +1,3 @@
-[![Action test](https://github.com/libbpf/ci/actions/workflows/test-prepare-incremental-build-action.yml/badge.svg)](https://github.com/libbpf/ci/actions/workflows/test-prepare-incremental-build-action.yml)
-
 # Prepare incremental build
 
 This action uses [actions/cache](https://github.com/actions/cache) in combination with custom scripts to save kernel build output from previous workflow runs to faciliate incremental builds.
