@@ -41,7 +41,7 @@ setup and results.
   * if not specified, `$VMLINUZ` var is checked
   * if `$VMLINUZ` is not set, the script will attempt to run `make -s
     image_name` to find the image
-* `output-dir` - path for test runner summaries and veristat output
+* `output-dir` - path for test runner summaries
 * `kbuild-output` (default: `./kbuild-output`) - path to Linux Kernel binaries, aka `$KBUILD_OUTPUT`
 * `vmtest-release` - release version name of the vmtest tool
 

@@ -94,46 +94,6 @@ test_progs-bpf_gcc() {
     test_progs_helper "-bpf_gcc" ""
 }
 
-export VERISTAT_TARGET=${VERISTAT_TARGET:-kernel}
-export VERISTAT_CONFIGS=${VERISTAT_CONFIGS:-/mnt/vmtest/ci/vmtest/configs}
-export WORKING_DIR=$(pwd) # veristat config expects this variable
-
-run_veristat() {
-  foldable start run_veristat_${VERISTAT_TARGET} "Running veristat ${VERISTAT_TARGET}"
-  # Make veristat commands visible in the log
-  if [ -o xtrace ]; then
-      xtrace_was_on="1"
-  else
-      xtrace_was_on=""
-      set -x
-  fi
-
-  (
-    # shellcheck source=ci/vmtest/configs/run_veristat.default.cfg
-    # shellcheck source=ci/vmtest/configs/run_veristat.meta.cfg
-    source "${VERISTAT_CONFIGS}/run_veristat.${VERISTAT_TARGET}.cfg"
-    pushd "${VERISTAT_OBJECTS_DIR}"
-
-    args=()
-    args+=(-o csv)
-    args+=(-q)
-    args+=(-e file,prog,verdict,states)
-    args+=(${VERISTAT_CFG_FILE:+-f@$VERISTAT_CFG_FILE})
-
-    "${SELFTESTS_BPF}/veristat" "${args[@]}" ${VERISTAT_OBJECTS_GLOB} > \
-      "${OUTPUT_DIR}/${VERISTAT_OUTPUT}"
-
-    echo "run_veristat_${VERISTAT_TARGET}:$?" >> ${STATUS_FILE}
-    popd
-  )
-
-  # Hide commands again
-  if [ -z "$xtrace_was_on" ]; then
-      set +x
-  fi
-  foldable end run_veristat_${VERISTAT_TARGET}
-}
-
 foldable end vm_init
 
 foldable start kernel_config "Kconfig"
