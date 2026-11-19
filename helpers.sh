@@ -37,6 +37,22 @@ print_notice() {
   __print notice $1 $2
 }
 
+# $1 - number of attempts
+# $2... - command to run
+retry() {
+  local attempts=$1 delay=15 i
+  shift
+  for ((i = 1; i <= attempts; i++)); do
+    "$@" && return 0
+    if ((i < attempts)); then
+      echo "::warning::'$*' failed (attempt $i/$attempts), retrying in ${delay}s"
+      sleep $delay
+      delay=$((delay * 2))
+    fi
+  done
+  return 1
+}
+
 # No arguments
 llvm_default_version() {
   echo "17"

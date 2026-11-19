@@ -23,7 +23,7 @@ mkdir -p pahole
 cd pahole
 git init
 git remote add origin ${PAHOLE_ORIGIN}
-git fetch --depth=1 origin "${PAHOLE_BRANCH}"
+retry 3 git fetch --depth=1 origin "${PAHOLE_BRANCH}"
 git checkout "${PAHOLE_BRANCH}"
 
 cmake -Bbuild -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/usr
