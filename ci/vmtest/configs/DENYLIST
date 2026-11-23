@@ -2,3 +2,4 @@ file_reader
 verif_scale_pyperf600
 sockmap_basic/sockmap udp multi channels
 map_kptr
+verifier_linked_scalars/alu32_negative_offset
