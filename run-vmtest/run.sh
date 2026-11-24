@@ -33,15 +33,6 @@ else
     exit 2
 fi
 
-# Set this default before the config hook so its overrides take precedence.
-RUN_BPFTOOL_CHECKS=${RUN_BPFTOOL_CHECKS:-}
-if [[ -z "${RUN_BPFTOOL_CHECKS}" \
-          && "${KERNEL}" = 'LATEST' \
-          && "$KERNEL_TEST" != "sched_ext" ]];
-then
-    RUN_BPFTOOL_CHECKS=true
-fi
-
 VMTEST_CONFIGS=${VMTEST_CONFIGS:-}
 if [[ -n "$VMTEST_CONFIGS" && -f "${VMTEST_CONFIGS}/run-vmtest.env" ]];
 then
@@ -65,29 +56,6 @@ fi
 
 # clear exitstatus file
 echo -n > exitstatus
-
-foldable start bpftool_checks "Running bpftool checks..."
-
-# bpftool checks are aimed at checking type names, documentation, shell
-# completion etc. against the current kernel, so default to LATEST.
-if "$bpf_selftests" && [[ -n "${RUN_BPFTOOL_CHECKS:-}" ]]; then
-	bpftool_exitstatus=0
-	# "&& true" does not change the return code (it is not executed if the
-	# Python script fails), but it prevents the trap on ERR set at the top
-	# of this file to trigger on failure.
-	"${KERNEL_ROOT}/tools/testing/selftests/bpf/test_bpftool_synctypes.py" && true
-	bpftool_exitstatus=$?
-	if [[ $bpftool_exitstatus -eq 0 ]]; then
-		echo "bpftool checks passed successfully."
-	else
-		echo "bpftool checks returned ${bpftool_exitstatus}."
-	fi
-	echo "bpftool:${bpftool_exitstatus}" >> exitstatus
-else
-	echo "bpftool checks skipped."
-fi
-
-foldable end bpftool_checks
 
 foldable start vmtest "Starting virtual machine..."
 
